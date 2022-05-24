@@ -16,8 +16,14 @@ class lcdClass:
             self.i2c = SMBus()
             self.i2c.open(1)
         #
+        self.setup()
         self.init_LCD()
 
+    def setup(self):
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(self.RS, GPIO.OUT)
+        GPIO.setup(self.E, GPIO.OUT)
+    
     def init_LCD(self):
         self.send_instruction(0b00111000)
         self.send_instruction(0b00001111)
@@ -41,14 +47,14 @@ class lcdClass:
         for char in text:
             self.teller += 1
             self.send_character(ord(char))
-            if(self.teller == 16):
-                if(self.rij == 1):
-                    self.rij += 1
-                    self.second_row()
-                elif(self.rij == 2):
-                    self.rij = 1
-                    self.first_row()
-                self.teller = 0
+            # if(self.teller == 16):
+            #     if(self.rij == 1):
+            #         self.rij += 1
+            #         self.second_row()
+            #     elif(self.rij == 2):
+            #         self.rij = 1
+            #         self.first_row()
+            #     self.teller = 0
 
     def set_data_bits(self, value):
         if self.pcf == False:
@@ -61,6 +67,7 @@ class lcdClass:
                 mask = mask << 1
         else:
             self.i2c.write_byte(0x20, value)
+            # print(self.i2c.read_byte(0x20))
 
     def reset_lcd(self):
         self.send_instruction(0b00000001)
