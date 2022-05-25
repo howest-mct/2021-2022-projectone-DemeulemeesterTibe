@@ -1,4 +1,3 @@
-from cgitb import reset
 from helpers.lcdClass import lcdClass
 from helpers.klasseknop import Button
 from helpers.spiclass import SpiClass
@@ -14,7 +13,7 @@ joyBtn = Button(19)
 btn = Button(12)
 lcdStatus = 0
 vorips = ""
-vortijd = "gggggggg"
+tijd = ""
 teller = 4
 minldr = 1023
 maxldr = 0
@@ -27,20 +26,19 @@ spi = SpiClass(0,0)
 lcd = lcdClass(rs,e,None,True)
 
 def lees_knop(pin):
-    global lcdStatus,vortijd,vorips
+    global lcdStatus,tijd,vorips
     if btn.pressed:
         lcdStatus += 1
         if lcdStatus >= 2:
             lcdStatus = 0
             vorips = ""
-        vortijd = "gggggggg"
+        tijd = "gggggggg"
         lcd.reset_lcd()
 
 def joy_knop(pin):
     # wordt random ingedrukt
-    global lcdStatus,vortijd
+    global lcdStatus,tijd
     if joyBtn.pressed:
-        print("dfdsfq")
         if lcdStatus == 1 or lcdStatus == 3:
             if lcdStatus == 3:
                 lcdStatus = 1
@@ -54,15 +52,14 @@ def setup():
     btn.on_press(lees_knop)
     joyBtn.on_press(joy_knop)
 
-def displayStatus(y,x):
-    global lcdStatus, vorips , vortijd , teller , joyTimer , wekker
+def displayStatus(lcdStatus,y,x):
+    global vorips , tijd , teller , joyTimer , wekker
     if lcdStatus == 0:
         lcd.reset_cursor()
         ips = check_output(["hostname", "-I"])
         ips = ips.decode("utf-8")
         lijst = ips.split()
         if ips != vorips:
-            print("nieuw ip")
             for i in range(0, 2):
                 if (i % 2) == 0:
                     lcd.second_row()
@@ -71,15 +68,15 @@ def displayStatus(y,x):
                 lcd.write_message(lijst[i])
         vorips = ips
     elif lcdStatus == 1:
-        tijd = time.strftime("%H:%M:%S")
-        if vortijd != tijd:
+        huidigetijd = time.strftime("%H:%M:%S")
+        if tijd != huidigetijd:
             t = 0
-            for (a, b) in zip(tijd, vortijd):
+            for (a, b) in zip(huidigetijd, tijd):
                 if a !=b:
                     lcd.set_cursor(4+t)
                     lcd.write_message(a)
                 t += 1
-        vortijd = tijd
+        tijd = huidigetijd
     elif lcdStatus == 3:
         timer = time.time()
         # print("timer",timer,"joytimer",joyTimer)
@@ -87,19 +84,19 @@ def displayStatus(y,x):
             # print("test")
             if x > 1000:
                 teller += 1
-                cijfer = vortijd[teller-4:teller-3]
+                cijfer = tijd[teller-4:teller-3]
                 # als hij op een : komt 1 skippen
                 if cijfer == ":":
                     teller += 1
                 # checken als teller groter is dan lengte tijd
-                if teller -4  > len(vortijd)-1:
-                    print("groter")
+                if teller -4  > len(tijd)-1:
+                    print("terug naar begin\t",len(tijd))
                     teller = 4
                 lcd.set_cursor(teller)
                 joyTimer = time.time()
             elif x < 10:
                 teller -= 1
-                cijfer = vortijd[teller-4:teller-3]
+                cijfer = tijd[teller-4:teller-3]
                 # als hij op een : komt 1 skippen
                 if cijfer == ":":
                     teller -= 1
@@ -110,39 +107,14 @@ def displayStatus(y,x):
                 lcd.set_cursor(teller)
                 joyTimer = time.time()
             if y > 1000:
-                # cijfer = int(vortijd[teller-4:teller-3])
-                # cijfer += 1
-                # if cijfer >= 10:
-                #     cijfer = 0
-                # vortijd = vortijd[0:teller-4] + str(cijfer) + vortijd[teller-3::]
-                # print("naar boven",cijfer)
-                # lcd.set_cursor(4)
-                # lcd.write_message(vortijd)
-                # lcd.set_cursor(teller)
-                # joyTimer = time.time()
-                joyTimer = getal_veranderen(teller,True)
+                print("boven")
+                joyTimer = getal_veranderen(teller,tijd)
             elif y < 10:
-                # cijfer = int(vortijd[teller-4:teller-3])
-                # cijfer -= 1
-                # if cijfer <= -1:
-                #     cijfer = 9
-                # # print("test",vortijd[teller-5:teller-4],vortijd[teller-3::])
-                # vortijd = vortijd[0:teller-4] + str(cijfer) + vortijd[teller-3::]
-                # print("naar beneden",cijfer)
-                # lcd.set_cursor(4)
-                # lcd.write_message(vortijd)
-                # lcd.set_cursor(teller)
-                # joyTimer = time.time()
-                joyTimer = getal_veranderen(teller)
-                
+                joyTimer = getal_veranderen(teller,tijd,True)
 
-            # print(teller)
-        # print("X",x,"\nY",y)
-
-def getal_veranderen(teller,plus=False):
-    print("functie")
-    global vortijd
-    cijfer = int(vortijd[teller-4:teller-3])
+def getal_veranderen(teller,vortijd,plus=False):
+    global tijd
+    cijfer = int(tijd[teller-4])
     if plus is False:
         cijfer -= 1
     else:
@@ -151,15 +123,40 @@ def getal_veranderen(teller,plus=False):
         cijfer = 9
     elif cijfer >= 10:
         cijfer = 0
-    # print("test",vortijd[teller-5:teller-4],vortijd[teller-3::])
-    vortijd = vortijd[0:teller-4] + str(cijfer) + vortijd[teller-3::]
-    print("naar beneden",cijfer)
-    lcd.set_cursor(4)
-    lcd.write_message(vortijd)
+    tijd = tijd[0:teller-4] + str(cijfer) + tijd[teller-3::]
+    # lcd.set_cursor(4)
+    # lcd.write_message(tijd)
+    tijd = checkdeel(tijd)
+    print("#", tijd)
+    t = 0
+    for (a, b) in zip(vortijd, tijd):
+        if a !=b:
+            lcd.set_cursor(4+t)
+            lcd.write_message(b)
+        t += 1
     lcd.set_cursor(teller)
     joyTimer = time.time()
     return joyTimer
 
+def checkdeel(tijd):
+    delen = tijd.split(":")
+    string = ""
+    for deel in range(0,len(delen)):
+        if deel == 0:
+            print("M",delen[deel])
+            if int(delen[deel]) >= 25:
+                delen[deel] = "24"
+        else:
+            print("M",delen[deel])
+            if int(delen[deel]) >= 61:
+                delen[deel] = "00"
+        string += str(delen[deel])
+        if deel != 2:
+            string += ":"
+        # print(delen[deel])
+    # return f"{delen[0]}:{delen[0]}:{delen[0]}"
+    print(">", string)
+    return string
 
 try:
     setup()
@@ -167,7 +164,7 @@ try:
         joyY = spi.readChannel(0)
         joyX = spi.readChannel(1)
         waardeldr = spi.readChannel(2)
-        displayStatus(joyY,joyX)
+        displayStatus(lcdStatus,joyY,joyX)
         # ldr
         if(waardeldr < minldr):
             minldr = waardeldr
