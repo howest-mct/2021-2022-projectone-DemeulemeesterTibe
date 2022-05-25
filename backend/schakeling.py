@@ -10,12 +10,16 @@ import time
 rs = 21
 e =  20
 buzzer = 26
+joyBtn = Button(19)
 btn = Button(12)
-joyBtn = Button(16)
 lcdStatus = 0
 vorips = ""
 vortijd = "gggggggg"
 teller = 0
+minldr = 1023
+maxldr = 0
+waardeldr = 0
+lichtsterkte = 0
 # objecten
 spi = SpiClass(0,0)
 lcd = lcdClass(rs,e,None,True)
@@ -46,7 +50,7 @@ def setup():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(buzzer, GPIO.OUT)
     btn.on_press(lees_knop)
-    # joyBtn.on_press(joy_knop)
+    joyBtn.on_press(joy_knop)
 
 def displayStatus(y,x):
     global lcdStatus, vorips,vortijd,teller
@@ -75,13 +79,12 @@ def displayStatus(y,x):
                 t += 1
         vortijd = tijd
     elif lcdStatus == 3:
-        pass
-        # if x > 1000:
-        #     teller += 1
-        #     if teller > vortijd.length():
-        #         print("groter")
-        #     lcd.set_cursor(4+teller)
-        # print(teller)
+        if x > 1000:
+            teller += 1
+            if teller > len(vortijd):
+                print("groter")
+            lcd.set_cursor(4+teller)
+        print(teller)
         # print("X",x,"\nY",y)
 
 
@@ -91,7 +94,16 @@ try:
     while True:
         joyY = spi.readChannel(0)
         joyX = spi.readChannel(1)
+        waardeldr = spi.readChannel(2)
         displayStatus(joyY,joyX)
+        # ldr
+        if(waardeldr < minldr):
+            minldr = waardeldr
+        if waardeldr > maxldr:
+            maxldr = waardeldr
+        if maxldr != minldr:
+            lichtsterkte = 100 - (100*((waardeldr - minldr) / (maxldr - minldr)))
+            # print(f"Lichtsterkte: {lichtsterkte:.2f} %")
 
 except KeyboardInterrupt:
     print ('KeyboardInterrupt exception is caught')
