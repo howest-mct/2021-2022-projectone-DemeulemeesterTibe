@@ -9,45 +9,47 @@ import time
 # variabelen
 rs = 21
 e =  20
+buzzer = 26
 btn = Button(12)
 joyBtn = Button(16)
 lcdStatus = 0
 vorips = ""
 vortijd = "gggggggg"
+teller = 0
 # objecten
 spi = SpiClass(0,0)
 lcd = lcdClass(rs,e,None,True)
 
 def lees_knop(pin):
-    global lcdStatus,vortijd
+    global lcdStatus,vortijd,vorips
     if btn.pressed:
         lcdStatus += 1
         if lcdStatus >= 2:
             lcdStatus = 0
+            vorips = ""
         vortijd = "gggggggg"
         lcd.reset_lcd()
-        print(lcdStatus)
 
 def joy_knop(pin):
-    global lcdStatus,vortijd
+    # wordt random ingedrukt
+    global lcdStatus
     if joyBtn.pressed:
+        print("dfdsfq")
         if lcdStatus == 1 or lcdStatus == 3:
             if lcdStatus == 3:
                 lcdStatus = 1
             else:
                 lcdStatus = 3
-            lcd.reset_lcd()
-        vortijd = "gggggggg"
+                lcd.set_cursor(4)
 
 def setup():
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(rs, GPIO.OUT)
-    GPIO.setup(e, GPIO.OUT)
+    GPIO.setup(buzzer, GPIO.OUT)
     btn.on_press(lees_knop)
-    joyBtn.on_press(joy_knop)
+    # joyBtn.on_press(joy_knop)
 
-def displayStatus():
-    global lcdStatus, vorips,vortijd
+def displayStatus(y,x):
+    global lcdStatus, vorips,vortijd,teller
     if lcdStatus == 0:
         lcd.reset_cursor()
         ips = check_output(["hostname", "-I"])
@@ -73,17 +75,23 @@ def displayStatus():
                 t += 1
         vortijd = tijd
     elif lcdStatus == 3:
-        lcd.write_message("test")
+        pass
+        # if x > 1000:
+        #     teller += 1
+        #     if teller > vortijd.length():
+        #         print("groter")
+        #     lcd.set_cursor(4+teller)
+        # print(teller)
+        # print("X",x,"\nY",y)
 
 
 
 try:
     setup()
     while True:
-        displayStatus()
-        print(spi.readChannel(0))
-        print(spi.readChannel(1))
-        time.sleep(1)
+        joyY = spi.readChannel(0)
+        joyX = spi.readChannel(1)
+        displayStatus(joyY,joyX)
 
 except KeyboardInterrupt:
     print ('KeyboardInterrupt exception is caught')
