@@ -144,17 +144,18 @@ def checkdeel(tijd):
     for deel in range(0,len(delen)):
         if deel == 0:
             print("M",delen[deel])
-            if int(delen[deel]) >= 25:
-                delen[deel] = "24"
+            if int(delen[deel]) >= 24:
+                delen[deel] = "23"
         else:
-            print("M",delen[deel])
-            if int(delen[deel]) >= 61:
-                delen[deel] = "00"
+            print("N",delen[deel])
+            # if int(delen[deel]) == 90:
+            #     delen[deel] = "60"
+            if int(delen[deel]) >= 60:
+                delen[deel] = "59"
+            
         string += str(delen[deel])
         if deel != 2:
             string += ":"
-        # print(delen[deel])
-    # return f"{delen[0]}:{delen[0]}:{delen[0]}"
     print(">", string)
     return string
 
