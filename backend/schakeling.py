@@ -2,17 +2,24 @@ from helpers.lcdClass import lcdClass
 from helpers.klasseknop import Button
 from helpers.spiclass import SpiClass
 from subprocess import check_output
+# from hx711 import HX711
 from RPi import GPIO
 import time
 
 # variabelen
+dtWeight = 6
+clkWeight = 13
+
+alarmopScherm = True
 rs = 21
 e =  20
-buzzer = 26
+buzz = 26
+buzzer = ""
 joyBtn = Button(19)
 btn = Button(12)
 lcdStatus = 0
 vorips = ""
+huidigetijd = 0
 tijd = ""
 teller = 4
 minldr = 1023
@@ -20,10 +27,12 @@ maxldr = 0
 waardeldr = 0
 lichtsterkte = 0
 joyTimer = time.time()
-alarm = ""
+alarm = "14:32:10"
+aan = False
 # objecten
 spi = SpiClass(0,0)
 lcd = lcdClass(rs,e,None,True)
+# hx = HX711(dtWeight,clkWeight)
 
 def lees_knop(pin):
     global lcdStatus,tijd,vorips
@@ -37,40 +46,44 @@ def lees_knop(pin):
 
 def joy_knop(pin):
     # wordt random ingedrukt
-    global lcdStatus,tijd,alarm
+    global lcdStatus,tijd,alarm,alarmopScherm
     if joyBtn.pressed:
         if lcdStatus == 1 or lcdStatus == 3:
             if lcdStatus == 3:
                 lcdStatus = 1
                 alarm = tijd
+                alarmopScherm = True
                 print("alarm",alarm)
             else:
                 lcdStatus = 3
                 lcd.set_cursor(4)
 
 def setup():
+    global buzzer
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(buzzer, GPIO.OUT)
+    GPIO.setup(buzz, GPIO.OUT)
+    buzzer = GPIO.PWM(buzz,440)
+    buzzer.start(0)
     btn.on_press(lees_knop)
     joyBtn.on_press(joy_knop)
 
 def displayStatus(lcdStatus,y,x):
-    global vorips , tijd , teller , joyTimer , alarm
+    global vorips , tijd , teller , joyTimer , alarmopScherm, huidigetijd
     if lcdStatus == 0:
         lcd.reset_cursor()
         ips = check_output(["hostname", "-I"])
         ips = ips.decode("utf-8")
         lijst = ips.split()
         if ips != vorips:
-            for i in range(0, 2):
-                if (i % 2) == 0:
-                    lcd.second_row()
-                else:
-                    lcd.first_row()
-                lcd.write_message(lijst[i])
+            for i in range(0, len(lijst)):
+                if i <2:
+                    if (i % 2) == 0:
+                        lcd.second_row()
+                    else:
+                        lcd.first_row()
+                    lcd.write_message(lijst[i])
         vorips = ips
     elif lcdStatus == 1:
-        huidigetijd = time.strftime("%H:%M:%S")
         if tijd != huidigetijd:
             t = 0
             for (a, b) in zip(huidigetijd, tijd):
@@ -78,15 +91,16 @@ def displayStatus(lcdStatus,y,x):
                     lcd.set_cursor(4+t)
                     lcd.write_message(a)
                 t += 1
-        tijd = huidigetijd
-        if alarm != "":
+            tijd = huidigetijd
+        if alarmopScherm is True:
+            print("test")
             lcd.set_cursor(64)
             lcd.write_message(f"Alarm: {alarm}")
+            test = False
+            
     elif lcdStatus == 3:
         timer = time.time()
-        # print("timer",timer,"joytimer",joyTimer)
         if timer - joyTimer >=0.5:
-            # print("test")
             if x > 1000:
                 teller += 1
                 cijfer = tijd[teller-4:teller-3]
@@ -166,11 +180,12 @@ def checkdeel(tijd):
 try:
     setup()
     while True:
+        huidigetijd = time.strftime("%H:%M:%S")
         joyY = spi.readChannel(0)
         joyX = spi.readChannel(1)
-        waardeldr = spi.readChannel(2)
         displayStatus(lcdStatus,joyY,joyX)
         # ldr
+        waardeldr = spi.readChannel(2)
         if(waardeldr < minldr):
             minldr = waardeldr
         if waardeldr > maxldr:
@@ -178,6 +193,11 @@ try:
         if maxldr != minldr:
             lichtsterkte = 100 - (100*((waardeldr - minldr) / (maxldr - minldr)))
             # print(f"Lichtsterkte: {lichtsterkte:.2f} %")
+        # print(huidigetijd,alarm)
+        if huidigetijd == alarm:
+            aan = True
+        if aan == True:
+            print("buzzen")
 
 except KeyboardInterrupt:
     print ('KeyboardInterrupt exception is caught')
