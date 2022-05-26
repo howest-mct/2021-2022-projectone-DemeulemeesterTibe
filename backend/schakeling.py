@@ -10,7 +10,7 @@ import time
 dtWeight = 6
 clkWeight = 13
 
-alarmopScherm = True
+alarmopScherm = False
 rs = 21
 e =  20
 buzz = 26
@@ -27,7 +27,7 @@ maxldr = 0
 waardeldr = 0
 lichtsterkte = 0
 joyTimer = time.time()
-alarm = "14:32:10"
+alarm = ""
 aan = False
 # objecten
 spi = SpiClass(0,0)
@@ -86,6 +86,7 @@ def displayStatus(lcdStatus,y,x):
     elif lcdStatus == 1:
         if tijd != huidigetijd:
             t = 0
+            # print(zip(huidigetijd, tijd))
             for (a, b) in zip(huidigetijd, tijd):
                 if a !=b:
                     lcd.set_cursor(4+t)
