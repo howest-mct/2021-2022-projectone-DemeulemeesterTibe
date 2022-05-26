@@ -20,7 +20,7 @@ maxldr = 0
 waardeldr = 0
 lichtsterkte = 0
 joyTimer = time.time()
-wekker = 0
+alarm = ""
 # objecten
 spi = SpiClass(0,0)
 lcd = lcdClass(rs,e,None,True)
@@ -37,11 +37,13 @@ def lees_knop(pin):
 
 def joy_knop(pin):
     # wordt random ingedrukt
-    global lcdStatus,tijd
+    global lcdStatus,tijd,alarm
     if joyBtn.pressed:
         if lcdStatus == 1 or lcdStatus == 3:
             if lcdStatus == 3:
                 lcdStatus = 1
+                alarm = tijd
+                print("alarm",alarm)
             else:
                 lcdStatus = 3
                 lcd.set_cursor(4)
@@ -53,7 +55,7 @@ def setup():
     joyBtn.on_press(joy_knop)
 
 def displayStatus(lcdStatus,y,x):
-    global vorips , tijd , teller , joyTimer , wekker
+    global vorips , tijd , teller , joyTimer , alarm
     if lcdStatus == 0:
         lcd.reset_cursor()
         ips = check_output(["hostname", "-I"])
@@ -77,6 +79,9 @@ def displayStatus(lcdStatus,y,x):
                     lcd.write_message(a)
                 t += 1
         tijd = huidigetijd
+        if alarm != "":
+            lcd.set_cursor(64)
+            lcd.write_message(f"Alarm: {alarm}")
     elif lcdStatus == 3:
         timer = time.time()
         # print("timer",timer,"joytimer",joyTimer)
@@ -107,7 +112,6 @@ def displayStatus(lcdStatus,y,x):
                 lcd.set_cursor(teller)
                 joyTimer = time.time()
             if y > 1000:
-                print("boven")
                 joyTimer = getal_veranderen(teller,tijd)
             elif y < 10:
                 joyTimer = getal_veranderen(teller,tijd,True)
@@ -127,7 +131,7 @@ def getal_veranderen(teller,vortijd,plus=False):
     # lcd.set_cursor(4)
     # lcd.write_message(tijd)
     tijd = checkdeel(tijd)
-    print("#", tijd)
+    # print("#", tijd)
     t = 0
     for (a, b) in zip(vortijd, tijd):
         if a !=b:
@@ -143,11 +147,11 @@ def checkdeel(tijd):
     string = ""
     for deel in range(0,len(delen)):
         if deel == 0:
-            print("M",delen[deel])
+            # print("M",delen[deel])
             if int(delen[deel]) >= 24:
                 delen[deel] = "23"
         else:
-            print("N",delen[deel])
+            # print("N",delen[deel])
             # if int(delen[deel]) == 90:
             #     delen[deel] = "60"
             if int(delen[deel]) >= 60:
@@ -156,7 +160,7 @@ def checkdeel(tijd):
         string += str(delen[deel])
         if deel != 2:
             string += ":"
-    print(">", string)
+    # print(">", string)
     return string
 
 try:
