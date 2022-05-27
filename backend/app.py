@@ -9,7 +9,7 @@ import threading
 from subprocess import check_output
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from repositories.DataRepository import DataRepository
 
 from selenium import webdriver
@@ -101,11 +101,11 @@ def codeSchakeling():
         if timer - timerldr >= 60:
             print("LDR inlezen") 
             timerldr = time.time()
-            insert = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),lichtsterkte,None,2,1)
-            print(insert)
-            data = DataRepository.read_historiek_by_id(insert)
-            print(data)
-            socketio.emit('B2F_verandering_ldr', {'ldr': data}, broadcast=True)
+            # insert = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),lichtsterkte,None,2,1)
+            # print(insert)
+            # data = DataRepository.read_historiek_by_id(insert)
+            # print(data)
+            # socketio.emit('B2F_verandering_ldr', {'ldr': data}, broadcast=True)
         # alarm 
         if huidigetijd == alarm:
             aan = True
@@ -244,6 +244,19 @@ def error_handler(e):
 @app.route('/')
 def hallo():
     return "Server is running, er zijn momenteel geen API endpoints beschikbaar."
+
+@app.route('/api/alarm/',methods=["GET","POST"])
+def alarmen():
+    if request.method == "GET":
+        data = DataRepository.read_alarmen()
+        if data is not None:
+            return jsonify(alarmen=data),200
+    elif request.method == "POST":
+        gegevens = DataRepository.json_or_formdata(request)
+        print(gegevens)
+        data = DataRepository.insert_alarm(gegevens["naam"],gegevens["tijd"])
+        return jsonify(alarmid=data),201
+            
 
 
 

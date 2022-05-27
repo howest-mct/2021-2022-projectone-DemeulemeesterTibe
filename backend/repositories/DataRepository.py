@@ -22,6 +22,18 @@ class DataRepository:
         params = [id]
         return Database.get_one_row(sql, params)
     
+    @staticmethod
+    def read_alarmen():
+        sql = "SELECT *,dayname(tijd) as dag,concat(time(tijd)) as tijdstip FROM alarm"
+        return Database.get_rows(sql)
+
+    @staticmethod
+    def insert_alarm(naam,tijd):
+        sql = "insert into alarm (naam,tijd) VALUES (%s,%s)"
+        params = [naam,tijd]
+        print("test",params)
+        return Database.execute_sql(sql,params)
+    
 
     # @staticmethod
     # def read_status_lampen():
