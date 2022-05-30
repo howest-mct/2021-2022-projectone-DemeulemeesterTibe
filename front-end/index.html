@@ -81,12 +81,14 @@
             <br>
             <button class="js-makealarm"> Submit</button>
             <h1>RGB Ring</h1>
-            <input type="color" name="" class="js-color" value="#ff00ff" id="">
+            <input type="color" class="js-color" value="#ff00ff" id="">
             <br>
+            <input type="range" class="js-brightness" id="" min="0" max="1" step="0.05">
+            <button class="js-setbrightness"> Set Brightness</button>
             <button class="js-setcolor"> Set color</button>
             <button class="js-rgbtoggle"> Turn on</button>
             <div class="c-alarmen-list js-alarmen">
-                <a class="c-alarm" href="detail.html?id=x">
+                <div class="c-alarm" href="detail.html?id=x">
                     <div class="c-alarm__content">
                         <h2 class="c-alarm__title">Titel</h2>
                         <h3 class="c-alarm__day">Dagvandeweek</h3>
@@ -94,7 +96,7 @@
                                 class="c-alarm__tot">10u</span></div>
                         <p class="c-alarm__description">Bla bla bla</p>
                     </div>
-                </a>
+                </div>
                 <a class="c-alarm" href="detail.html?id=x">
                     <div class="c-alarm__content">
                         <h2 class="c-alarm__title">Titel</h2>

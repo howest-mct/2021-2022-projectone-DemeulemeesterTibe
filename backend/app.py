@@ -276,11 +276,7 @@ def historiek():
         print(gegevens)
         data = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),gegevens["color"],None,gegevens["deviceID"],gegevens["actieID"])
         return jsonify(historiekID=data),201
-    elif request.method == "GET":
-        return jsonify(status="efhuizfhuiifupphuifhupifzhpuifhuizfhui")
             
-
-
 
 @socketio.on('connect')
 def initial_connection():
@@ -300,15 +296,25 @@ def setColor(payload):
     print("RGB",Red,Green,Blue)
     socketio.emit("B2F_SetColor",{"red":Red,"green":Green,"blue":Blue},broadcast=True)
 
-
-
 @socketio.on("F2B_RGBring")
 def setRing(payload):
     global ring
-    if payload["aan"] == 1:
-        ring = True
     ring = payload["aan"]
-    print(ring)
+    if payload["aan"] == 1:
+        id = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),None,None,4,3)
+    else:
+        id = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),None,None,4,4)
+
+@socketio.on("F2B_Addalarm")
+def setRing(payload):
+    socketio.emit("B2F_Addalarm")
+
+@socketio.on("F2B_SetBrightness")
+def setRing(payload):
+    pixels.brightness = float(payload["brightness"])
+    socketio.emit("B2F_SetBrightness",{"brightness": payload["brightness"]})
+
+
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
 

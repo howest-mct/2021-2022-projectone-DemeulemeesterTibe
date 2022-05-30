@@ -8,16 +8,13 @@ let RingAan = 0;
 
 //#region ***  Callback-Visualisation - show___         ***********
 const showResultAddAlarm = function (jsonObject) {
-  console.log('fout');
   console.log(jsonObject);
-  getAlarmen();
+  socket.emit('F2B_Addalarm', { alarmID: jsonObject });
 };
 const showAlarmen = function (jsonObject) {
-  console.log(jsonObject);
   const alarmen = document.querySelector('.c-alarmen-list');
   let html = '';
   for (alarm of jsonObject.alarmen) {
-    console.log(alarm);
     html += `<a class="c-alarm" href="detail.html?id=${alarm.alarmID}">
                     <div class="c-alarm__content">
                         <h2 class="c-alarm__title">${alarm.naam}</h2>
@@ -33,7 +30,7 @@ const showResultAddColor = function (jsonObject) {
   console.log('historiek', jsonObject);
 };
 const showError = function (err) {
-  console.log(err);
+  console.error(err);
 };
 //#endregion
 
@@ -86,6 +83,13 @@ const listenToSocket = function () {
     console.log('HEXCODE', hexcode);
     document.querySelector('.js-color').value = hexcode;
   });
+  socket.on('B2F_SetBrightness', function (jsonObject) {
+    console.log(jsonObject['brightness']);
+    document.querySelector('.js-brightness').value = jsonObject['brightness'];
+  });
+  socket.on('B2F_Addalarm', function () {
+    getAlarmen();
+  });
 };
 const listenToUI = function () {
   document
@@ -97,6 +101,9 @@ const listenToUI = function () {
   document
     .querySelector('.js-rgbtoggle')
     .addEventListener('click', listenToRgbToggle);
+  document
+    .querySelector('.js-setbrightness')
+    .addEventListener('click', listenToSetBrightness);
 };
 const listenToCreateAlarm = function () {
   let t = document.querySelector('.js-alarm').value;
@@ -132,6 +139,11 @@ const listenToRgbToggle = function () {
   }
   socket.emit('F2B_RGBring', { aan: RingAan });
   console.log(RingAan);
+};
+const listenToSetBrightness = function () {
+  const brightness = document.querySelector('.js-brightness').value;
+  console.log(brightness);
+  socket.emit('F2B_SetBrightness', { brightness: brightness });
 };
 //#endregion
 
