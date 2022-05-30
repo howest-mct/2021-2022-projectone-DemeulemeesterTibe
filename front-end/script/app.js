@@ -15,7 +15,7 @@ const showAlarmen = function (jsonObject) {
   const alarmen = document.querySelector('.c-alarmen-list');
   let html = '';
   for (alarm of jsonObject.alarmen) {
-    html += `<a class="c-alarm" href="detail.html?id=${alarm.alarmID}">
+    html += `<a class="c-alarm" href="detail.html?alarmid=${alarm.alarmID}">
                     <div class="c-alarm__content">
                         <h2 class="c-alarm__title">${alarm.naam}</h2>
                         <h3 class="c-alarm__day">${alarm.dag}</h3>
@@ -150,10 +150,18 @@ const listenToSetBrightness = function () {
 //#region ***  Init / DOMContentLoaded                  ***********
 
 const init = function () {
-  getAlarmen();
-  toggleNav();
-  listenToSocket();
-  listenToUI();
+  if (document.querySelector('.js-alarmen')) {
+    getAlarmen();
+    toggleNav();
+    listenToSocket();
+    listenToUI();
+    console.log('test');
+  } else if (document.querySelector('.js-updatealarm')) {
+    console.log('detail');
+    let urlParams = new URLSearchParams(window.location.search);
+    alarmid = urlParams.get('alarmid');
+    console.log(alarmid);
+  }
 };
 
 document.addEventListener('DOMContentLoaded', init);
