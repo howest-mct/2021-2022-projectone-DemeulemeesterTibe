@@ -34,7 +34,6 @@ class DataRepository:
         print("test",params)
         return Database.execute_sql(sql,params)
     
-
     # @staticmethod
     # def read_status_lampen():
     #     sql = "SELECT * from lampen"

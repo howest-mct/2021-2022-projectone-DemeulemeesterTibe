@@ -86,7 +86,6 @@ def displayStatus(lcdStatus,y,x):
     elif lcdStatus == 1:
         if tijd != huidigetijd:
             t = 0
-            # print(zip(huidigetijd, tijd))
             for (a, b) in zip(huidigetijd, tijd):
                 if a !=b:
                     lcd.set_cursor(4+t)

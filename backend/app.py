@@ -11,6 +11,8 @@ from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send
 from flask import Flask, jsonify, request
 from repositories.DataRepository import DataRepository
+import neopixel
+import board
 
 from selenium import webdriver
 
@@ -21,31 +23,36 @@ from selenium import webdriver
 dtWeight = 6
 clkWeight = 13
 
-alarmopScherm = True
+Red = 0
+Green = 0
+Blue = 0
+alarmopScherm = False
 rs = 21
 e =  20
 buzz = 26
 buzzer = ""
 lcdStatus = 0
 vorips = ""
-huidigetijd = 0
+huidigetijd = "fddfsdf"
 tijd = ""
 teller = 4
 minldr = 1023
 maxldr = 0
 waardeldr = 0
 lichtsterkte = 0
-joyTimer = time.time()
 alarm = ""
 aan = False
 timer = 0
-timerldr = time.time()
+ring = False
 # objecten
+joyTimer = time.time()
+timerldr = time.time()
 joyBtn = Button(19)
 btn = Button(12)
 spi = SpiClass(0,0)
 lcd = lcdClass(rs,e,None,True)
-# hx = HX711(dtWeight,clkWeight)
+pixels = neopixel.NeoPixel(board.D18,12)
+hx = HX711(dtWeight,clkWeight)
 
 # Code voor Hardware
 def setup_gpio():
@@ -82,7 +89,7 @@ def joy_knop(pin):
                 lcd.set_cursor(4)
 
 def codeSchakeling():
-    global minldr,maxldr,aan,timer,timerldr
+    global minldr,maxldr,aan,timer,timerldr,pixels,huidigetijd
     while True:
         timer = time.time()
         huidigetijd = time.strftime("%H:%M:%S")
@@ -111,6 +118,11 @@ def codeSchakeling():
             aan = True
         if aan == True:
             print("buzzen")
+        if ring == 1:
+            pixels.fill((Red,Green,Blue))
+        elif ring == 0:
+            pixels.fill((0,0,0))
+
 
 def displayStatus(lcdStatus,y,x):
     global vorips , tijd , teller , joyTimer , alarmopScherm, huidigetijd,timer
@@ -128,7 +140,7 @@ def displayStatus(lcdStatus,y,x):
                         lcd.first_row()
                     lcd.write_message(lijst[i])
         vorips = ips
-    elif lcdStatus == 2:
+    elif lcdStatus == 1:
         if tijd != huidigetijd:
             t = 0
             for (a, b) in zip(huidigetijd, tijd):
@@ -256,6 +268,16 @@ def alarmen():
         print(gegevens)
         data = DataRepository.insert_alarm(gegevens["naam"],gegevens["tijd"])
         return jsonify(alarmid=data),201
+
+@app.route('/api/historiek/',methods=["GET","POST"])
+def historiek():
+    if request.method == "POST":
+        gegevens = DataRepository.json_or_formdata(request)
+        print(gegevens)
+        data = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),gegevens["color"],None,gegevens["deviceID"],gegevens["actieID"])
+        return jsonify(historiekID=data),201
+    elif request.method == "GET":
+        return jsonify(status="efhuizfhuiifupphuifhupifzhpuifhuizfhui")
             
 
 
@@ -263,14 +285,30 @@ def alarmen():
 @socketio.on('connect')
 def initial_connection():
     print('A new client connect')
-    # # Send to the client!
-    # vraag de status op van de lampen uit de DB
-    # status = DataRepository.read_status_lampen()
-    # emit('B2F_status_lampen', {'lampen': status}, broadcast=True)
-
+    # random ldr waarde op website tot volgende inlees moment
     data = DataRepository.read_historiek_by_id(20)
     socketio.emit("B2F_verandering_ldr",{'ldr': data}, broadcast=True)
 
+@socketio.on("F2B_SetColor")
+def setColor(payload):
+    global Red,Green,Blue
+    print("---------- Set Color ----------")
+    RGB = payload["color"].split(",")
+    Red = int(RGB[0])
+    Green = int(RGB[1])
+    Blue = int(RGB[2])
+    print("RGB",Red,Green,Blue)
+    socketio.emit("B2F_SetColor",{"red":Red,"green":Green,"blue":Blue},broadcast=True)
+
+
+
+@socketio.on("F2B_RGBring")
+def setRing(payload):
+    global ring
+    if payload["aan"] == 1:
+        ring = True
+    ring = payload["aan"]
+    print(ring)
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
 
@@ -323,12 +361,13 @@ if __name__ == '__main__':
     try:
         setup_gpio()
         start_thread()
-        start_chrome_thread()
+        # start_chrome_thread()
         print("**** Starting APP ****")
         socketio.run(app, debug=False, host='0.0.0.0')
     except KeyboardInterrupt:
         print ('KeyboardInterrupt exception is caught')
     finally:
         lcd.reset_lcd()
+        pixels.deinit()
         GPIO.cleanup()
 
