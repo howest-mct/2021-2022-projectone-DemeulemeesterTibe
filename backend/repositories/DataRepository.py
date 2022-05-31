@@ -26,6 +26,18 @@ class DataRepository:
     def read_alarmen():
         sql = "SELECT *,dayname(tijd) as dag,concat(time(tijd)) as tijdstip FROM alarm"
         return Database.get_rows(sql)
+    
+    @staticmethod
+    def read_alarm_by_id(id):
+        sql = "SELECT *,dayname(tijd) as dag,concat(time(tijd)) as tijdstip,concat(tijd) as datetime FROM alarm WHERE alarmid = %s"
+        payload = [id]
+        return Database.get_one_row(sql,payload)
+    
+    @staticmethod
+    def delete_alarm_by_id(id):
+        sql = "DELETE FROM alarm WHERE alarmid = %s"
+        payload = [id]
+        return Database.execute_sql(sql,payload)
 
     @staticmethod
     def insert_alarm(naam,tijd):

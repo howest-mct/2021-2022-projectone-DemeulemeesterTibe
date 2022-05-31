@@ -32,6 +32,17 @@ const showResultAddColor = function (jsonObject) {
 const showError = function (err) {
   console.error(err);
 };
+const showAlarm = function (jsonObject) {
+  console.log(jsonObject);
+  document.querySelector('.js-alarmid').value = jsonObject.alarm.alarmID;
+  document.querySelector('.js-naam').value = jsonObject.alarm.naam;
+  let time = jsonObject.alarm.datetime;
+  time = time.replace(' ', 'T');
+  document.querySelector('.js-tijdstip').value = time;
+};
+const showResultDelAlarm = function (jsonObject) {
+  console.log(jsonObject);
+};
 //#endregion
 
 //#region ***  Callback-No Visualisation - callback___  ***********
@@ -54,6 +65,11 @@ const rgbToHex = function (r, g, b) {
 const getAlarmen = function () {
   const url = 'http://192.168.168.169:5000/api/alarm/';
   handleData(url, showAlarmen, showError);
+};
+const getAlarm = function (id) {
+  console.log(id);
+  const url = `http://192.168.168.169:5000/api/alarm/${id}/`;
+  handleData(url, showAlarm, showError);
 };
 //#endregion
 
@@ -92,18 +108,27 @@ const listenToSocket = function () {
   });
 };
 const listenToUI = function () {
-  document
-    .querySelector('.js-makealarm')
-    .addEventListener('click', listenToCreateAlarm);
-  document
-    .querySelector('.js-setcolor')
-    .addEventListener('click', listenToSetColor);
-  document
-    .querySelector('.js-rgbtoggle')
-    .addEventListener('click', listenToRgbToggle);
-  document
-    .querySelector('.js-setbrightness')
-    .addEventListener('click', listenToSetBrightness);
+  if (document.querySelector('.js-alarmen')) {
+    document
+      .querySelector('.js-makealarm')
+      .addEventListener('click', listenToCreateAlarm);
+    document
+      .querySelector('.js-setcolor')
+      .addEventListener('click', listenToSetColor);
+    document
+      .querySelector('.js-rgbtoggle')
+      .addEventListener('click', listenToRgbToggle);
+    document
+      .querySelector('.js-setbrightness')
+      .addEventListener('click', listenToSetBrightness);
+  } else if (document.querySelector('.js-updatealarm')) {
+    document
+      .querySelector('.js-deletealarm')
+      .addEventListener('click', listenToDeleteAlarm);
+    document
+      .querySelector('.js-updatealarm')
+      .addEventListener('click', listenToUpdateAlarm);
+  }
 };
 const listenToCreateAlarm = function () {
   let t = document.querySelector('.js-alarm').value;
@@ -145,6 +170,11 @@ const listenToSetBrightness = function () {
   console.log(brightness);
   socket.emit('F2B_SetBrightness', { brightness: brightness });
 };
+const listenToDeleteAlarm = function (id) {
+  const url = `https://192.168.168.169:5000/api/alarm/${id}/`;
+  handleData(url, showResultDelAlarm, showError, 'DELETE');
+};
+const listenToUpdateAlarm = function () {};
 //#endregion
 
 //#region ***  Init / DOMContentLoaded                  ***********
@@ -157,10 +187,14 @@ const init = function () {
     listenToUI();
     console.log('test');
   } else if (document.querySelector('.js-updatealarm')) {
-    console.log('detail');
     let urlParams = new URLSearchParams(window.location.search);
     alarmid = urlParams.get('alarmid');
-    console.log(alarmid);
+    if (alarmid) {
+      listenToUI();
+      getAlarm(alarmid);
+    } else {
+      window.location.href = 'index.html';
+    }
   }
 };
 

@@ -1,4 +1,5 @@
 import time
+from unittest import result
 from RPi import GPIO
 from helpers.lcdClass import lcdClass
 from helpers.klasseknop import Button
@@ -269,6 +270,18 @@ def alarmen():
         data = DataRepository.insert_alarm(gegevens["naam"],gegevens["tijd"])
         return jsonify(alarmid=data),201
 
+@app.route('/api/alarm/<alarmid>/',methods=["GET","PUT","DELETE"])
+def alarmbyid(alarmid):
+    if request.method == "GET":
+        data = DataRepository.read_alarm_by_id(alarmid)
+        if data is not None:
+            return jsonify(alarm=data),200
+        else:
+            return jsonify(status="error"),404
+    elif request.method == "DELETE":
+        dele = DataRepository.delete_alarm_by_id(alarmid)
+        return jsonify(status=dele),201
+
 @app.route('/api/historiek/',methods=["GET","POST"])
 def historiek():
     if request.method == "POST":
@@ -276,7 +289,6 @@ def historiek():
         print(gegevens)
         data = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),gegevens["color"],None,gegevens["deviceID"],gegevens["actieID"])
         return jsonify(historiekID=data),201
-            
 
 @socketio.on('connect')
 def initial_connection():
