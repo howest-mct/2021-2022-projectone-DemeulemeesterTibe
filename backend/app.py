@@ -319,12 +319,23 @@ def setRing(payload):
 
 @socketio.on("F2B_Addalarm")
 def setRing(payload):
-    socketio.emit("B2F_Addalarm")
+    socketio.emit("B2F_Addalarm",broadcast=True)
 
 @socketio.on("F2B_SetBrightness")
 def setRing(payload):
     pixels.brightness = float(payload["brightness"])
-    socketio.emit("B2F_SetBrightness",{"brightness": payload["brightness"]})
+    socketio.emit("B2F_SetBrightness",{"brightness": payload["brightness"]},broadcast=True)
+
+@socketio.on("F2B_DELalarm")
+def delAlarm(payload):
+    dele = DataRepository.delete_alarm_by_id(payload["alarmid"])
+    print(dele)
+    socketio.emit("B2F_Addalarm",broadcast=True)
+
+@socketio.on("F2B_UpdateAlarm")
+def updateAlarm(payload):
+    dele = DataRepository.update_alarm_by_id(payload["alarmid"],payload["naam"],payload["tijdstip"])
+    socketio.emit("B2F_Addalarm",broadcast=True)
 
 
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op

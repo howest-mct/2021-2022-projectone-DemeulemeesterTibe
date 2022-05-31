@@ -20,7 +20,6 @@ const showAlarmen = function (jsonObject) {
                         <h2 class="c-alarm__title">${alarm.naam}</h2>
                         <h3 class="c-alarm__day">${alarm.dag}</h3>
                         <div class="c-alarm__periode"><span class="c-alarm__van">${alarm.tijdstip}</span></div>
-                        <p class="c-alarm__description">Bla bla bla</p>
                     </div>
                 </a>`;
   }
@@ -39,9 +38,6 @@ const showAlarm = function (jsonObject) {
   let time = jsonObject.alarm.datetime;
   time = time.replace(' ', 'T');
   document.querySelector('.js-tijdstip').value = time;
-};
-const showResultDelAlarm = function (jsonObject) {
-  console.log(jsonObject);
 };
 //#endregion
 
@@ -133,8 +129,6 @@ const listenToUI = function () {
 const listenToCreateAlarm = function () {
   let t = document.querySelector('.js-alarm').value;
   t = t.replace('T', ' ');
-  console.log('test');
-  test = document.querySelector('.js-alarm').value;
   const url = `http://192.168.168.169:5000/api/alarm/`;
   const payload = JSON.stringify({
     naam: document.querySelector('.js-alarmnaam').value,
@@ -170,11 +164,22 @@ const listenToSetBrightness = function () {
   console.log(brightness);
   socket.emit('F2B_SetBrightness', { brightness: brightness });
 };
-const listenToDeleteAlarm = function (id) {
-  const url = `https://192.168.168.169:5000/api/alarm/${id}/`;
-  handleData(url, showResultDelAlarm, showError, 'DELETE');
+const listenToDeleteAlarm = function () {
+  let id = document.querySelector('.js-alarmid').value;
+  socket.emit('F2B_DELalarm', { alarmid: id });
+  window.location.href = 'index.html';
 };
-const listenToUpdateAlarm = function () {};
+const listenToUpdateAlarm = function () {
+  let id = document.querySelector('.js-alarmid').value;
+  let naam = document.querySelector('.js-naam').value;
+  let tijdstip = document.querySelector('.js-tijdstip').value;
+  tijdstip = tijdstip.replace(' ', 'T');
+  socket.emit('F2B_UpdateAlarm', {
+    alarmid: id,
+    naam: naam,
+    tijdstip: tijdstip,
+  });
+};
 //#endregion
 
 //#region ***  Init / DOMContentLoaded                  ***********

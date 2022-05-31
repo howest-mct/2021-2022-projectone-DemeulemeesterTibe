@@ -34,6 +34,12 @@ class DataRepository:
         return Database.get_one_row(sql,payload)
     
     @staticmethod
+    def update_alarm_by_id(id,naam,tijdstip):
+        sql = "UPDATE alarm SET naam = %s, tijd = %s WHERE alarmid = %s"
+        payload = [naam,tijdstip,id]
+        return Database.execute_sql(sql,payload)
+    
+    @staticmethod
     def delete_alarm_by_id(id):
         sql = "DELETE FROM alarm WHERE alarmid = %s"
         payload = [id]
