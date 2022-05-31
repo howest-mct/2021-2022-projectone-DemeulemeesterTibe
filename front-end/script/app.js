@@ -134,8 +134,15 @@ const listenToCreateAlarm = function () {
   let t = document.querySelector('.js-alarm').value;
   t = t.replace('T', ' ');
   const url = `http://192.168.168.169:5000/api/alarm/`;
+  let naam = '';
+  console.log('dsfsqdfsdqf', document.querySelector('.js-alarmnaam').value);
+  if (document.querySelector('.js-alarmnaam').value == '') {
+    naam = 'Alarm';
+  } else {
+    naam = document.querySelector('.js-alarmnaam').value;
+  }
   const payload = JSON.stringify({
-    naam: document.querySelector('.js-alarmnaam').value,
+    naam: naam,
     tijd: t,
   });
   console.log(payload);

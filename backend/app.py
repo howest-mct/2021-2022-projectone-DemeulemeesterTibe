@@ -5,7 +5,7 @@ from helpers.lcdClass import lcdClass
 from helpers.klasseknop import Button
 from helpers.spiclass import SpiClass
 from hx711 import HX711
-from datetime import datetime
+from datetime import datetime,timedelta
 import threading
 from subprocess import check_output
 from flask_cors import CORS
@@ -85,8 +85,13 @@ def joy_knop(pin):
             if lcdStatus == 3:
                 lcdStatus = 1
                 alarm = tijd
+                alarm = datetime.strptime(alarm,"%H:%M:%S")
+                alarm = alarm.replace(year=datetime.now().year,month=datetime.now().month,day=datetime.now().day)
+                alarm = alarm + timedelta(days=1)
+                t = DataRepository.insert_alarm("Alarm",alarm)
+                socketio.emit("B2F_Addalarm",broadcast=True)
                 alarmopScherm = True
-                print("alarm",alarm)
+                print("alarm",alarm,"\n",alarm)
             else:
                 lcdStatus = 3
                 lcd.set_cursor(4)
@@ -300,6 +305,10 @@ def historiek():
         data = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),gegevens["color"],None,gegevens["deviceID"],gegevens["actieID"])
         return jsonify(historiekID=data),201
 
+
+# socket endpoints
+
+
 @socketio.on('connect')
 def initial_connection():
     print('A new client connect')
@@ -399,7 +408,6 @@ def start_chrome_thread():
     chromeThread.start()
 
 
-
 # ANDERE FUNCTIES
 
 
@@ -416,4 +424,3 @@ if __name__ == '__main__':
         lcd.reset_lcd()
         pixels.deinit()
         GPIO.cleanup()
-
