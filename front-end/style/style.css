@@ -11,9 +11,11 @@
 /*------------------------------------*\
   #GENERIC
 \*------------------------------------*/
+
 .center{
     text-align: center;
 }
+
 /*
     Generic: Page
     ---
@@ -431,6 +433,130 @@ a:focus {
 /*------------------------------------*\
   #COMPONENTS
 \*------------------------------------*/
+/*
+    Component: input color
+    ---
+*/
+.c-input__color{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 50px;
+    height: 50px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+.c-input__color::-webkit-color-swatch{
+    border-radius: 10px;
+    border: none
+}
+/*
+    Component: input color
+    ---
+*/
+.c-input__range {
+    height: 38px;
+    -webkit-appearance: none;
+    margin: 10px 0;
+    width: 20%;
+}
+
+.c-input__range:focus {
+    outline: none;
+}
+
+.c-input__range::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 10px;
+    cursor: pointer;
+    box-shadow: 1px 1px 1px #000000;
+    background: #3071A9;
+    border-radius: 5px;
+    border: 1px solid #000000;
+}
+
+.c-input__range::-webkit-slider-thumb {
+    box-shadow: 1px 1px 1px #000000;
+    border: 1px solid #000000;
+    height: 30px;
+    width: 15px;
+    border-radius: 5px;
+    background: #FFFFFF;
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -11px;
+}
+
+.c-input__range:focus::-webkit-slider-runnable-track {
+    background: #3071A9;
+}
+
+.c-input__range::-moz-range-track {
+    width: 100%;
+    height: 10px;
+    cursor: pointer;
+    box-shadow: 1px 1px 1px #000000;
+    background: #3071A9;
+    border-radius: 5px;
+    border: 1px solid #000000;
+}
+
+.c-input__range::-moz-range-thumb {
+    box-shadow: 1px 1px 1px #000000;
+    border: 1px solid #000000;
+    height: 30px;
+    width: 15px;
+    border-radius: 5px;
+    background: #FFFFFF;
+    cursor: pointer;
+}
+
+.c-input__range::-ms-track {
+    width: 100%;
+    height: 10px;
+    cursor: pointer;
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+}
+
+.c-input__range::-ms-fill-lower {
+    background: #3071A9;
+    border: 1px solid #000000;
+    border-radius: 10px;
+    box-shadow: 1px 1px 1px #000000;
+}
+
+.c-input__range::-ms-fill-upper {
+    background: #3071A9;
+    border: 1px solid #000000;
+    border-radius: 10px;
+    box-shadow: 1px 1px 1px #000000;
+}
+
+.c-input__range::-ms-thumb {
+    margin-top: 1px;
+    box-shadow: 1px 1px 1px #000000;
+    border: 1px solid #000000;
+    height: 30px;
+    width: 15px;
+    border-radius: 5px;
+    background: #FFFFFF;
+    cursor: pointer;
+}
+
+.c-input__range:focus::-ms-fill-lower {
+    background: #3071A9;
+}
+
+.c-input__range:focus::-ms-fill-upper {
+    background: #3071A9;
+}
+/*
+    Component: alarm
+    ---
+*/
 .c-alarmen-list {
     /* display: -webkit-box; */
     text-align: center;
@@ -506,10 +632,6 @@ a:focus {
 .c-alarm__description{
     text-align: center;
 }
-/*
-    Component: alarm
-    ---
-*/
 /* .c-alarm {
     min-width: 200px;
     max-width: 350px;
@@ -539,73 +661,7 @@ a:focus {
 .c-alarm__midden--logo{
     height: 75%;
 } */
-/*
-    Component: switch / slider
-    ---
-    on / off swich
-*/
-/* The c-switch - the box around the slider */
-.c-switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 24px;
-}
 
-/* Hide default HTML checkbox */
-.c-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-/* The slider */
-.c-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-}
-
-.c-slider:before {
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-}
-
-input:checked+.c-slider {
-    background-color: #E9333C;
-}
-
-input:focus+.c-slider {
-    box-shadow: 0 0 1px red;
-}
-
-input:checked+.c-slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
-}
-
-/* Rounded c-sliders */
-.c-slider.round {
-    border-radius: 34px;
-}
-
-.c-slider.round:before {
-    border-radius: 50%;
-}
 /*
     Component: mobile nav
     ---

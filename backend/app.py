@@ -23,7 +23,8 @@ from selenium import webdriver
 # variabelen
 dtWeight = 6
 clkWeight = 13
-
+timenow = datetime.now().replace(microsecond=0)
+wekkers = []
 Red = 0
 Green = 0
 Blue = 0
@@ -53,6 +54,7 @@ btn = Button(12)
 spi = SpiClass(0,0)
 lcd = lcdClass(rs,e,None,True)
 pixels = neopixel.NeoPixel(board.D18,12)
+pixels.brightness = 0.5
 hx = HX711(dtWeight,clkWeight)
 
 # Code voor Hardware
@@ -90,10 +92,16 @@ def joy_knop(pin):
                 lcd.set_cursor(4)
 
 def codeSchakeling():
-    global minldr,maxldr,aan,timer,timerldr,pixels,huidigetijd
+    global minldr,maxldr,aan,timer,timerldr,pixels,huidigetijd,timenow,alarmopScherm
+    data = DataRepository.read_alarmen()
+    for w in data:
+        wekkers.append(w["tijd"])
+    if wekkers is not None:
+        alarmopScherm = True
     while True:
         timer = time.time()
         huidigetijd = time.strftime("%H:%M:%S")
+        timenow = datetime.now().replace(microsecond=0)
         joyY = spi.readChannel(0)
         joyX = spi.readChannel(1)
         displayStatus(lcdStatus,joyY,joyX)
@@ -116,6 +124,8 @@ def codeSchakeling():
             # socketio.emit('B2F_verandering_ldr', {'ldr': data}, broadcast=True)
         # alarm 
         if huidigetijd == alarm:
+            aan = True
+        if timenow in wekkers:
             aan = True
         if aan == True:
             print("buzzen")
@@ -316,9 +326,16 @@ def setRing(payload):
         id = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),None,None,4,3)
     else:
         id = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),None,None,4,4)
+    socketio.emit("B2F_Ringstatus",{"ring":payload["aan"]})
 
 @socketio.on("F2B_Addalarm")
 def setRing(payload):
+    global wekkers
+    wekkers = []
+    data = DataRepository.read_alarmen()
+    for w in data:
+        wekkers.append(w["tijd"])
+    print("W0",wekkers[0])
     socketio.emit("B2F_Addalarm",broadcast=True)
 
 @socketio.on("F2B_SetBrightness")

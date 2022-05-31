@@ -96,11 +96,15 @@ const listenToSocket = function () {
     document.querySelector('.js-color').value = hexcode;
   });
   socket.on('B2F_SetBrightness', function (jsonObject) {
-    console.log(jsonObject['brightness']);
     document.querySelector('.js-brightness').value = jsonObject['brightness'];
+    document.querySelector('.js-rangeValue').innerHTML =
+      Math.round(document.querySelector('.js-brightness').value * 100) + ' %';
   });
   socket.on('B2F_Addalarm', function () {
     getAlarmen();
+  });
+  socket.on('B2F_Ringstatus', function (jsonObject) {
+    RingAan = jsonObject.ring;
   });
 };
 const listenToUI = function () {
@@ -185,12 +189,15 @@ const listenToUpdateAlarm = function () {
 //#region ***  Init / DOMContentLoaded                  ***********
 
 const init = function () {
+  toggleNav();
   if (document.querySelector('.js-alarmen')) {
     getAlarmen();
-    toggleNav();
     listenToSocket();
     listenToUI();
-    console.log('test');
+    document.querySelector('.js-brightness').oninput = function () {
+      document.querySelector('.js-rangeValue').innerHTML =
+        Math.round(document.querySelector('.js-brightness').value * 100) + ' %';
+    };
   } else if (document.querySelector('.js-updatealarm')) {
     let urlParams = new URLSearchParams(window.location.search);
     alarmid = urlParams.get('alarmid');
