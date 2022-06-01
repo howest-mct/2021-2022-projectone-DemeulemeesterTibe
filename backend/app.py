@@ -57,7 +57,7 @@ pixels = neopixel.NeoPixel(board.D18,12)
 pixels.brightness = 0.5
 hx = HX711(dtWeight,clkWeight)
 hx.set_scale_ratio(hx.get_data_mean(20)/188)
-
+print(DataRepository.read_slaap())
 
 # Code voor Hardware
 def setup_gpio():
@@ -66,6 +66,7 @@ def setup_gpio():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(buzz, GPIO.OUT)
     buzzer = GPIO.PWM(buzz,1000)
+    buzzer.ChangeFrequency(440)
     buzzer.start(0)
     btn.on_press(lees_knop)
     joyBtn.on_press(joy_knop)
@@ -318,7 +319,12 @@ def historiek():
         data = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),gegevens["color"],None,gegevens["deviceID"],gegevens["actieID"])
         return jsonify(historiekID=data),201
 
-
+@app.route('/api/slaap/',methods=["GET"])
+def slaap():
+    if request.method == "GET":
+        data = DataRepository.read_slaap()
+        if data is not None:
+            return jsonify(slaap=data),200
 # socket endpoints
 
 

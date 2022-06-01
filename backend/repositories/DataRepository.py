@@ -57,20 +57,7 @@ class DataRepository:
         print("test",params)
         return Database.execute_sql(sql,params)
     
-    # @staticmethod
-    # def read_status_lampen():
-    #     sql = "SELECT * from lampen"
-    #     return Database.get_rows(sql)
-
-
-    # @staticmethod
-    # def update_status_lamp(id, status):
-    #     sql = "UPDATE lampen SET status = %s WHERE id = %s"
-    #     params = [status, id]
-    #     return Database.execute_sql(sql, params)
-
-    # @staticmethod
-    # def update_status_alle_lampen(status):
-    #     sql = "UPDATE lampen SET status = %s"
-    #     params = [status]
-    #     return Database.execute_sql(sql, params)
+    @staticmethod
+    def read_slaap():
+        sql = "SELECT *,timestampdiff(minute,starttijd,eindtijd) as sleptmin FROM smartwekker.slaap ORDER BY STARTTIJD desc"
+        return Database.get_rows(sql)

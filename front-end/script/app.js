@@ -40,8 +40,15 @@ const showAlarm = function (jsonObject) {
   time = time.replace(' ', 'T');
   document.querySelector('.js-tijdstip').value = time;
 };
-const ShowSlaapGrafiek = function () {
-  console.log('fdqfd');
+const ShowSlaapGrafiek = function (jsonObject) {
+  let converted_labels = [];
+  let converted_data = [];
+  for (let s of jsonObject.slaap) {
+    let hours = Math.round(s.sleptmin / 60, 2);
+    converted_data.push(hours);
+    converted_labels.push(s.eindtijd);
+  }
+  drawChart(converted_labels, converted_data);
 };
 const showHistoriek = function () {
   console.log('mdsfkqsdfkjldf');
@@ -62,17 +69,53 @@ const hexToRgb = function (hex) {
 const rgbToHex = function (r, g, b) {
   return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 };
+const drawChart = function (l, d) {
+  let options = {
+    chart: {
+      id: 'myChart',
+      type: 'bar',
+    },
+    plotOptions: {
+      bar: {
+        borderRadius: 10,
+      },
+    },
+    stroke: {
+      curve: 'smooth',
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    series: [
+      {
+        name: 'Uren geslapen',
+        data: d,
+        color: '#ff0000',
+      },
+    ],
+    labels: l,
+    noData: {
+      text: 'Loading...',
+    },
+  };
+  let chart = new ApexCharts(document.querySelector('.js-content'), options);
+  chart.render();
+};
 //#endregion
 
 //#region ***  Data Access - get___                     ***********
 const getAlarmen = function () {
-  const url = 'http://192.168.168.169:5000/api/alarm/';
+  const url = `http://${lanIP}/api/alarm/`;
   handleData(url, showAlarmen, showError);
 };
 const getAlarm = function (id) {
   console.log(id);
-  const url = `http://${window.location.hostname}:5000  /api/alarm/${id}/`;
+  const url = `http://${lanIP}/api/alarm/${id}/`;
   handleData(url, showAlarm, showError);
+};
+const getSlaapData = function () {
+  const url = `http://${lanIP}/api/slaap/`;
+  handleData(url, ShowSlaapGrafiek, showError);
 };
 //#endregion
 
@@ -101,6 +144,7 @@ const listenToSocket = function () {
     );
     console.log('HEXCODE', hexcode);
     document.querySelector('.js-color').value = hexcode;
+    document.querySelector('.c-input__color').style.backgroundColor = hexcode;
   });
   socket.on('B2F_SetBrightness', function (jsonObject) {
     document.querySelector('.js-brightness').value = jsonObject['brightness'];
@@ -139,9 +183,7 @@ const listenToUI = function () {
       .querySelector('.js-updatealarm')
       .addEventListener('click', listenToUpdateAlarm);
   } else if (document.querySelector('.js-slaap')) {
-    document
-      .querySelector('.js-slaap')
-      .addEventListener('click', ShowSlaapGrafiek);
+    document.querySelector('.js-slaap').addEventListener('click', getSlaapData);
     document
       .querySelector('.js-historiek')
       .addEventListener('click', showHistoriek);
