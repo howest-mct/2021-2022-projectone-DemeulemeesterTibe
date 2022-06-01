@@ -56,29 +56,34 @@ lcd = lcdClass(rs,e,None,True)
 pixels = neopixel.NeoPixel(board.D18,12)
 pixels.brightness = 0.5
 hx = HX711(dtWeight,clkWeight)
+hx.set_scale_ratio(hx.get_data_mean(20)/188)
+
 
 # Code voor Hardware
 def setup_gpio():
+    global buzzer
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(buzz, GPIO.OUT)
-    buzzer = GPIO.PWM(buzz,440)
+    buzzer = GPIO.PWM(buzz,1000)
     buzzer.start(0)
     btn.on_press(lees_knop)
     joyBtn.on_press(joy_knop)
 
 def lees_knop(pin):
-    global lcdStatus,tijd,vorips
+    global lcdStatus,tijd,vorips,alarmopScherm
     if btn.pressed:
+        if lcdStatus == 3:
+            lcd.disable_cursor()
         lcdStatus += 1
         if lcdStatus >= 2:
             lcdStatus = 0
             vorips = ""
+            alarmopScherm = True
         tijd = "gggggggg"
         lcd.reset_lcd()
 
 def joy_knop(pin):
-    # wordt random ingedrukt
     global lcdStatus,tijd,alarm,alarmopScherm,wekkers
     if joyBtn.pressed:
         if lcdStatus == 1 or lcdStatus == 3:
@@ -97,7 +102,9 @@ def joy_knop(pin):
                     wekkers.append(w["tijd"])
                 alarmopScherm = True
                 print("alarm",alarm,"\n",alarm)
+                lcd.disable_cursor()
             else:
+                lcd.enable_cursor()
                 lcdStatus = 3
                 lcd.set_cursor(4)
 
@@ -133,17 +140,15 @@ def codeSchakeling():
             data = DataRepository.read_historiek_by_id(insert)
             socketio.emit('B2F_verandering_ldr', {'ldr': data}, broadcast=True)
         # alarm 
-        if huidigetijd == alarm:
-            aan = True
         if timenow in wekkers:
             aan = True
         if aan == True:
-            print("buzzen")
+            print(round(hx.get_weight_mean(1),2), 'g')
+            buzzer.start(10)
         if ring == 1:
             pixels.fill((Red,Green,Blue))
         elif ring == 0:
             pixels.fill((0,0,0))
-
 
 def displayStatus(lcdStatus,y,x):
     global vorips , tijd , teller , joyTimer , alarmopScherm, huidigetijd,timer
@@ -173,14 +178,11 @@ def displayStatus(lcdStatus,y,x):
         if alarmopScherm is True:
             print("test")
             lcd.set_cursor(64)
-            print(wekkers[0].time())
-            print(type(wekkers))
+            print("Wekker",wekkers[0].time())
             lcd.write_message(f"Alarm: {wekkers[0].time()}")
             alarmopScherm = False
-            
     elif lcdStatus == 3:
-        
-        if timer - joyTimer >=0.5:
+        if timer - joyTimer >=0.3:
             if x > 1000:
                 teller += 1
                 cijfer = tijd[teller-4:teller-3]
@@ -256,6 +258,11 @@ def checkdeel(tijd):
             string += ":"
     # print(">", string)
     return string
+
+def getWeight():
+    while True:
+        while aan == True:
+            print(round(hx.get_weight_mean(20),2), 'g')
 
 # Code voor Flask
 
@@ -352,7 +359,7 @@ def setRing(payload):
     data = DataRepository.read_alarmen_nog_komen()
     for w in data:
         wekkers.append(w["tijd"])
-    print("W0",wekkers[0])
+    print("W0",wekkers)
     socketio.emit("B2F_Addalarm",broadcast=True)
 
 @socketio.on("F2B_SetBrightness")
@@ -376,11 +383,16 @@ def updateAlarm(payload):
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
 
-def start_thread():
-    print("**** Starting THREAD ****")
-    thread = threading.Thread(target=codeSchakeling, args=(), daemon=True)
-    thread.start()
+def start_schakeling_thread():
+    print("**** Starting SCHAKELING THREAD ****")
+    schakelingThread = threading.Thread(target=codeSchakeling, args=(), daemon=True)
+    schakelingThread.start()
 
+def start_weight_thread():
+    print("**** Starting WEIGHT THREAD ****")
+    weightThread = threading.Thread(target=getWeight,args=(),daemon=True)
+    weightThread.start()
+    
 
 def start_chrome_kiosk():
     import os
@@ -423,7 +435,8 @@ def start_chrome_thread():
 if __name__ == '__main__':
     try:
         setup_gpio()
-        start_thread()
+        start_schakeling_thread()
+        start_weight_thread()
         # start_chrome_thread()
         print("**** Starting APP ****")
         socketio.run(app, debug=False, host='0.0.0.0')
