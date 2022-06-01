@@ -59,5 +59,5 @@ class DataRepository:
     
     @staticmethod
     def read_slaap():
-        sql = "SELECT *,timestampdiff(minute,starttijd,eindtijd) as sleptmin FROM smartwekker.slaap ORDER BY STARTTIJD desc"
+        sql = "SELECT *,timestampdiff(minute,starttijd,eindtijd) as sleptmin,concat(day(eindtijd),' ',monthname(eindtijd),' ',year(eindtijd)) as datum FROM smartwekker.slaap ORDER BY STARTTIJD desc;"
         return Database.get_rows(sql)

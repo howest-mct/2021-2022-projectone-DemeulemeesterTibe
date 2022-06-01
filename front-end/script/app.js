@@ -43,12 +43,14 @@ const showAlarm = function (jsonObject) {
 const ShowSlaapGrafiek = function (jsonObject) {
   let converted_labels = [];
   let converted_data = [];
+  let rec = [];
   for (let s of jsonObject.slaap) {
     let hours = Math.round(s.sleptmin / 60, 2);
     converted_data.push(hours);
-    converted_labels.push(s.eindtijd);
+    converted_labels.push(s.datum);
+    rec.push(8);
   }
-  drawChart(converted_labels, converted_data);
+  drawChart(converted_labels, converted_data, rec);
 };
 const showHistoriek = function () {
   console.log('mdsfkqsdfkjldf');
@@ -69,7 +71,7 @@ const hexToRgb = function (hex) {
 const rgbToHex = function (r, g, b) {
   return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 };
-const drawChart = function (l, d) {
+const drawChart = function (l, d, r) {
   let options = {
     chart: {
       id: 'myChart',
@@ -88,6 +90,7 @@ const drawChart = function (l, d) {
     },
     series: [
       {
+        type: 'column',
         name: 'Uren geslapen',
         data: d,
         color: '#ff0000',
