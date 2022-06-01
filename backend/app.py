@@ -114,10 +114,9 @@ def codeSchakeling():
     for w in data:
         wekkers.append(w["tijd"])
     if wekkers:
-        print("Geen wekkers")
         alarmopScherm = True
     print(wekkers)
-    while True:
+    while True: 
         timer = time.time()
         huidigetijd = time.strftime("%H:%M:%S")
         timenow = datetime.now().replace(microsecond=0)
@@ -355,11 +354,11 @@ def setRing(payload):
 def setRing(payload):
     global wekkers,alarmopScherm
     wekkers = []
-    alarmopScherm = True
     data = DataRepository.read_alarmen_nog_komen()
     for w in data:
         wekkers.append(w["tijd"])
     print("W0",wekkers)
+    alarmopScherm = True
     socketio.emit("B2F_Addalarm",broadcast=True)
 
 @socketio.on("F2B_SetBrightness")

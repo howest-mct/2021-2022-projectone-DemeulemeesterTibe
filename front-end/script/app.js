@@ -1,6 +1,7 @@
 // veranderen naar window.location.hostname
 const lanIP = `${window.location.hostname}:5000`;
 const socket = io(`http://${lanIP}`);
+console.log(window.location.hostname);
 
 //#region ***  DOM references                           ***********
 let RingAan = 0;
@@ -39,6 +40,12 @@ const showAlarm = function (jsonObject) {
   time = time.replace(' ', 'T');
   document.querySelector('.js-tijdstip').value = time;
 };
+const ShowSlaapGrafiek = function () {
+  console.log('fdqfd');
+};
+const showHistoriek = function () {
+  console.log('mdsfkqsdfkjldf');
+};
 //#endregion
 
 //#region ***  Callback-No Visualisation - callback___  ***********
@@ -64,7 +71,7 @@ const getAlarmen = function () {
 };
 const getAlarm = function (id) {
   console.log(id);
-  const url = `http://192.168.168.169:5000/api/alarm/${id}/`;
+  const url = `http://${window.location.hostname}:5000  /api/alarm/${id}/`;
   handleData(url, showAlarm, showError);
 };
 //#endregion
@@ -109,6 +116,7 @@ const listenToSocket = function () {
 };
 const listenToUI = function () {
   if (document.querySelector('.js-alarmen')) {
+    // index.html
     document
       .querySelector('.js-makealarm')
       .addEventListener('click', listenToCreateAlarm);
@@ -121,13 +129,22 @@ const listenToUI = function () {
     document
       .querySelector('.js-setbrightness')
       .addEventListener('click', listenToSetBrightness);
+    listenToChangeColor();
   } else if (document.querySelector('.js-updatealarm')) {
+    // detail.html
     document
       .querySelector('.js-deletealarm')
       .addEventListener('click', listenToDeleteAlarm);
     document
       .querySelector('.js-updatealarm')
       .addEventListener('click', listenToUpdateAlarm);
+  } else if (document.querySelector('.js-slaap')) {
+    document
+      .querySelector('.js-slaap')
+      .addEventListener('click', ShowSlaapGrafiek);
+    document
+      .querySelector('.js-historiek')
+      .addEventListener('click', showHistoriek);
   }
 };
 const listenToCreateAlarm = function () {
@@ -175,6 +192,11 @@ const listenToSetBrightness = function () {
   console.log(brightness);
   socket.emit('F2B_SetBrightness', { brightness: brightness });
 };
+const listenToChangeColor = function () {
+  document.querySelector('.c-input__color').oninput = function () {
+    this.style.backgroundColor = this.value;
+  };
+};
 const listenToDeleteAlarm = function () {
   let id = document.querySelector('.js-alarmid').value;
   socket.emit('F2B_DELalarm', { alarmid: id });
@@ -198,6 +220,8 @@ const listenToUpdateAlarm = function () {
 const init = function () {
   toggleNav();
   if (document.querySelector('.js-alarmen')) {
+    document.querySelector('.c-input__color').style.backgroundColor =
+      document.querySelector('.c-input__color').value;
     getAlarmen();
     listenToSocket();
     listenToUI();
@@ -214,6 +238,8 @@ const init = function () {
     } else {
       window.location.href = 'index.html';
     }
+  } else if (document.querySelector('.js-slaap')) {
+    listenToUI();
   }
 };
 
