@@ -25,7 +25,7 @@ dtWeight = 6
 clkWeight = 13
 timenow = datetime.now().replace(microsecond=0)
 wekkers = []
-Red = 0
+Red = 255
 Green = 0
 Blue = 0
 alarmopScherm = False
@@ -79,7 +79,7 @@ def lees_knop(pin):
 
 def joy_knop(pin):
     # wordt random ingedrukt
-    global lcdStatus,tijd,alarm,alarmopScherm
+    global lcdStatus,tijd,alarm,alarmopScherm,wekkers
     if joyBtn.pressed:
         if lcdStatus == 1 or lcdStatus == 3:
             if lcdStatus == 3:
@@ -90,6 +90,11 @@ def joy_knop(pin):
                 alarm = alarm + timedelta(days=1)
                 t = DataRepository.insert_alarm("Alarm",alarm)
                 socketio.emit("B2F_Addalarm",broadcast=True)
+                wekkers = []
+                alarmopScherm = True
+                data = DataRepository.read_alarmen_nog_komen()
+                for w in data:
+                    wekkers.append(w["tijd"])
                 alarmopScherm = True
                 print("alarm",alarm,"\n",alarm)
             else:
@@ -98,11 +103,13 @@ def joy_knop(pin):
 
 def codeSchakeling():
     global minldr,maxldr,aan,timer,timerldr,pixels,huidigetijd,timenow,alarmopScherm
-    data = DataRepository.read_alarmen()
+    data = DataRepository.read_alarmen_nog_komen()
     for w in data:
         wekkers.append(w["tijd"])
-    if wekkers is not None:
+    if wekkers:
+        print("Geen wekkers")
         alarmopScherm = True
+    print(wekkers)
     while True:
         timer = time.time()
         huidigetijd = time.strftime("%H:%M:%S")
@@ -122,11 +129,9 @@ def codeSchakeling():
         if timer - timerldr >= 60:
             print("LDR inlezen") 
             timerldr = time.time()
-            # insert = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),lichtsterkte,None,2,1)
-            # print(insert)
-            # data = DataRepository.read_historiek_by_id(insert)
-            # print(data)
-            # socketio.emit('B2F_verandering_ldr', {'ldr': data}, broadcast=True)
+            insert = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),lichtsterkte,None,2,1)
+            data = DataRepository.read_historiek_by_id(insert)
+            socketio.emit('B2F_verandering_ldr', {'ldr': data}, broadcast=True)
         # alarm 
         if huidigetijd == alarm:
             aan = True
@@ -168,7 +173,9 @@ def displayStatus(lcdStatus,y,x):
         if alarmopScherm is True:
             print("test")
             lcd.set_cursor(64)
-            lcd.write_message(f"Alarm: {alarm}")
+            print(wekkers[0].time())
+            print(type(wekkers))
+            lcd.write_message(f"Alarm: {wekkers[0].time()}")
             alarmopScherm = False
             
     elif lcdStatus == 3:
@@ -339,9 +346,10 @@ def setRing(payload):
 
 @socketio.on("F2B_Addalarm")
 def setRing(payload):
-    global wekkers
+    global wekkers,alarmopScherm
     wekkers = []
-    data = DataRepository.read_alarmen()
+    alarmopScherm = True
+    data = DataRepository.read_alarmen_nog_komen()
     for w in data:
         wekkers.append(w["tijd"])
     print("W0",wekkers[0])
@@ -350,6 +358,7 @@ def setRing(payload):
 @socketio.on("F2B_SetBrightness")
 def setRing(payload):
     pixels.brightness = float(payload["brightness"])
+    d = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),None,None,4,5)
     socketio.emit("B2F_SetBrightness",{"brightness": payload["brightness"]},broadcast=True)
 
 @socketio.on("F2B_DELalarm")

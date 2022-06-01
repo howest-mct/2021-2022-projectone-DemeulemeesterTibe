@@ -28,7 +28,7 @@ class DataRepository:
         return Database.get_rows(sql)
     
     @staticmethod
-    def rad_alarmen_nog_komen():
+    def read_alarmen_nog_komen():
         sql = "SELECT *,concat(time(tijd)) as tijdstip FROM smartwekker.alarm WHERE timestampdiff(minute,now(),tijd) >0 ORDER BY timestampdiff(minute,now(),tijd);"
         return Database.get_rows(sql)
     
