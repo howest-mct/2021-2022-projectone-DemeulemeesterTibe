@@ -19,6 +19,17 @@ from selenium import webdriver
 
 # from selenium import webdriver
 # from selenium.webdriver.chrome.options import Options
+# lcd.reset_cursor()
+        # ips = check_output(["hostname", "-I"])
+        # ips = ips.decode("utf-8")
+        # lijst = ips.split()
+            # for i in range(0, len(lijst)):
+        #         if i <2:
+        #             if (i % 2) == 0:
+        #                 lcd.second_row()
+        #             else:
+        #                 lcd.first_row()
+        #             lcd.write_message(lijst[i])
 
 # variabelen
 dtWeight = 6
@@ -57,7 +68,6 @@ pixels = neopixel.NeoPixel(board.D18,12)
 pixels.brightness = 0.5
 hx = HX711(dtWeight,clkWeight)
 hx.set_scale_ratio(hx.get_data_mean(20)/188)
-print(DataRepository.read_slaap())
 
 # Code voor Hardware
 def setup_gpio():
@@ -80,7 +90,8 @@ def lees_knop(pin):
         if lcdStatus >= 2:
             lcdStatus = 0
             vorips = ""
-            alarmopScherm = True
+            if wekkers:
+                alarmopScherm = True
         tijd = "gggggggg"
         lcd.reset_lcd()
 
@@ -116,7 +127,6 @@ def codeSchakeling():
         wekkers.append(w["tijd"])
     if wekkers:
         alarmopScherm = True
-    print(wekkers)
     while True: 
         timer = time.time()
         huidigetijd = time.strftime("%H:%M:%S")
@@ -153,18 +163,25 @@ def codeSchakeling():
 def displayStatus(lcdStatus,y,x):
     global vorips , tijd , teller , joyTimer , alarmopScherm, huidigetijd,timer
     if lcdStatus == 0:
-        lcd.reset_cursor()
-        ips = check_output(["hostname", "-I"])
-        ips = ips.decode("utf-8")
-        lijst = ips.split()
+        ifconfig = check_output(['ifconfig', "wlan0"])
+        for line in ifconfig.decode().split('\n'):
+            fields = line.split()
+            if fields[0] == 'inet':
+                wifiIp = fields[1]  
+                break
+        ifconfig = check_output(['ifconfig', "eth0"])
+        for line in ifconfig.decode().split('\n'):
+            fields = line.split()
+            if fields[0] == 'inet':
+                lanIp = fields[1]  
+                break
+        ips = [wifiIp,lanIp]
         if ips != vorips:
-            for i in range(0, len(lijst)):
-                if i <2:
-                    if (i % 2) == 0:
-                        lcd.second_row()
-                    else:
-                        lcd.first_row()
-                    lcd.write_message(lijst[i])
+            for i in range(0, len(ips)):
+                if i == 1:
+                    lcd.second_row()
+                lcd.write_message(ips[i])
+            print("test")
         vorips = ips
     elif lcdStatus == 1:
         if tijd != huidigetijd:
