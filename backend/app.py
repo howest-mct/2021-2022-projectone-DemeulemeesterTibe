@@ -30,8 +30,22 @@ from selenium import webdriver
         #             else:
         #                 lcd.first_row()
         #             lcd.write_message(lijst[i])
-
+ifconfig = check_output(['ifconfig', "wlan0"])
+for line in ifconfig.decode().split('\n'):
+    fields = line.split()
+    if fields[0] == 'inet':
+        wifiIp = fields[1]  
+        break
+ifconfig = check_output(['ifconfig', "eth0"])
+for line in ifconfig.decode().split('\n'):
+    fields = line.split()
+    if fields[0] == 'inet':
+        lanIp = fields[1]  
+        break
+print("wifi",wifiIp,"lan",lanIp )
 # variabelen
+beginTijdSlapen = time.strftime('%Y-%m-%d %H:%M:%S')
+eindTijdSlapen = time.strftime('%Y-%m-%d %H:%M:%S')
 dtWeight = 6
 clkWeight = 13
 timenow = datetime.now().replace(microsecond=0)
@@ -54,9 +68,10 @@ maxldr = 0
 waardeldr = 0
 lichtsterkte = 0
 alarm = ""
-aan = False
 timer = 0
+aan = False
 ring = False
+GaanSlapen = False
 # objecten
 joyTimer = time.time()
 timerldr = time.time()
@@ -163,25 +178,18 @@ def codeSchakeling():
 def displayStatus(lcdStatus,y,x):
     global vorips , tijd , teller , joyTimer , alarmopScherm, huidigetijd,timer
     if lcdStatus == 0:
-        ifconfig = check_output(['ifconfig', "wlan0"])
-        for line in ifconfig.decode().split('\n'):
-            fields = line.split()
-            if fields[0] == 'inet':
-                wifiIp = fields[1]  
-                break
-        ifconfig = check_output(['ifconfig', "eth0"])
-        for line in ifconfig.decode().split('\n'):
-            fields = line.split()
-            if fields[0] == 'inet':
-                lanIp = fields[1]  
-                break
-        ips = [wifiIp,lanIp]
+        lcd.reset_cursor()
+        ips = check_output(["hostname", "-I"])
+        ips = ips.decode("utf-8")
+        lijst = ips.split()
         if ips != vorips:
-            for i in range(0, len(ips)):
-                if i == 1:
-                    lcd.second_row()
-                lcd.write_message(ips[i])
-            print("test")
+            for i in range(0, len(lijst)):
+                if i <2:
+                    if (i % 2) == 0:
+                        lcd.second_row()
+                    else:
+                        lcd.first_row()
+                    lcd.write_message(lijst[i])
         vorips = ips
     elif lcdStatus == 1:
         if tijd != huidigetijd:
@@ -350,7 +358,9 @@ def initial_connection():
     print('A new client connect')
     # random ldr waarde op website tot volgende inlees moment
     data = DataRepository.read_historiek_by_id(20)
-    socketio.emit("B2F_verandering_ldr",{'ldr': data}, broadcast=True)
+    socketio.emit("B2F_Ringstatus",{"ring": ring})
+    socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen})
+    socketio.emit("B2F_verandering_ldr",{'ldr': data})
 
 @socketio.on("F2B_SetColor")
 def setColor(payload):
@@ -374,7 +384,7 @@ def setRing(payload):
     socketio.emit("B2F_Ringstatus",{"ring":payload["aan"]})
 
 @socketio.on("F2B_Addalarm")
-def setRing(payload):
+def addAlarm(payload):
     global wekkers,alarmopScherm
     wekkers = []
     data = DataRepository.read_alarmen_nog_komen()
@@ -385,7 +395,7 @@ def setRing(payload):
     socketio.emit("B2F_Addalarm",broadcast=True)
 
 @socketio.on("F2B_SetBrightness")
-def setRing(payload):
+def setBrightness(payload):
     pixels.brightness = float(payload["brightness"])
     d = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),None,None,4,5)
     socketio.emit("B2F_SetBrightness",{"brightness": payload["brightness"]},broadcast=True)
@@ -401,6 +411,20 @@ def updateAlarm(payload):
     dele = DataRepository.update_alarm_by_id(payload["alarmid"],payload["naam"],payload["tijdstip"])
     socketio.emit("B2F_Addalarm",broadcast=True)
 
+@socketio.on("F2B_GaanSlapen")
+def setSlaap(payload):
+    global beginTijdSlapen, eindTijdSlapen,GaanSlapen
+    GaanSlapen = payload["Slapen"]
+    print(payload["Slapen"])
+    if GaanSlapen == 1:
+        beginTijdSlapen = datetime.now().replace(microsecond=0)
+        print(beginTijdSlapen)
+    elif GaanSlapen == 0:
+        eindTijdSlapen = datetime.now().replace(microsecond=0)
+        print(eindTijdSlapen)
+        dat = DataRepository.insert_slaap(beginTijdSlapen,eindTijdSlapen)
+    print(GaanSlapen)
+    socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
 
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
@@ -464,7 +488,7 @@ if __name__ == '__main__':
         socketio.run(app, debug=False, host='0.0.0.0')
     except KeyboardInterrupt:
         print ('KeyboardInterrupt exception is caught')
-    finally:
         lcd.reset_lcd()
         pixels.deinit()
+    finally:
         GPIO.cleanup()

@@ -5,6 +5,7 @@ console.log(window.location.hostname);
 
 //#region ***  DOM references                           ***********
 let RingAan = 0;
+let Slapen = 0;
 //#endregion
 
 //#region ***  Callback-Visualisation - show___         ***********
@@ -45,15 +46,16 @@ const ShowSlaapGrafiek = function (jsonObject) {
   let converted_data = [];
   let rec = [];
   for (let s of jsonObject.slaap) {
-    let hours = Math.round(s.sleptmin / 60, 2);
-    converted_data.push(hours);
+    console.log(s.hoursMin);
+    let hours = Math.round(s.sleptmin % 60, 2);
+    console.log('hours', hours);
+    converted_data.push(s.hoursMin);
     converted_labels.push(s.datum);
-    rec.push(8);
   }
-  drawChart(converted_labels, converted_data, rec);
+  drawChart(converted_labels, converted_data);
 };
 const showHistoriek = function () {
-  console.log('mdsfkqsdfkjldf');
+  console.log('NOG AFWERKEN');
 };
 //#endregion
 
@@ -71,7 +73,8 @@ const hexToRgb = function (hex) {
 const rgbToHex = function (r, g, b) {
   return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 };
-const drawChart = function (l, d, r) {
+const drawChart = function (l, d) {
+  console.log('data', d, 'labels', l);
   let options = {
     chart: {
       id: 'myChart',
@@ -86,7 +89,18 @@ const drawChart = function (l, d, r) {
       curve: 'smooth',
     },
     dataLabels: {
-      enabled: false,
+      enabled: true,
+      style: {
+        fontSize: '16px',
+        colors: ['#000000'],
+      },
+    },
+    plotOptions: {
+      bar: {
+        dataLabels: {
+          position: 'top',
+        },
+      },
     },
     series: [
       {
@@ -160,6 +174,9 @@ const listenToSocket = function () {
   socket.on('B2F_Ringstatus', function (jsonObject) {
     RingAan = jsonObject.ring;
   });
+  socket.on('B2F_SlaapStatus', function (jsonObject) {
+    Slapen = jsonObject.slapen;
+  });
 };
 const listenToUI = function () {
   if (document.querySelector('.js-alarmen')) {
@@ -177,6 +194,9 @@ const listenToUI = function () {
       .querySelector('.js-setbrightness')
       .addEventListener('click', listenToSetBrightness);
     listenToChangeColor();
+    document
+      .querySelector('.js-GoSleep')
+      .addEventListener('click', ListenToGoSleep);
   } else if (document.querySelector('.js-updatealarm')) {
     // detail.html
     document
@@ -257,6 +277,16 @@ const listenToUpdateAlarm = function () {
     naam: naam,
     tijdstip: tijdstip,
   });
+};
+const ListenToGoSleep = function () {
+  if (Slapen == 0) {
+    Slapen = 1;
+    console.log('Slaapwel');
+  } else if (Slapen == 1) {
+    Slapen = 0;
+    console.log('Goeiemorgen /Middag /Avond');
+  }
+  socket.emit('F2B_GaanSlapen', { Slapen: Slapen });
 };
 //#endregion
 
