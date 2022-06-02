@@ -58,7 +58,7 @@ class DataRepository:
     
     @staticmethod
     def read_slaap():
-        sql = "SELECT *,timestampdiff(minute,starttijd,eindtijd) as sleptmin,concat(day(eindtijd),' ',monthname(eindtijd),' ',year(eindtijd)) as datum,concat(LPad(TIMESTAMPDIFF(hour,starttijd,eindtijd), 2, 0), '.', LPad(MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60), 2, 0))as 'hoursMin' FROM smartwekker.slaap ORDER BY STARTTIJD desc;"
+        sql = "SELECT *,timestampdiff(minute,starttijd,eindtijd) as sleptmin,concat(day(eindtijd),' ',monthname(eindtijd),' ',year(eindtijd)) as datum,concat(LPad(TIMESTAMPDIFF(hour,starttijd,eindtijd), 2, 0), '.', LPad(MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60), 2, 0))as 'hoursMin' FROM smartwekker.slaap ORDER BY STARTTIJD;"
         return Database.get_rows(sql)
 
     @staticmethod

@@ -44,11 +44,8 @@ const showAlarm = function (jsonObject) {
 const ShowSlaapGrafiek = function (jsonObject) {
   let converted_labels = [];
   let converted_data = [];
-  let rec = [];
   for (let s of jsonObject.slaap) {
-    console.log(s.hoursMin);
     let hours = Math.round(s.sleptmin % 60, 2);
-    console.log('hours', hours);
     converted_data.push(s.hoursMin);
     converted_labels.push(s.datum);
   }
@@ -74,7 +71,6 @@ const rgbToHex = function (r, g, b) {
   return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 };
 const drawChart = function (l, d) {
-  console.log('data', d, 'labels', l);
   let options = {
     chart: {
       id: 'myChart',
