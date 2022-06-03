@@ -141,6 +141,20 @@ const toggleNav = function () {
     });
   }
 };
+const togglePopUP = function () {
+  document
+    .querySelector('.js-showCreateAlarm')
+    .addEventListener('click', function () {
+      document.querySelector('.c-createalarm').style.display = 'flex';
+      document.querySelector('.c-floatingButton').style.display = 'None';
+    });
+  document
+    .querySelector('.js-removeCreateAlarm')
+    .addEventListener('click', function () {
+      document.querySelector('.c-floatingButton').style.display = 'flex';
+      document.querySelector('.c-createalarm').style.display = 'None';
+    });
+};
 const listenToSocket = function () {
   socket.on('B2F_verandering_ldr', function (jsonObject) {
     console.log('Ldr binnen');
@@ -213,7 +227,6 @@ const listenToCreateAlarm = function () {
   t = t.replace('T', ' ');
   const url = `http://192.168.168.169:5000/api/alarm/`;
   let naam = '';
-  console.log('dsfsqdfsdqf', document.querySelector('.js-alarmnaam').value);
   if (document.querySelector('.js-alarmnaam').value == '') {
     naam = 'Alarm';
   } else {
@@ -223,6 +236,8 @@ const listenToCreateAlarm = function () {
     naam: naam,
     tijd: t,
   });
+  document.querySelector('.c-floatingButton').style.display = 'flex';
+  document.querySelector('.c-createalarm').style.display = 'None';
   console.log(payload);
   handleData(url, showResultAddAlarm, showError, 'POST', payload);
 };
@@ -293,6 +308,7 @@ const init = function () {
   if (document.querySelector('.js-alarmen')) {
     document.querySelector('.c-input__color').style.backgroundColor =
       document.querySelector('.c-input__color').value;
+    togglePopUP();
     getAlarmen();
     listenToSocket();
     listenToUI();

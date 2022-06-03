@@ -20,7 +20,7 @@
 </head>
 
 <body>
-    <button class="c-floatingButton">
+    <button class="c-floatingButton js-showCreateAlarm">
         <svg xmlns="http://www.w3.org/2000/svg" height="40" width="40">
             <path d="M18.625 31.667V21.375H8.333V18.625H18.625V8.333H21.375V18.625H31.667V21.375H21.375V31.667Z" />
         </svg>
@@ -82,16 +82,6 @@
                 <button class="js-GoSleep">Slapen</button>
                 <h1 class="js-test">Test</h1>
                 <p>tt</p>
-                <label for="naam">Naam</label>
-                <br>
-                <input class="js-alarmnaam" type="text" class="c-input__text" id="naam">
-                <br>
-                <label for="Datetime">Datetime</label>
-                <br>
-                <input class="js-alarm" type="datetime-local" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}"
-                    name="Datetime" id="Datetime">
-                <br>
-                <button class="js-makealarm"> Create alarm</button>
                 <h1>RGB Ring</h1>
                 <input type="color" class="js-color c-input__color" value="#ff0000" id="">
                 <br>
@@ -202,6 +192,19 @@
             </div>
         </div>
     </aside>
+    <div class="c-createalarm">
+        <div class="c-createalarm__content">
+            <div class="close js-removeCreateAlarm">+</div>
+            <p class="c-lead--lg"><label for="naam">Naam</label></p>
+
+            <input class="js-alarmnaam c-input__text" type="text" id="naam">
+            <h3 class="c-lead--lg"><label for="Datetime">Datetime</label></h3>
+            <input class="js-alarm" type="datetime-local" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}"
+                name="Datetime" id="Datetime">
+            <br>
+            <button class="js-makealarm"> Create alarm</button>
+        </div>
+    </div>
 </body>
 
 </html>

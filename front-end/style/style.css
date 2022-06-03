@@ -480,9 +480,19 @@ input[type=text],input[type=datetime-local] {
     height: 38px;
     -webkit-appearance: none;
     margin: 10px 0;
-    width: 20%;
+    width: 40%;
+}
+@media (min-width: 576px) {
+    .c-input__range {
+        width: 27.5%;
+    }
 }
 
+@media (min-width: 765px) {
+    .c-input__range {
+        width: 18.5%;
+    }
+}
 .c-input__range:focus {
     outline: none;
 }
@@ -600,7 +610,6 @@ input[type=text],input[type=datetime-local] {
 @media (min-width: 576px) {
     .c-floatingButton{
         right: 15px
-
     }
 }
 @media (min-width: 1000px) {
@@ -718,7 +727,57 @@ input[type=text],input[type=datetime-local] {
 .c-alarm__midden--logo{
     height: 75%;
 } */
-
+/*
+    Component: mobile nav
+    ---
+    Dedicated mobile nav component
+*/
+.c-createalarm{
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+.c-createalarm__content{
+    width: 350px;
+    height: 325px;
+    background-color: white;
+    border-radius: 10px;
+    text-align: center;
+    padding: 20px;
+    position: relative;
+}
+.c-createalarm__content--close{
+    top: 0;
+    right: 14px;
+    font-size: 42px;
+    /* transform: rotate(45deg); */
+}
+.close{
+    position: absolute;
+    top: 0;
+    right: 14px;
+    font-size: 42px;
+    text-decoration: none;
+    cursor: pointer;
+    transform: rotate(45deg);
+}
+@media (min-width: 768px) {
+    .c-createalarm__content{
+        width: 400px;
+    }
+}
+@media (min-width: 992px) {
+    .c-createalarm__content{
+        width: 450px;
+    }
+}
 /*
     Component: mobile nav
     ---
