@@ -309,7 +309,6 @@ const ListenToGoSleep = function () {
 //#endregion
 
 //#region ***  Init / DOMContentLoaded                  ***********
-
 const init = function () {
   toggleNav();
   if (document.querySelector('.js-alarmen')) {

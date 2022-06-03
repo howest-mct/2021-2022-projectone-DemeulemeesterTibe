@@ -78,8 +78,8 @@
             </div>
         </header>
 
-        <div class="o-container">
-            <section class="o-row o-row--lg">
+        <section class="o-row o-row--lg">
+            <div class="o-container">
                 <div class=" center">
                     <button class="js-GoSleep">Slapen</button>
                     <input type="time" name="" id="">
@@ -93,10 +93,17 @@
                     <br>
                     <button class="js-setbrightness"> Set Brightness</button>
                     <button class="js-setcolor"> Set color</button>
-                    <button class="js-rgbtoggle"> Turn on</button>
+                    <button class="js-rgbtoggle c-button"> Turn on</button>
+                    <div class="c-checkbox">
+                        <input type="checkbox" id="RGB" class="c-toggle js-test">
+                        <label for="RGB"></label>
+                    </div>
+
                 </div>
-            </section>
-            <section class="o-row o-row--lg">
+            </div>
+        </section>
+        <section class="o-row o-row--lg o-row--neutral-x-light">
+            <div class="o-container">
                 <div class="c-alarmen-list js-alarmen">
                     <a class="c-alarm" href="detail.html?alarmid=x">
                         <div class="c-alarm__content">
@@ -126,8 +133,8 @@
                         </div>
                     </a>
                 </div>
-            </section>
-        </div>
+            </div>
+        </section>
 
         <footer class="o-row o-row--md">
             <div class="o-container">
