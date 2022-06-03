@@ -155,11 +155,12 @@ const togglePopUP = function () {
       document.querySelector('.c-floatingButton').style.display = 'flex';
       document.querySelector('.c-createalarm').style.display = 'None';
     });
-  document
-    .querySelector('.c-createalarm')
-    .addEventListener('click', function () {
-      console.log('dsfsqdfsdfq');
-    });
+  window.onclick = function (event) {
+    if (event.target == document.querySelector('.c-createalarm')) {
+      document.querySelector('.c-createalarm').style.display = 'none';
+      document.querySelector('.c-floatingButton').style.display = 'flex';
+    }
+  };
 };
 const listenToSocket = function () {
   socket.on('B2F_verandering_ldr', function (jsonObject) {
