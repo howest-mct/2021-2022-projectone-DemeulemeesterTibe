@@ -402,8 +402,21 @@ def setBrightness(payload):
 
 @socketio.on("F2B_DELalarm")
 def delAlarm(payload):
+    global wekkers,alarmopScherm,tijd
     dele = DataRepository.delete_alarm_by_id(payload["alarmid"])
     print(dele)
+    wekkers = []
+    data = DataRepository.read_alarmen_nog_komen()
+    for w in data:
+        wekkers.append(w["tijd"])
+    print("W0",wekkers)
+    if wekkers:
+        alarmopScherm = True
+    else:
+        if lcdStatus == 1:
+            lcd.reset_lcd()
+            tijd = "gggggggg"
+
     socketio.emit("B2F_Addalarm",broadcast=True)
 
 @socketio.on("F2B_UpdateAlarm")

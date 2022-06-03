@@ -71,6 +71,7 @@ const rgbToHex = function (r, g, b) {
   return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 };
 const drawChart = function (l, d) {
+  console.log(d);
   let options = {
     chart: {
       id: 'myChart',
@@ -153,6 +154,11 @@ const togglePopUP = function () {
     .addEventListener('click', function () {
       document.querySelector('.c-floatingButton').style.display = 'flex';
       document.querySelector('.c-createalarm').style.display = 'None';
+    });
+  document
+    .querySelector('.c-createalarm')
+    .addEventListener('click', function () {
+      console.log('dsfsqdfsdfq');
     });
 };
 const listenToSocket = function () {

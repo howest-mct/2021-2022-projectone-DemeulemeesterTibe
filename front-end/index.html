@@ -11,6 +11,7 @@
     <link rel="icon" href="favicon.svg">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style/normalize.css">
     <link rel="stylesheet" href="style/style.css">
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"
         integrity="sha384-LzhRnpGmQP+lOvWruF/lgkcqD+WDVt9fU3H4BWmwP5u5LTmkUGafMcpZKNObVMLU"
@@ -78,49 +79,54 @@
         </header>
 
         <div class="o-container">
-            <div class=" center">
-                <button class="js-GoSleep">Slapen</button>
-                <h1 class="js-test">Test</h1>
-                <p>tt</p>
-                <h1>RGB Ring</h1>
-                <input type="color" class="js-color c-input__color" value="#ff0000" id="">
-                <br>
-                <input type="range" class="js-brightness c-input__range" id="" min="0" max="1" step="0.05">
-                <p class="js-rangeValue">50 %</p>
-                <br>
-                <button class="js-setbrightness"> Set Brightness</button>
-                <button class="js-setcolor"> Set color</button>
-                <button class="js-rgbtoggle"> Turn on</button>
-            </div>
-            <div class="c-alarmen-list js-alarmen">
-                <a class="c-alarm" href="detail.html?alarmid=x">
-                    <div class="c-alarm__content">
-                        <h2 class="c-alarm__title">Titel</h2>
-                        <h3 class="c-alarm__day">Dagvandeweek</h3>
-                        <div class="c-alarm__periode"><span class="c-alarm__van">9u</span> tot <span
-                                class="c-alarm__tot">10u</span></div>
-                        <p class="c-alarm__description">Bla bla bla</p>
-                    </div>
-                </a>
-                <a class="c-alarm" href="detail.html?alarmid=x">
-                    <div class="c-alarm__content">
-                        <h2 class="c-alarm__title">Titel</h2>
-                        <h3 class="c-alarm__day">Dagvandeweek</h3>
-                        <div class="c-alarm__periode"><span class="c-alarm__van">9u</span> tot <span
-                                class="c-alarm__tot">10u</span></div>
-                        <p class="c-alarm__description">Bla bla bla</p>
-                    </div>
-                </a>
-                <a class="c-alarm" href="detail.html?alarmid=x">
-                    <div class="c-alarm__content">
-                        <h2 class="c-alarm__title">Titel</h2>
-                        <h3 class="c-alarm__day">Dagvandeweek</h3>
-                        <div class="c-alarm__periode"><span class="c-alarm__van">9u</span> tot <span
-                                class="c-alarm__tot">10u</span></div>
-                        <p class="c-alarm__description">Bla bla bla</p>
-                    </div>
-                </a>
-            </div>
+            <section class="o-row o-row--lg">
+                <div class=" center">
+                    <button class="js-GoSleep">Slapen</button>
+                    <input type="time" name="" id="">
+                    <h1 class="js-test">Test</h1>
+                    <p>tt</p>
+                    <h1>RGB Ring</h1>
+                    <input type="color" class="js-color c-input__color" value="#ff0000" id="">
+                    <br>
+                    <input type="range" class="js-brightness c-input__range" id="" min="0" max="1" step="0.05">
+                    <p class="js-rangeValue">50 %</p>
+                    <br>
+                    <button class="js-setbrightness"> Set Brightness</button>
+                    <button class="js-setcolor"> Set color</button>
+                    <button class="js-rgbtoggle"> Turn on</button>
+                </div>
+            </section>
+            <section class="o-row o-row--lg">
+                <div class="c-alarmen-list js-alarmen">
+                    <a class="c-alarm" href="detail.html?alarmid=x">
+                        <div class="c-alarm__content">
+                            <h2 class="c-alarm__title">Titel</h2>
+                            <h3 class="c-alarm__day">Dagvandeweek</h3>
+                            <div class="c-alarm__periode"><span class="c-alarm__van">9u</span> tot <span
+                                    class="c-alarm__tot">10u</span></div>
+                            <p class="c-alarm__description">Bla bla bla</p>
+                        </div>
+                    </a>
+                    <a class="c-alarm" href="detail.html?alarmid=x">
+                        <div class="c-alarm__content">
+                            <h2 class="c-alarm__title">Titel</h2>
+                            <h3 class="c-alarm__day">Dagvandeweek</h3>
+                            <div class="c-alarm__periode"><span class="c-alarm__van">9u</span> tot <span
+                                    class="c-alarm__tot">10u</span></div>
+                            <p class="c-alarm__description">Bla bla bla</p>
+                        </div>
+                    </a>
+                    <a class="c-alarm" href="detail.html?alarmid=x">
+                        <div class="c-alarm__content">
+                            <h2 class="c-alarm__title">Titel</h2>
+                            <h3 class="c-alarm__day">Dagvandeweek</h3>
+                            <div class="c-alarm__periode"><span class="c-alarm__van">9u</span> tot <span
+                                    class="c-alarm__tot">10u</span></div>
+                            <p class="c-alarm__description">Bla bla bla</p>
+                        </div>
+                    </a>
+                </div>
+            </section>
         </div>
 
         <footer class="o-row o-row--md">
