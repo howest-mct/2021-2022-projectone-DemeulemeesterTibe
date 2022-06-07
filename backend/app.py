@@ -122,14 +122,15 @@ def joy_knop(pin):
                 alarm = alarm + timedelta(days=1)
                 t = DataRepository.insert_alarm("Alarm",alarm)
                 socketio.emit("B2F_Addalarm",broadcast=True)
-                wekkers = []
-                alarmopScherm = True
                 data = DataRepository.read_alarmen_nog_komen()
+                print("#",data)
+                wekkers = []
                 for w in data:
                     wekkers.append(w["tijd"])
-                alarmopScherm = True
+                print(">",wekkers[0])
                 print("alarm",alarm,"\n",alarm)
                 lcd.disable_cursor()
+                alarmopScherm = True
             else:
                 lcd.enable_cursor()
                 lcdStatus = 3
@@ -163,6 +164,7 @@ def codeSchakeling():
             timerldr = time.time()
             insert = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),lichtsterkte,None,2,1)
             data = DataRepository.read_historiek_by_id(insert)
+            print("LDR",lichtsterkte)
             socketio.emit('B2F_verandering_ldr', {'ldr': data}, broadcast=True)
         # alarm 
         if timenow in wekkers:
@@ -201,9 +203,10 @@ def displayStatus(lcdStatus,y,x):
                 t += 1
             tijd = huidigetijd
         if alarmopScherm is True:
-            print("test")
+            print("nieuw alarm")
             lcd.set_cursor(64)
-            print("Wekker",wekkers[0].time())
+            print("@",wekkers[0].time())
+
             lcd.write_message(f"Alarm: {wekkers[0].time()}")
             alarmopScherm = False
     elif lcdStatus == 3:
