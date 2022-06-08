@@ -19,10 +19,10 @@ const showAlarmen = function (jsonObject) {
   for (alarm of jsonObject.alarmen) {
     html += `<a class="c-alarm" href="detail.html?alarmid=${alarm.alarmID}">
                     <div class="c-alarm__content">
-                        <h2 class="c-alarm__title">${alarm.naam}</h2>
-                        <h3 class="c-alarm__day">${alarm.dag}</h3>
-                        <div class="c-alarm__periode"><span class="c-alarm__van">${alarm.tijdstip}</span></div>
-                    </div>
+                    <h2 class="c-alarm__title">${alarm.naam}</h2>
+                    <div class="c-alarm__periode"><span class="c-alarm__van">${alarm.tijdstip}</span></div></div>
+                    <h3 class="c-alarm__day">${alarm.dag}</h3>
+                    <p class="c-alarm__description"></p>
                 </a>`;
   }
   alarmen.innerHTML = html;
@@ -155,7 +155,7 @@ const togglePopUP = function () {
       document.querySelector('.c-floatingButton').style.display = 'flex';
       document.querySelector('.c-createalarm').style.display = 'None';
     });
-  window.onclick = function (event) {
+  document.onclick = function (event) {
     if (event.target == document.querySelector('.c-createalarm')) {
       document.querySelector('.c-createalarm').style.display = 'none';
       document.querySelector('.c-floatingButton').style.display = 'flex';
@@ -190,6 +190,11 @@ const listenToSocket = function () {
   });
   socket.on('B2F_Ringstatus', function (jsonObject) {
     RingAan = jsonObject.ring;
+    if (RingAan == 1) {
+      document.querySelector('.js-rgb').checked = true;
+    } else {
+      document.querySelector('.js-rgb').checked = false;
+    }
   });
   socket.on('B2F_SlaapStatus', function (jsonObject) {
     Slapen = jsonObject.slapen;
@@ -205,15 +210,14 @@ const listenToUI = function () {
       .querySelector('.js-setcolor')
       .addEventListener('click', listenToSetColor);
     document
-      .querySelector('.js-rgbtoggle')
-      .addEventListener('click', listenToRgbToggle);
-    document
       .querySelector('.js-setbrightness')
       .addEventListener('click', listenToSetBrightness);
-    listenToChangeColor();
+    document.querySelector('.js-rgb').addEventListener('change', ListenToRgb);
     document
       .querySelector('.js-GoSleep')
       .addEventListener('click', ListenToGoSleep);
+    listenToChangeColor();
+    listenToChangeBrightness();
   } else if (document.querySelector('.js-updatealarm')) {
     // detail.html
     document
@@ -261,15 +265,6 @@ const listenToSetColor = function () {
   socket.emit('F2B_SetColor', { color: color });
   handleData(url, showResultAddColor, showError, 'POST', payload);
 };
-const listenToRgbToggle = function () {
-  if (RingAan == 0) {
-    RingAan = 1;
-  } else if (RingAan == 1) {
-    RingAan = 0;
-  }
-  socket.emit('F2B_RGBring', { aan: RingAan });
-  console.log(RingAan);
-};
 const listenToSetBrightness = function () {
   const brightness = document.querySelector('.js-brightness').value;
   console.log(brightness);
@@ -278,6 +273,26 @@ const listenToSetBrightness = function () {
 const listenToChangeColor = function () {
   document.querySelector('.c-input__color').oninput = function () {
     this.style.backgroundColor = this.value;
+    // console.log('color');
+    // const url = 'http://192.168.168.169:5000/api/historiek/';
+    // let color = hexToRgb(document.querySelector('.js-color').value);
+    // console.log(color);
+    // const payload = JSON.stringify({
+    //   color: color,
+    //   deviceID: 4,
+    //   actieID: 2,
+    // });
+    // socket.emit('F2B_SetColor', { color: color });
+    // handleData(url, showResultAddColor, showError, 'POST', payload);
+  };
+};
+const listenToChangeBrightness = function () {
+  document.querySelector('.js-brightness').oninput = function () {
+    document.querySelector('.js-rangeValue').innerHTML =
+      Math.round(document.querySelector('.js-brightness').value * 100) + ' %';
+    // const brightness = document.querySelector('.js-brightness').value;
+    // console.log(brightness);
+    // socket.emit('F2B_SetBrightness', { brightness: brightness });
   };
 };
 const listenToDeleteAlarm = function () {
@@ -306,6 +321,15 @@ const ListenToGoSleep = function () {
   }
   socket.emit('F2B_GaanSlapen', { Slapen: Slapen });
 };
+const ListenToRgb = function () {
+  if (this.checked == true) {
+    RingAan = 1;
+  } else if (this.checked == false) {
+    RingAan = 0;
+  }
+  socket.emit('F2B_RGBring', { aan: RingAan });
+  console.log(RingAan);
+};
 //#endregion
 
 //#region ***  Init / DOMContentLoaded                  ***********
@@ -318,10 +342,6 @@ const init = function () {
     getAlarmen();
     listenToSocket();
     listenToUI();
-    document.querySelector('.js-brightness').oninput = function () {
-      document.querySelector('.js-rangeValue').innerHTML =
-        Math.round(document.querySelector('.js-brightness').value * 100) + ' %';
-    };
   } else if (document.querySelector('.js-updatealarm')) {
     let urlParams = new URLSearchParams(window.location.search);
     alarmid = urlParams.get('alarmid');

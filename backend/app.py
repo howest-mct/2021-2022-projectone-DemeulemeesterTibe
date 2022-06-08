@@ -1,6 +1,7 @@
 import time
 from unittest import result
 from RPi import GPIO
+from numpy import average
 from helpers.lcdClass import lcdClass
 from helpers.klasseknop import Button
 from helpers.spiclass import SpiClass
@@ -72,6 +73,8 @@ timer = 0
 aan = False
 ring = False
 GaanSlapen = False
+gewichtmetingen = []
+averagegewicht = -240000
 # objecten
 joyTimer = time.time()
 timerldr = time.time()
@@ -82,7 +85,7 @@ lcd = lcdClass(rs,e,None,True)
 pixels = neopixel.NeoPixel(board.D18,12)
 pixels.brightness = 0.5
 hx = HX711(dtWeight,clkWeight)
-hx.set_scale_ratio(hx.get_data_mean(20)/188)
+
 
 # Code voor Hardware
 def setup_gpio():
@@ -91,7 +94,7 @@ def setup_gpio():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(buzz, GPIO.OUT)
     buzzer = GPIO.PWM(buzz,1000)
-    buzzer.ChangeFrequency(440)
+    buzzer.ChangeFrequency(1000)
     buzzer.start(0)
     btn.on_press(lees_knop)
     joyBtn.on_press(joy_knop)
@@ -170,8 +173,9 @@ def codeSchakeling():
         if timenow in wekkers:
             aan = True
         if aan == True:
-            print(round(hx.get_weight_mean(1),2), 'g')
+            # pass
             buzzer.start(10)
+
         if ring == 1:
             pixels.fill((Red,Green,Blue))
         elif ring == 0:
@@ -288,9 +292,40 @@ def checkdeel(tijd):
     return string
 
 def getWeight():
+    global averagegewicht,gewichtmetingen,aan
+    # hx.set_scale_ratio(hx.get_data_mean(20)/188.0)
     while True:
-        while aan == True:
-            print(round(hx.get_weight_mean(20),2), 'g')
+        # while aan == True:
+        # print(round(hx.get_weight_mean(20),2), 'g')
+        reading = hx.get_raw_data_mean(20)
+        print(reading)
+        if aan == False:
+            gewichtmetingen.append(reading)
+            if len(gewichtmetingen) == 5:
+                averagegewicht = average(gewichtmetingen)
+                gewichtmetingen = []
+                print(">",averagegewicht,"\n#",gewichtmetingen)
+        else:
+            diff = averagegewicht - reading
+            print("diff",diff)
+            if diff > 500:
+                print("ALARM GAAT AF")
+                aan = False
+                buzzer.start(0)
+                lcd.second_row()
+                lcd.write_message("               ")
+                Wekkers()
+
+def Wekkers():
+    global wekkers,alarmopScherm
+    wekkers = []
+    data = DataRepository.read_alarmen_nog_komen()
+    for w in data:
+        wekkers.append(w["tijd"])
+    print("W0",wekkers)
+    if wekkers:
+        alarmopScherm = True
+
 
 # Code voor Flask
 
@@ -360,10 +395,11 @@ def slaap():
 def initial_connection():
     print('A new client connect')
     # random ldr waarde op website tot volgende inlees moment
-    data = DataRepository.read_historiek_by_id(20)
     socketio.emit("B2F_Ringstatus",{"ring": ring})
     socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen})
-    socketio.emit("B2F_verandering_ldr",{'ldr': data})
+    socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness},broadcast=True)
+    socketio.emit("B2F_SetColor",{"red":Red,"green":Green,"blue":Blue})
+    
 
 @socketio.on("F2B_SetColor")
 def setColor(payload):
@@ -425,6 +461,7 @@ def delAlarm(payload):
 @socketio.on("F2B_UpdateAlarm")
 def updateAlarm(payload):
     dele = DataRepository.update_alarm_by_id(payload["alarmid"],payload["naam"],payload["tijdstip"])
+    Wekkers()
     socketio.emit("B2F_Addalarm",broadcast=True)
 
 @socketio.on("F2B_GaanSlapen")
