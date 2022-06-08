@@ -13,6 +13,10 @@
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style/normalize.css">
     <link rel="stylesheet" href="style/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"
         integrity="sha384-LzhRnpGmQP+lOvWruF/lgkcqD+WDVt9fU3H4BWmwP5u5LTmkUGafMcpZKNObVMLU"
         crossorigin="anonymous"></script>
@@ -79,6 +83,11 @@
                 <p>Tijdstip</p>
                 <input type="datetime-local" name="" class="js-tijdstip">
                 <br>
+                <p>Actief</p>
+                <div class="c-checkbox">
+                    <input type="checkbox" id="actief" class="c-toggle js-actief">
+                    <label for="actief"></label>
+                </div>
                 <button class="js-deletealarm">Delete alarm</button>
                 <button class="js-updatealarm">Update alarm</button>
             </div>

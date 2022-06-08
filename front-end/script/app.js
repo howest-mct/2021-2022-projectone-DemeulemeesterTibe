@@ -40,6 +40,7 @@ const showAlarm = function (jsonObject) {
   let time = jsonObject.alarm.datetime;
   time = time.replace(' ', 'T');
   document.querySelector('.js-tijdstip').value = time;
+  document.querySelector('.js-actief').checked = jsonObject.alarm.actief;
 };
 const ShowSlaapGrafiek = function (jsonObject) {
   let converted_labels = [];
@@ -246,6 +247,7 @@ const listenToCreateAlarm = function () {
   const payload = JSON.stringify({
     naam: naam,
     tijd: t,
+    actief: document.querySelector('.js-actief').checked,
   });
   document.querySelector('.c-floatingButton').style.display = 'flex';
   document.querySelector('.c-createalarm').style.display = 'None';
@@ -309,6 +311,7 @@ const listenToUpdateAlarm = function () {
     alarmid: id,
     naam: naam,
     tijdstip: tijdstip,
+    actief: document.querySelector('.js-actief').checked,
   });
 };
 const ListenToGoSleep = function () {

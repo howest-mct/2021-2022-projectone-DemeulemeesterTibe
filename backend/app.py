@@ -143,7 +143,7 @@ def codeSchakeling():
     global minldr,maxldr,aan,timer,timerldr,pixels,huidigetijd,timenow,alarmopScherm
     data = DataRepository.read_alarmen_nog_komen()
     for w in data:
-        wekkers.append(w["tijd"])
+        wekkers.append([w["tijd"],w["alarmID"]])
     if wekkers:
         alarmopScherm = True
     while True: 
@@ -170,10 +170,10 @@ def codeSchakeling():
             print("LDR",lichtsterkte)
             socketio.emit('B2F_verandering_ldr', {'ldr': data}, broadcast=True)
         # alarm 
-        if timenow in wekkers:
-            aan = True
+        for w in wekkers:
+            if timenow in w:
+                aan = True
         if aan == True:
-            # pass
             buzzer.start(10)
 
         if ring == 1:
@@ -209,9 +209,9 @@ def displayStatus(lcdStatus,y,x):
         if alarmopScherm is True:
             print("nieuw alarm")
             lcd.set_cursor(64)
-            print("@",wekkers[0].time())
+            print("@",wekkers[0][0].time())
 
-            lcd.write_message(f"Alarm: {wekkers[0].time()}")
+            lcd.write_message(f"Alarm: {wekkers[0][0].time()}")
             alarmopScherm = False
     elif lcdStatus == 3:
         if timer - joyTimer >=0.3:
@@ -304,27 +304,28 @@ def getWeight():
             if len(gewichtmetingen) == 5:
                 averagegewicht = average(gewichtmetingen)
                 gewichtmetingen = []
-                print(">",averagegewicht,"\n#",gewichtmetingen)
+                print(">",averagegewicht,"\t#",gewichtmetingen)
         else:
             diff = averagegewicht - reading
             print("diff",diff)
             if diff > 500:
-                print("ALARM GAAT AF")
+                print("ALARM UIT")
                 aan = False
+                up = DataRepository.update_alarmActief0_by_id(wekkers[0][1])
                 buzzer.start(0)
-                lcd.second_row()
-                lcd.write_message("               ")
                 Wekkers()
 
 def Wekkers():
-    global wekkers,alarmopScherm
+    global wekkers,alarmopScherm,tijd
+    lcd.reset_lcd()
     wekkers = []
     data = DataRepository.read_alarmen_nog_komen()
     for w in data:
-        wekkers.append(w["tijd"])
+        wekkers.append([w["tijd"],w["alarmID"]])
     print("W0",wekkers)
     if wekkers:
         alarmopScherm = True
+    tijd = "gggggggg"
 
 
 # Code voor Flask
@@ -359,7 +360,7 @@ def alarmen():
     elif request.method == "POST":
         gegevens = DataRepository.json_or_formdata(request)
         print(gegevens)
-        data = DataRepository.insert_alarm(gegevens["naam"],gegevens["tijd"])
+        data = DataRepository.insert_alarm(gegevens["naam"],gegevens["tijd"],gegevens["actief"])
         return jsonify(alarmid=data),201
 
 @app.route('/api/alarm/<alarmid>/',methods=["GET","PUT","DELETE"])
@@ -424,13 +425,8 @@ def setRing(payload):
 
 @socketio.on("F2B_Addalarm")
 def addAlarm(payload):
-    global wekkers,alarmopScherm
-    wekkers = []
-    data = DataRepository.read_alarmen_nog_komen()
-    for w in data:
-        wekkers.append(w["tijd"])
-    print("W0",wekkers)
-    alarmopScherm = True
+    global alarmopScherm
+    Wekkers()
     socketio.emit("B2F_Addalarm",broadcast=True)
 
 @socketio.on("F2B_SetBrightness")
@@ -441,26 +437,17 @@ def setBrightness(payload):
 
 @socketio.on("F2B_DELalarm")
 def delAlarm(payload):
-    global wekkers,alarmopScherm,tijd
+    global alarmopScherm,tijd
     dele = DataRepository.delete_alarm_by_id(payload["alarmid"])
     print(dele)
-    wekkers = []
-    data = DataRepository.read_alarmen_nog_komen()
-    for w in data:
-        wekkers.append(w["tijd"])
-    print("W0",wekkers)
-    if wekkers:
-        alarmopScherm = True
-    else:
-        if lcdStatus == 1:
-            lcd.reset_lcd()
-            tijd = "gggggggg"
+    Wekkers()
 
     socketio.emit("B2F_Addalarm",broadcast=True)
 
 @socketio.on("F2B_UpdateAlarm")
 def updateAlarm(payload):
-    dele = DataRepository.update_alarm_by_id(payload["alarmid"],payload["naam"],payload["tijdstip"])
+    print("*** Update alarm ***")
+    dele = DataRepository.update_alarm_by_id(payload["alarmid"],payload["naam"],payload["tijdstip"],payload["actief"])
     Wekkers()
     socketio.emit("B2F_Addalarm",broadcast=True)
 

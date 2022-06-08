@@ -29,7 +29,7 @@ class DataRepository:
     
     @staticmethod
     def read_alarmen_nog_komen():
-        sql = "SELECT *,concat(time(tijd)) as tijdstip FROM smartwekker.alarm WHERE timestampdiff(second,now(),tijd) >0 ORDER BY timestampdiff(second,now(),tijd);"
+        sql = "SELECT *,concat(time(tijd)) as tijdstip FROM smartwekker.alarm WHERE timestampdiff(second,now(),tijd) >0 and actief = 1 ORDER BY timestampdiff(second,now(),tijd);"
         return Database.get_rows(sql)
     
     @staticmethod
@@ -39,9 +39,15 @@ class DataRepository:
         return Database.get_one_row(sql,payload)
     
     @staticmethod
-    def update_alarm_by_id(id,naam,tijdstip):
-        sql = "UPDATE alarm SET naam = %s, tijd = %s WHERE alarmid = %s"
-        payload = [naam,tijdstip,id]
+    def update_alarmActief0_by_id(id):
+        sql = "UPDATE alarm set actief = 0 WHERE alarmid = %s"
+        payload = [id]
+        return Database.execute_sql(sql,payload)
+
+    @staticmethod
+    def update_alarm_by_id(id,naam,tijdstip,actief):
+        sql = "UPDATE alarm SET naam = %s, tijd = %s,actief = %s WHERE alarmid = %s"
+        payload = [naam,tijdstip,actief,id]
         return Database.execute_sql(sql,payload)
     
     @staticmethod
@@ -51,9 +57,9 @@ class DataRepository:
         return Database.execute_sql(sql,payload)
 
     @staticmethod
-    def insert_alarm(naam,tijd):
-        sql = "insert into alarm (naam,tijd) VALUES (%s,%s)"
-        params = [naam,tijd]
+    def insert_alarm(naam,tijd,actief):
+        sql = "insert into alarm (naam,tijd,actief) VALUES (%s,%s,%s)"
+        params = [naam,tijd,actief]
         return Database.execute_sql(sql,params)
     
     @staticmethod
