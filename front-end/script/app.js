@@ -16,6 +16,7 @@ const showResultAddAlarm = function (jsonObject) {
   socket.emit('F2B_Addalarm', { alarmID: jsonObject });
 };
 const showAlarmen = function (jsonObject) {
+  console.log(jsonObject);
   const alarmen = document.querySelector('.c-alarmen-list');
   let html = '';
   for (alarm of jsonObject.alarmen) {
@@ -23,7 +24,7 @@ const showAlarmen = function (jsonObject) {
                     <div class="c-alarm__content">
                     <h2 class="c-alarm__title">${alarm.naam}</h2>
                     <div class="c-alarm__periode"><span class="c-alarm__van">${alarm.tijdstip}</span></div></div>
-                    <h3 class="c-alarm__day">${alarm.dag}</h3>
+                    <h3 class="c-alarm__day">${alarm.date}</h3>
                     <p class="c-alarm__description"></p>
                 </a>`;
   }
@@ -85,60 +86,60 @@ const herhaalDagen = function () {
   let repeat = '';
   let teller = 0;
   let vorTeller = 0;
-  if (document.querySelector('.js-maandag').checked == true) {
+  if (document.querySelector('.js-Monday').checked == true) {
     if (teller != vorTeller) {
       repeat += ',';
       vorTeller = teller;
     }
-    repeat += 'maandag';
+    repeat += 'Monday';
     teller += 1;
   }
-  if (document.querySelector('.js-dinsdag').checked == true) {
+  if (document.querySelector('.js-Tuesday').checked == true) {
     if (teller != vorTeller) {
       repeat += ',';
       vorTeller = teller;
     }
-    repeat += 'dinsdag';
+    repeat += 'Tuesday';
     teller += 1;
   }
-  if (document.querySelector('.js-woensdag').checked == true) {
+  if (document.querySelector('.js-Wednesday').checked == true) {
     if (teller != vorTeller) {
       repeat += ',';
       vorTeller = teller;
     }
-    repeat += 'woensdag';
+    repeat += 'Wednesday';
     teller += 1;
   }
-  if (document.querySelector('.js-donderdag').checked == true) {
+  if (document.querySelector('.js-Thursday').checked == true) {
     if (teller != vorTeller) {
       repeat += ',';
       vorTeller = teller;
     }
-    repeat += 'donderdag';
+    repeat += 'Thursday';
     teller += 1;
   }
-  if (document.querySelector('.js-vrijdag').checked == true) {
+  if (document.querySelector('.js-Friday').checked == true) {
     if (teller != vorTeller) {
       repeat += ',';
       vorTeller = teller;
     }
-    repeat += 'vrijdag';
+    repeat += 'Friday';
     teller += 1;
   }
-  if (document.querySelector('.js-zaterdag').checked == true) {
+  if (document.querySelector('.js-Saturday').checked == true) {
     if (teller != vorTeller) {
       repeat += ',';
       vorTeller = teller;
     }
-    repeat += 'zaterdag';
+    repeat += 'Saturday';
     teller += 1;
   }
-  if (document.querySelector('.js-zondag').checked == true) {
+  if (document.querySelector('.js-Sunday').checked == true) {
     if (teller != vorTeller) {
       repeat += ',';
       vorTeller = teller;
     }
-    repeat += 'zondag';
+    repeat += 'Sunday';
     teller += 1;
   }
   return repeat;

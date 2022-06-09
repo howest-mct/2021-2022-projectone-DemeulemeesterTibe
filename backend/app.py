@@ -1,3 +1,4 @@
+from calendar import weekday
 import time
 from unittest import result
 from RPi import GPIO
@@ -58,7 +59,7 @@ rs = 21
 e =  20
 buzz = 26
 buzzer = ""
-lcdStatus = 0
+lcdStatus = 1
 vorips = ""
 huidigetijd = "fddfsdf"
 tijd = ""
@@ -127,12 +128,13 @@ def joy_knop(pin):
                 alarm = alarm + timedelta(days=1)
                 t = DataRepository.insert_alarm("Alarm",alarm)
                 socketio.emit("B2F_Addalarm",broadcast=True)
-                data = DataRepository.read_alarmen_nog_komen()
-                print("#",data)
-                wekkers = []
-                for w in data:
-                    wekkers.append(w["tijd"])
-                print(">",wekkers[0])
+                # data = DataRepository.read_alarmen_nog_komen()
+                # print("#",data)
+                # wekkers = []
+                # for w in data:
+                #     wekkers.append(w["tijd"])
+                # print(">",wekkers[0])
+                Wekkers()
                 print("alarm",alarm,"\n",alarm)
                 lcd.disable_cursor()
                 alarmopScherm = True
@@ -143,9 +145,10 @@ def joy_knop(pin):
 
 def codeSchakeling():
     global minldr,maxldr,aan,timer,timerldr,pixels,huidigetijd,timenow,alarmopScherm
-    data = DataRepository.read_alarmen_nog_komen()
-    for w in data:
-        wekkers.append([w["tijd"],w["alarmID"]])
+    # data = DataRepository.read_alarmen_nog_komen()
+    # for w in data:
+    #     wekkers.append([w["tijd"],w["alarmID"]])
+    Wekkers()
     if wekkers:
         alarmopScherm = True
     while True: 
@@ -154,7 +157,6 @@ def codeSchakeling():
         timenow = datetime.now().replace(microsecond=0)
         joyY = spi.readChannel(0)
         joyX = spi.readChannel(1)
-        displayStatus(lcdStatus,joyY,joyX)
         # ldr
         waardeldr = spi.readChannel(2)
         if(waardeldr < minldr):
@@ -172,14 +174,14 @@ def codeSchakeling():
             print("LDR",lichtsterkte)
             socketio.emit('B2F_verandering_ldr', {'ldr': data}, broadcast=True)
         # alarm 
-        for w in wekkers:
-            if timenow in w:
-                lcd.reset_lcd()
-                aan = True
+        # for w in wekkers:
+        if timenow == wekkers["tijd"]:
+            lcd.reset_lcd()
+            aan = True
         if aan == True:
             # buzzer.start(10)
             print("WEKKER GAAT AF")
-
+        displayStatus(lcdStatus,joyY,joyX)
         if ring == 1:
             pixels.fill((Red,Green,Blue))
         elif ring == 0:
@@ -214,8 +216,8 @@ def displayStatus(lcdStatus,y,x):
             if alarmopScherm is True:
                 print("nieuw alarm")
                 lcd.set_cursor(64)
-                print("@",wekkers[0][0].time())
-                lcd.write_message(f"Alarm: {wekkers[0][0].time()}")
+                print("@",wekkers["tijd"].time())
+                lcd.write_message(f"Alarm: {wekkers['tijd'].time()}")
                 alarmopScherm = False
     elif lcdStatus == 3:
         if timer - joyTimer >=0.3:
@@ -314,7 +316,8 @@ def getWeight():
                 print(reading)
                 averagegewicht = average(gewichtmetingen)
                 gewichtmetingen = []
-                print(">",averagegewicht,"\t#",gewichtmetingen)
+                # print(">",averagegewicht,"\t#",gewichtmetingen)
+            timergewicht = time.time()  
         else:
             lcdStatus = 5
             diff = averagegewicht - reading
@@ -324,9 +327,20 @@ def getWeight():
                     print("ALARM UIT")
                     aan = False
                     buzzer.start(0)
-                    Wekkers()
                     lcdStatus = 2
                     vorWakkerWorden = ""
+                    print("id wekker",wekkers["alarmID"])
+                    if wekkers["herhaal"] != "":
+                        dagenoverlopen = True
+                        tijdstip = wekkers["tijd"]
+                        while dagenoverlopen is True:
+                            tijdstip = tijdstip + timedelta(days=1)
+                            if tijdstip.strftime("%A") in wekkers["herhaal"]:
+                                print("NIEUWE DATUM",tijdstip)
+                                te = DataRepository.update_alarm_tijdstip_by_id(wekkers["alarmID"],tijdstip)
+                                socketio.emit("B2F_Addalarm",broadcast=True)
+                                dagenoverlopen = False
+                            
                     if beginTijdSlapen:
                         eindTijdSlapen = datetime.now().replace(microsecond=0)
                         print("eindTijdSlapen")
@@ -334,24 +348,33 @@ def getWeight():
                         GaanSlapen = 0
                         socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
                         beginTijdSlapen = None
+                    Wekkers()
             else:
                 timergewicht = time.time()  
             print("diff",diff)
 
 
+# def Wekkers():
+#     global wekkers,alarmopScherm,tijd
+#     if lcdStatus == 2:
+#         lcd.reset_lcd()
+#     wekkers = []
+#     data = DataRepository.read_alarmen_nog_komen()
+#     for w in data:
+#         wekkers.append([w["tijd"],w["alarmID"]])
+#     print("W0",wekkers)
+#     if wekkers:
+#         alarmopScherm = True
+#     tijd = "gggggggg"
 def Wekkers():
     global wekkers,alarmopScherm,tijd
     if lcdStatus == 2:
         lcd.reset_lcd()
-    wekkers = []
-    data = DataRepository.read_alarmen_nog_komen()
-    for w in data:
-        wekkers.append([w["tijd"],w["alarmID"]])
+    wekkers = DataRepository.read_alarm_nog_komen()
     print("W0",wekkers)
     if wekkers:
         alarmopScherm = True
     tijd = "gggggggg"
-
 
 # Code voor Flask
 

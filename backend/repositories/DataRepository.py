@@ -24,13 +24,18 @@ class DataRepository:
     
     @staticmethod
     def read_alarmen():
-        sql = "SELECT *,dayname(tijd) as dag,concat(time(tijd)) as tijdstip FROM alarm"
+        sql = "SELECT *,dayname(tijd) as dag,concat(time(tijd)) as tijdstip,concat(date(tijd)) as date FROM alarm"
         return Database.get_rows(sql)
     
     @staticmethod
     def read_alarmen_nog_komen():
         sql = "SELECT *,concat(time(tijd)) as tijdstip FROM smartwekker.alarm WHERE timestampdiff(second,now(),tijd) >0 and actief = 1 ORDER BY timestampdiff(second,now(),tijd);"
         return Database.get_rows(sql)
+    
+    @staticmethod
+    def read_alarm_nog_komen():
+        sql = "SELECT *,concat(time(tijd)) as tijdstip FROM smartwekker.alarm WHERE timestampdiff(second,now(),tijd) >0 and actief = 1 ORDER BY timestampdiff(second,now(),tijd) LIMIT 1;"
+        return Database.get_one_row(sql)
     
     @staticmethod
     def read_alarm_by_id(id):
@@ -42,6 +47,12 @@ class DataRepository:
     def update_alarmActief0_by_id(id):
         sql = "UPDATE alarm set actief = 0 WHERE alarmid = %s"
         payload = [id]
+        return Database.execute_sql(sql,payload)
+
+    @staticmethod
+    def update_alarm_tijdstip_by_id(id,tijd):
+        sql = "UPDATE alarm set tijd = %s WHERE alarmid = %s"
+        payload = [tijd,id]
         return Database.execute_sql(sql,payload)
 
     @staticmethod
