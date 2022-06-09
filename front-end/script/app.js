@@ -213,12 +213,6 @@ const listenToUI = function () {
     document
       .querySelector('.js-makealarm')
       .addEventListener('click', listenToCreateAlarm);
-    document
-      .querySelector('.js-setcolor')
-      .addEventListener('click', listenToSetColor);
-    document
-      .querySelector('.js-setbrightness')
-      .addEventListener('click', listenToSetBrightness);
     document.querySelector('.js-rgb').addEventListener('change', ListenToRgb);
     document
       .querySelector('.js-GoSleep')
@@ -259,24 +253,6 @@ const listenToCreateAlarm = function () {
   document.querySelector('.c-createalarm').style.display = 'None';
   console.log(payload);
   handleData(url, showResultAddAlarm, showError, 'POST', payload);
-};
-const listenToSetColor = function () {
-  console.log('color');
-  const url = 'http://192.168.168.169:5000/api/historiek/';
-  let color = hexToRgb(document.querySelector('.js-color').value);
-  console.log(color);
-  const payload = JSON.stringify({
-    color: color,
-    deviceID: 4,
-    actieID: 2,
-  });
-  socket.emit('F2B_SetColor', { color: color });
-  handleData(url, showResultAddColor, showError, 'POST', payload);
-};
-const listenToSetBrightness = function () {
-  const brightness = document.querySelector('.js-brightness').value;
-  console.log(brightness);
-  socket.emit('F2B_SetBrightness', { brightness: brightness });
 };
 const listenToChangeColor = function () {
   document.querySelector('.c-input__color').oninput = function () {

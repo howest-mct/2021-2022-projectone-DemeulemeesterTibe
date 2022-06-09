@@ -45,11 +45,10 @@ for line in ifconfig.decode().split('\n'):
         break
 print("wifi",wifiIp,"lan",lanIp )
 # variabelen
-beginTijdSlapen = time.strftime('%Y-%m-%d %H:%M:%S')
-eindTijdSlapen = time.strftime('%Y-%m-%d %H:%M:%S')
+beginTijdSlapen = None
+eindTijdSlapen = None
 dtWeight = 6
 clkWeight = 13
-timenow = datetime.now().replace(microsecond=0)
 wekkers = []
 Red = 255
 Green = 0
@@ -74,8 +73,11 @@ aan = False
 ring = False
 GaanSlapen = False
 gewichtmetingen = []
-averagegewicht = -240000
+averagegewicht = -100000
+WakkerWorden = "Wakker worden!!!"
+vorWakkerWorden = ""
 # objecten
+timenow = datetime.now().replace(microsecond=0)
 joyTimer = time.time()
 timerldr = time.time()
 joyBtn = Button(19)
@@ -172,9 +174,11 @@ def codeSchakeling():
         # alarm 
         for w in wekkers:
             if timenow in w:
+                lcd.reset_lcd()
                 aan = True
         if aan == True:
-            buzzer.start(10)
+            # buzzer.start(10)
+            print("WEKKER GAAT AF")
 
         if ring == 1:
             pixels.fill((Red,Green,Blue))
@@ -182,7 +186,7 @@ def codeSchakeling():
             pixels.fill((0,0,0))
 
 def displayStatus(lcdStatus,y,x):
-    global vorips , tijd , teller , joyTimer , alarmopScherm, huidigetijd,timer
+    global vorips , tijd , teller , joyTimer , alarmopScherm, huidigetijd,timer, vorWakkerWorden
     if lcdStatus == 0:
         lcd.reset_cursor()
         ips = check_output(["hostname", "-I"])
@@ -206,13 +210,13 @@ def displayStatus(lcdStatus,y,x):
                     lcd.write_message(a)
                 t += 1
             tijd = huidigetijd
-        if alarmopScherm is True:
-            print("nieuw alarm")
-            lcd.set_cursor(64)
-            print("@",wekkers[0][0].time())
-
-            lcd.write_message(f"Alarm: {wekkers[0][0].time()}")
-            alarmopScherm = False
+        if wekkers:
+            if alarmopScherm is True:
+                print("nieuw alarm")
+                lcd.set_cursor(64)
+                print("@",wekkers[0][0].time())
+                lcd.write_message(f"Alarm: {wekkers[0][0].time()}")
+                alarmopScherm = False
     elif lcdStatus == 3:
         if timer - joyTimer >=0.3:
             if x > 1000:
@@ -243,7 +247,11 @@ def displayStatus(lcdStatus,y,x):
                 joyTimer = getal_veranderen(teller,tijd)
             elif y < 10:
                 joyTimer = getal_veranderen(teller,tijd,True)
-
+    elif lcdStatus == 5:
+        if vorWakkerWorden != WakkerWorden:
+            lcd.first_row()
+            lcd.write_message(WakkerWorden)
+        vorWakkerWorden = WakkerWorden
 def getal_veranderen(teller,vortijd,plus=False):
     global tijd
     cijfer = int(tijd[teller-4])
@@ -291,33 +299,50 @@ def checkdeel(tijd):
     # print(">", string)
     return string
 
+
 def getWeight():
-    global averagegewicht,gewichtmetingen,aan
+    global averagegewicht,gewichtmetingen,aan,eindTijdSlapen,GaanSlapen,beginTijdSlapen, lcdStatus,vorWakkerWorden
     # hx.set_scale_ratio(hx.get_data_mean(20)/188.0)
+    timergewicht = time.time()
     while True:
         # while aan == True:
         # print(round(hx.get_weight_mean(20),2), 'g')
-        reading = hx.get_raw_data_mean(20)
-        print(reading)
+        reading = hx.get_raw_data_mean(10)
         if aan == False:
             gewichtmetingen.append(reading)
             if len(gewichtmetingen) == 5:
+                print(reading)
                 averagegewicht = average(gewichtmetingen)
                 gewichtmetingen = []
                 print(">",averagegewicht,"\t#",gewichtmetingen)
         else:
+            lcdStatus = 5
             diff = averagegewicht - reading
-            print("diff",diff)
             if diff > 500:
-                print("ALARM UIT")
-                aan = False
-                up = DataRepository.update_alarmActief0_by_id(wekkers[0][1])
-                buzzer.start(0)
-                Wekkers()
+                print(">",timer - timergewicht)
+                if timer - timergewicht >= 2:
+                    print("ALARM UIT")
+                    aan = False
+                    buzzer.start(0)
+                    Wekkers()
+                    lcdStatus = 2
+                    vorWakkerWorden = ""
+                    if beginTijdSlapen:
+                        eindTijdSlapen = datetime.now().replace(microsecond=0)
+                        print("eindTijdSlapen")
+                        dat = DataRepository.insert_slaap(beginTijdSlapen,eindTijdSlapen)
+                        GaanSlapen = 0
+                        socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
+                        beginTijdSlapen = None
+            else:
+                timergewicht = time.time()  
+            print("diff",diff)
+
 
 def Wekkers():
     global wekkers,alarmopScherm,tijd
-    lcd.reset_lcd()
+    if lcdStatus == 2:
+        lcd.reset_lcd()
     wekkers = []
     data = DataRepository.read_alarmen_nog_komen()
     for w in data:
