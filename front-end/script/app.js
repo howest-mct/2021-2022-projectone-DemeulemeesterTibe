@@ -6,6 +6,8 @@ console.log(window.location.hostname);
 //#region ***  DOM references                           ***********
 let RingAan = 0;
 let Slapen = 0;
+let brightnessbool = false;
+let colorbool = false;
 //#endregion
 
 //#region ***  Callback-Visualisation - show___         ***********
@@ -171,20 +173,24 @@ const listenToSocket = function () {
     ).innerHTML = `${jsonObject.ldr.waarde} ${jsonObject.ldr.meeteenheid}`;
   });
   socket.on('B2F_SetColor', function (jsonObject) {
-    console.log('B2F_SETCOLOR', jsonObject);
-    const hexcode = rgbToHex(
-      jsonObject['red'],
-      jsonObject['green'],
-      jsonObject['blue']
-    );
-    console.log('HEXCODE', hexcode);
-    document.querySelector('.js-color').value = hexcode;
-    document.querySelector('.c-input__color').style.backgroundColor = hexcode;
+    if (colorbool == false) {
+      console.log('B2F_SETCOLOR', jsonObject);
+      const hexcode = rgbToHex(
+        jsonObject['red'],
+        jsonObject['green'],
+        jsonObject['blue']
+      );
+      console.log('HEXCODE', hexcode);
+      document.querySelector('.js-color').value = hexcode;
+      document.querySelector('.c-input__color').style.backgroundColor = hexcode;
+    }
   });
   socket.on('B2F_SetBrightness', function (jsonObject) {
-    document.querySelector('.js-brightness').value = jsonObject['brightness'];
-    document.querySelector('.js-rangeValue').innerHTML =
-      Math.round(document.querySelector('.js-brightness').value * 100) + ' %';
+    if (brightnessbool == false) {
+      document.querySelector('.js-brightness').value = jsonObject['brightness'];
+      document.querySelector('.js-rangeValue').innerHTML =
+        Math.round(document.querySelector('.js-brightness').value * 100) + ' %';
+    }
   });
   socket.on('B2F_Addalarm', function () {
     getAlarmen();
@@ -274,28 +280,38 @@ const listenToSetBrightness = function () {
 };
 const listenToChangeColor = function () {
   document.querySelector('.c-input__color').oninput = function () {
+    colorbool = true;
     this.style.backgroundColor = this.value;
-    // console.log('color');
-    // const url = 'http://192.168.168.169:5000/api/historiek/';
-    // let color = hexToRgb(document.querySelector('.js-color').value);
-    // console.log(color);
-    // const payload = JSON.stringify({
-    //   color: color,
-    //   deviceID: 4,
-    //   actieID: 2,
-    // });
-    // socket.emit('F2B_SetColor', { color: color });
-    // handleData(url, showResultAddColor, showError, 'POST', payload);
+    console.log('color');
+    const url = 'http://192.168.168.169:5000/api/historiek/';
+    let color = hexToRgb(document.querySelector('.js-color').value);
+    console.log(color);
+    const payload = JSON.stringify({
+      color: color,
+      deviceID: 4,
+      actieID: 2,
+    });
+    socket.emit('F2B_SetColor', { color: color });
+    handleData(url, showResultAddColor, showError, 'POST', payload);
   };
+  document
+    .querySelector('.c-input__color')
+    .addEventListener('blur', function () {
+      colorbool = false;
+    });
 };
 const listenToChangeBrightness = function () {
   document.querySelector('.js-brightness').oninput = function () {
+    brightnessbool = true;
     document.querySelector('.js-rangeValue').innerHTML =
       Math.round(document.querySelector('.js-brightness').value * 100) + ' %';
-    // const brightness = document.querySelector('.js-brightness').value;
-    // console.log(brightness);
-    // socket.emit('F2B_SetBrightness', { brightness: brightness });
+    const brightness = document.querySelector('.js-brightness').value;
+    console.log(brightness);
+    socket.emit('F2B_SetBrightness', { brightness: brightness });
   };
+  const myTimeout = setTimeout(function () {
+    brightnessbool = false;
+  }, 1000);
 };
 const listenToDeleteAlarm = function () {
   let id = document.querySelector('.js-alarmid').value;
