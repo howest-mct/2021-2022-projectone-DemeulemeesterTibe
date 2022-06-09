@@ -36,7 +36,15 @@ const showError = function (err) {
   console.error(err);
 };
 const showAlarm = function (jsonObject) {
-  console.log(jsonObject);
+  console.log(jsonObject.alarm.herhaal);
+  let dagen = jsonObject.alarm.herhaal;
+  if (dagen) {
+    dagen = dagen.split(',');
+    for (let dag of dagen) {
+      console.log(dag);
+      document.querySelector(`.js-${dag}`).checked = true;
+    }
+  }
   document.querySelector('.js-alarmid').value = jsonObject.alarm.alarmID;
   document.querySelector('.js-naam').value = jsonObject.alarm.naam;
   let time = jsonObject.alarm.datetime;
@@ -72,6 +80,68 @@ const hexToRgb = function (hex) {
 };
 const rgbToHex = function (r, g, b) {
   return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+};
+const herhaalDagen = function () {
+  let repeat = '';
+  let teller = 0;
+  let vorTeller = 0;
+  if (document.querySelector('.js-maandag').checked == true) {
+    if (teller != vorTeller) {
+      repeat += ',';
+      vorTeller = teller;
+    }
+    repeat += 'maandag';
+    teller += 1;
+  }
+  if (document.querySelector('.js-dinsdag').checked == true) {
+    if (teller != vorTeller) {
+      repeat += ',';
+      vorTeller = teller;
+    }
+    repeat += 'dinsdag';
+    teller += 1;
+  }
+  if (document.querySelector('.js-woensdag').checked == true) {
+    if (teller != vorTeller) {
+      repeat += ',';
+      vorTeller = teller;
+    }
+    repeat += 'woensdag';
+    teller += 1;
+  }
+  if (document.querySelector('.js-donderdag').checked == true) {
+    if (teller != vorTeller) {
+      repeat += ',';
+      vorTeller = teller;
+    }
+    repeat += 'donderdag';
+    teller += 1;
+  }
+  if (document.querySelector('.js-vrijdag').checked == true) {
+    if (teller != vorTeller) {
+      repeat += ',';
+      vorTeller = teller;
+    }
+    repeat += 'vrijdag';
+    teller += 1;
+  }
+  if (document.querySelector('.js-zaterdag').checked == true) {
+    if (teller != vorTeller) {
+      repeat += ',';
+      vorTeller = teller;
+    }
+    repeat += 'zaterdag';
+    teller += 1;
+  }
+  if (document.querySelector('.js-zondag').checked == true) {
+    if (teller != vorTeller) {
+      repeat += ',';
+      vorTeller = teller;
+    }
+    repeat += 'zondag';
+    teller += 1;
+  }
+  return repeat;
 };
 const drawChart = function (l, d) {
   console.log(d);
@@ -237,17 +307,19 @@ const listenToUI = function () {
 const listenToCreateAlarm = function () {
   let t = document.querySelector('.js-alarm').value;
   t = t.replace('T', ' ');
-  const url = `http://192.168.168.169:5000/api/alarm/`;
+  const url = `http://${lanIP}/api/alarm/`;
   let naam = '';
   if (document.querySelector('.js-alarmnaam').value == '') {
     naam = 'Alarm';
   } else {
     naam = document.querySelector('.js-alarmnaam').value;
   }
+  const herhaling = herhaalDagen();
   const payload = JSON.stringify({
     naam: naam,
     tijd: t,
     actief: document.querySelector('.js-actief').checked,
+    herhaal: herhaling,
   });
   document.querySelector('.c-floatingButton').style.display = 'flex';
   document.querySelector('.c-createalarm').style.display = 'None';
@@ -299,11 +371,13 @@ const listenToUpdateAlarm = function () {
   let naam = document.querySelector('.js-naam').value;
   let tijdstip = document.querySelector('.js-tijdstip').value;
   tijdstip = tijdstip.replace(' ', 'T');
+  const herhaling = herhaalDagen();
   socket.emit('F2B_UpdateAlarm', {
     alarmid: id,
     naam: naam,
     tijdstip: tijdstip,
     actief: document.querySelector('.js-actief').checked,
+    herhaal: herhaling,
   });
 };
 const ListenToGoSleep = function () {
@@ -330,6 +404,7 @@ const ListenToRgb = function () {
 //#region ***  Init / DOMContentLoaded                  ***********
 const init = function () {
   toggleNav();
+  herhaalDagen();
   if (document.querySelector('.js-alarmen')) {
     document.querySelector('.c-input__color').style.backgroundColor =
       document.querySelector('.c-input__color').value;

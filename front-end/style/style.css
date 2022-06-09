@@ -19,7 +19,7 @@
 html {
     font-size: 16px;
     line-height: 1.5;
-    font-weight: 200;
+    font-weight: 400;
     font-family: 'Source Sans Pro',Helvetica, arial, sans-serif;
     color: #1A1717;
     box-sizing: border-box;
@@ -302,6 +302,9 @@ a:focus {
 
 /* gutter modifiers, these affect o-layout__item too */
 
+.o-layout--gap {
+    gap: 10px;
+}
 .o-layout--gutter {
     margin: 0 -12px;
 }
@@ -474,23 +477,20 @@ a:focus {
     border: none
 }
 /*
-    Component: input checkbox
+    Component: c-toggle
     ---
 */
-.c-checkbox{
-    display: flex;
-    justify-content: center;
-}
- input[type=checkbox].c-toggle{
+
+.c-toggle{
     display: none;
 }
-input[type=checkbox].c-toggle +label{
+.c-toggle +label{
     position: relative;
     display: flex;
     align-items: center;
     cursor: pointer;
 }
-input[type=checkbox].c-toggle +label::before{
+.c-toggle +label::before{
     content: "";
     width: 4em;
     height: 2em;
@@ -499,7 +499,7 @@ input[type=checkbox].c-toggle +label::before{
     margin-right: .5em;
     transition: background-color 200ms ease-in-out;
 }
-input[type=checkbox].c-toggle +label::after{
+.c-toggle +label::after{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -514,26 +514,30 @@ input[type=checkbox].c-toggle +label::after{
     border-radius: 1em;
     transition: background-color 200ms ease-in-out, transform 200ms ease-in-out;
 }
-input[type=checkbox].c-toggle:checked+label::before {
+.c-toggle:checked+label::before {
     background-color: hsl(100, 70%, 90%);
 }
-input[type=checkbox].c-toggle:checked +label::after{
+.c-toggle:checked +label::after{
     left: 1.1em;
     content: "\2713";
     transform: translateX(.9em);
     background-color: hsl(100, 70%, 60%);
 } 
 
- input[type=checkbox].c-toggleAlarmen{
+/*
+    Component: c-toggle alarmen
+    ---
+*/
+.c-toggleAlarmen{
     display: none;
 }
-input[type=checkbox].c-toggleAlarmen +label{
+.c-toggleAlarmen +label{
     position: relative;
     display: flex;
     align-items: center;
     cursor: pointer;
 }
-input[type=checkbox].c-toggleAlarmen +label::before{
+.c-toggleAlarmen +label::before{
     content: "";
     width: 2em;
     height: 1em;
@@ -542,7 +546,7 @@ input[type=checkbox].c-toggleAlarmen +label::before{
     margin-right: .25em;
     transition: background-color 200ms ease-in-out;
 }
-input[type=checkbox].c-toggleAlarmen +label::after{
+.c-toggleAlarmen +label::after{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -558,15 +562,35 @@ input[type=checkbox].c-toggleAlarmen +label::after{
     border-radius: 1em;
     transition: background-color 200ms ease-in-out, transform 200ms ease-in-out;
 }
-input[type=checkbox].c-toggleAlarmen:checked+label::before {
+.c-toggleAlarmen:checked+label::before {
     background-color: hsl(100, 70%, 90%);
 }
-input[type=checkbox].c-toggleAlarmen:checked +label::after{
+.c-toggleAlarmen:checked +label::after{
     left: 1em;
     content: "\2713";
     transform: translateX(.9em);
     background-color: hsl(100, 70%, 60%);
 } 
+/*
+    Component: Dagen
+    ---
+*/
+.c-dagen{
+    display: none;
+}
+.c-dagen +label{
+    position: relative;
+    display: block;
+    padding: 0px 9px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+}
+.c-dagen:checked +label {
+    font-weight: 600;
+    background-color: #FF4D4D;
+    color: white;
+}
 /*
     Component: input text + datetime-local
     ---
@@ -738,7 +762,8 @@ input[type=text],input[type=datetime-local] {
 */
 .test{
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: space-around;
 }
 .c-alarmen-list {
     /* display: -webkit-box; */
@@ -865,7 +890,7 @@ input[type=text],input[type=datetime-local] {
 }
 .c-createalarm__content{
     width: 350px;
-    height: 325px;
+    min-height: 325px;
     background-color: white;
     border-radius: 20px;
     text-align: center;

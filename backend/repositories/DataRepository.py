@@ -45,9 +45,9 @@ class DataRepository:
         return Database.execute_sql(sql,payload)
 
     @staticmethod
-    def update_alarm_by_id(id,naam,tijdstip,actief):
-        sql = "UPDATE alarm SET naam = %s, tijd = %s,actief = %s WHERE alarmid = %s"
-        payload = [naam,tijdstip,actief,id]
+    def update_alarm_by_id(id,naam,tijdstip,actief,herhaal):
+        sql = "UPDATE alarm SET naam = %s, tijd = %s,actief = %s,herhaal = %s WHERE alarmid = %s"
+        payload = [naam,tijdstip,actief,herhaal,id]
         return Database.execute_sql(sql,payload)
     
     @staticmethod
@@ -57,9 +57,9 @@ class DataRepository:
         return Database.execute_sql(sql,payload)
 
     @staticmethod
-    def insert_alarm(naam,tijd,actief):
-        sql = "insert into alarm (naam,tijd,actief) VALUES (%s,%s,%s)"
-        params = [naam,tijd,actief]
+    def insert_alarm(naam,tijd,actief,herhaal):
+        sql = "insert into alarm (naam,tijd,actief,herhaal) VALUES (%s,%s,%s,%s)"
+        params = [naam,tijd,actief,herhaal]
         return Database.execute_sql(sql,params)
     
     @staticmethod

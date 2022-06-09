@@ -385,7 +385,7 @@ def alarmen():
     elif request.method == "POST":
         gegevens = DataRepository.json_or_formdata(request)
         print(gegevens)
-        data = DataRepository.insert_alarm(gegevens["naam"],gegevens["tijd"],gegevens["actief"])
+        data = DataRepository.insert_alarm(gegevens["naam"],gegevens["tijd"],gegevens["actief"],gegevens["herhaal"])
         return jsonify(alarmid=data),201
 
 @app.route('/api/alarm/<alarmid>/',methods=["GET","PUT","DELETE"])
@@ -472,7 +472,7 @@ def delAlarm(payload):
 @socketio.on("F2B_UpdateAlarm")
 def updateAlarm(payload):
     print("*** Update alarm ***")
-    dele = DataRepository.update_alarm_by_id(payload["alarmid"],payload["naam"],payload["tijdstip"],payload["actief"])
+    dele = DataRepository.update_alarm_by_id(payload["alarmid"],payload["naam"],payload["tijdstip"],payload["actief"],payload["herhaal"])
     Wekkers()
     socketio.emit("B2F_Addalarm",broadcast=True)
 

@@ -96,7 +96,7 @@
                     <br>
                     <input type="range" class="js-brightness c-input__range" id="" min="0" max="1" step="0.05">
                     <p class="js-rangeValue">50 %</p>
-                    <div class="c-checkbox">
+                    <div class="o-layout o-layout--justify-center">
                         <input type="checkbox" id="RGB" class="c-toggle js-rgb">
                         <label for="RGB"></label>
                     </div>
@@ -217,10 +217,28 @@
             <input class="js-alarm" type="datetime-local" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}"
                 name="Datetime" id="Datetime">
             <br>
-            <div class="c-checkbox">
+            <div class="o-layout o-layout--justify-center">
                 <input type="checkbox" id="actief" checked class="c-toggle js-actief">
                 <label for="actief"></label>
             </div>
+            <p class="c-lead--lg u-mb-sm">Repeat</p>
+            <div class="o-layout o-layout--align-center o-layout--justify-space-around u-mb-sm">
+                <input type="checkbox" name="" id="maandag" class="c-dagen js-maandag">
+                <label for="maandag">M</label>
+                <input type="checkbox" name="" id="dinsdag" class="c-dagen js-dinsdag">
+                <label for="dinsdag">D</label>
+                <input type="checkbox" name="" id="woensdag" class="c-dagen js-woensdag">
+                <label for="woensdag">W</label>
+                <input type="checkbox" name="" id="donderdag" class="c-dagen js-donderdag">
+                <label for="donderdag">D</label>
+                <input type="checkbox" name="" id="vrijdag" class="c-dagen js-vrijdag">
+                <label for="vrijdag">V</label>
+                <input type="checkbox" name="" id="zaterdag" class="c-dagen js-zaterdag">
+                <label for="zaterdag">Z</label>
+                <input type="checkbox" name="" id="zondag" class="c-dagen js-zondag">
+                <label for="zondag">Z</label>
+            </div>
+
             <button class="js-makealarm"> Create alarm</button>
         </div>
     </div>
