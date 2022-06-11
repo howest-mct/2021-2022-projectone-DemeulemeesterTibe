@@ -1,6 +1,4 @@
-from calendar import weekday
 import time
-from unittest import result
 from RPi import GPIO
 from numpy import average
 from helpers.lcdClass import lcdClass
@@ -47,6 +45,7 @@ for line in ifconfig.decode().split('\n'):
 print("wifi",wifiIp,"lan",lanIp )
 # variabelen
 beginTijdSlapen = None
+beginTijdSlapenLater = None
 eindTijdSlapen = None
 dtWeight = 6
 clkWeight = 13
@@ -120,18 +119,6 @@ def Slaap_knop(pin):
         print(dat)
     socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
 
-    # GaanSlapen = payload["Slapen"]
-    # print(payload["Slapen"])
-    # if GaanSlapen == 1:
-    #     beginTijdSlapen = datetime.now().replace(microsecond=0)
-    #     print(beginTijdSlapen)
-    # elif GaanSlapen == 0:
-    #     eindTijdSlapen = datetime.now().replace(microsecond=0)
-    #     print(eindTijdSlapen)
-    #     dat = DataRepository.insert_slaap(beginTijdSlapen,eindTijdSlapen)
-    # print(GaanSlapen)
-    # socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
-
 def Shutdown_knop(pin):
     print("Shutdown")
     lcd.reset_lcd()
@@ -181,7 +168,7 @@ def joy_knop(pin):
                 lcd.set_cursor(4)
 
 def codeSchakeling():
-    global minldr,maxldr,aan,timer,timerldr,pixels,huidigetijd,timenow,alarmopScherm
+    global minldr,maxldr,aan,timer,timerldr,pixels,huidigetijd,timenow,alarmopScherm,GaanSlapen,beginTijdSlapen
     # data = DataRepository.read_alarmen_nog_komen()
     # for w in data:
     #     wekkers.append([w["tijd"],w["alarmID"]])
@@ -215,6 +202,11 @@ def codeSchakeling():
         if timenow == wekkers["tijd"]:
             lcd.reset_lcd()
             aan = True
+        if timenow == beginTijdSlapenLater:
+            print("GAAN SLAPEN JIJ KOEKWOUS")
+            beginTijdSlapen = beginTijdSlapenLater
+            GaanSlapen = 1
+            socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
         if aan == True:
             # buzzer.start(10)
             print("WEKKER GAAT AF")
@@ -291,6 +283,7 @@ def displayStatus(lcdStatus,y,x):
             lcd.first_row()
             lcd.write_message(WakkerWorden)
         vorWakkerWorden = WakkerWorden
+
 def getal_veranderen(teller,vortijd,plus=False):
     global tijd
     cijfer = int(tijd[teller-4])
@@ -338,7 +331,6 @@ def checkdeel(tijd):
     # print(">", string)
     return string
 
-
 def getWeight():
     global averagegewicht,gewichtmetingen,aan,eindTijdSlapen,GaanSlapen,beginTijdSlapen, lcdStatus,vorWakkerWorden
     # hx.set_scale_ratio(hx.get_data_mean(20)/188.0)
@@ -350,8 +342,8 @@ def getWeight():
         if aan == False:
             gewichtmetingen.append(reading)
             if len(gewichtmetingen) == 5:
-                print(reading)
                 averagegewicht = average(gewichtmetingen)
+                print("gemiddelde",averagegewicht)
                 gewichtmetingen = []
                 # print(">",averagegewicht,"\t#",gewichtmetingen)
             timergewicht = time.time()  
@@ -538,17 +530,38 @@ def updateAlarm(payload):
 
 @socketio.on("F2B_GaanSlapen")
 def setSlaap(payload):
-    global beginTijdSlapen, eindTijdSlapen,GaanSlapen
-    GaanSlapen = payload["Slapen"]
-    print(payload["Slapen"])
-    if GaanSlapen == 1:
-        beginTijdSlapen = datetime.now().replace(microsecond=0)
-        print(beginTijdSlapen)
-    elif GaanSlapen == 0:
+    # checken of de tijden gelijk zijn voor GaanSlapen intestellen
+    global beginTijdSlapen, eindTijdSlapen,GaanSlapen,beginTijdSlapenLater
+    tijd = str(datetime.now().hour) + ":" + str(datetime.now().minute)
+    print(payload,tijd)
+    if payload["Slapen"] == 1:
+        if payload["tijd"] == tijd:
+            print("test")
+            GaanSlapen = 1
+            beginTijdSlapen = datetime.now().replace(microsecond=0)
+            print(beginTijdSlapen)
+        else:
+            print("andere tijd")
+            uur = int(payload["tijd"][0:2])
+            minuten = int(payload["tijd"][3:5])
+            print("uur",uur,"min",minuten)
+            beginTijdSlapenLater = datetime.now().replace(hour=uur,minute=minuten,microsecond=0)
+            if(beginTijdSlapenLater < datetime.now()) == True:
+                beginTijdSlapenLater += timedelta(days=1)
+                print(beginTijdSlapenLater)
+            print(beginTijdSlapenLater)
+    # GaanSlapen = payload["Slapen"]
+    # print(payload["Slapen"])
+    # if GaanSlapen == 1:
+    #     beginTijdSlapen = datetime.now().replace(microsecond=0)
+    #     print(beginTijdSlapen)
+    elif payload["Slapen"] == 0:
+        GaanSlapen = 0
         eindTijdSlapen = datetime.now().replace(microsecond=0)
         print(eindTijdSlapen)
         dat = DataRepository.insert_slaap(beginTijdSlapen,eindTijdSlapen)
-    print(GaanSlapen)
+        print("id",dat)
+    # print(GaanSlapen)
     socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
 
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op

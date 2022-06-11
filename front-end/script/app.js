@@ -382,14 +382,24 @@ const listenToUpdateAlarm = function () {
   });
 };
 const ListenToGoSleep = function () {
+  let time;
   if (Slapen == 0) {
     Slapen = 1;
+    if (document.querySelector('.js-GoSleepInput').value) {
+      console.log(document.querySelector('.js-GoSleepInput').value);
+      time = document.querySelector('.js-GoSleepInput').value;
+    } else {
+      let today = new Date();
+      time = today.toTimeString().split(' ');
+      time = time[0].substring(0, 5);
+      document.querySelector('.js-GoSleepInput').value = time;
+    }
     console.log('Slaapwel');
   } else if (Slapen == 1) {
     Slapen = 0;
     console.log('Goeiemorgen /Middag /Avond');
   }
-  socket.emit('F2B_GaanSlapen', { Slapen: Slapen });
+  socket.emit('F2B_GaanSlapen', { Slapen: Slapen, tijd: time });
 };
 const ListenToRgb = function () {
   if (this.checked == true) {
