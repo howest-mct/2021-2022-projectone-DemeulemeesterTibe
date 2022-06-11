@@ -134,6 +134,10 @@ def Slaap_knop(pin):
 
 def Shutdown_knop(pin):
     print("Shutdown")
+    lcd.reset_lcd()
+    pixels.deinit()
+    GPIO.cleanup()
+    test = check_output(["sudo","shutdown","-h","now"])
 
 def lees_knop(pin):
     global lcdStatus,tijd,vorips,alarmopScherm
