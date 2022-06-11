@@ -83,6 +83,8 @@ joyTimer = time.time()
 timerldr = time.time()
 joyBtn = Button(19)
 btn = Button(12)
+knopSlapen = Button(17)
+knopShutdown = Button(27)
 spi = SpiClass(0,0)
 lcd = lcdClass(rs,e,None,True)
 pixels = neopixel.NeoPixel(board.D18,12)
@@ -101,6 +103,37 @@ def setup_gpio():
     buzzer.start(0)
     btn.on_press(lees_knop)
     joyBtn.on_press(joy_knop)
+    knopSlapen.on_press(Slaap_knop)
+    knopShutdown.on_press(Shutdown_knop)
+
+def Slaap_knop(pin):
+    global beginTijdSlapen, eindTijdSlapen, GaanSlapen
+    GaanSlapen = not GaanSlapen
+    print("slaap",GaanSlapen)
+    if GaanSlapen == 1:
+        print("Slaapwel")
+        beginTijdSlapen = datetime.now().replace(microsecond=0)
+    elif GaanSlapen == 0:
+        print("Hallo")
+        eindTijdSlapen = datetime.now().replace(microsecond=0)
+        dat = DataRepository.insert_slaap(beginTijdSlapen,eindTijdSlapen)
+        print(dat)
+    socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
+
+    # GaanSlapen = payload["Slapen"]
+    # print(payload["Slapen"])
+    # if GaanSlapen == 1:
+    #     beginTijdSlapen = datetime.now().replace(microsecond=0)
+    #     print(beginTijdSlapen)
+    # elif GaanSlapen == 0:
+    #     eindTijdSlapen = datetime.now().replace(microsecond=0)
+    #     print(eindTijdSlapen)
+    #     dat = DataRepository.insert_slaap(beginTijdSlapen,eindTijdSlapen)
+    # print(GaanSlapen)
+    # socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
+
+def Shutdown_knop(pin):
+    print("Shutdown")
 
 def lees_knop(pin):
     global lcdStatus,tijd,vorips,alarmopScherm
@@ -126,7 +159,7 @@ def joy_knop(pin):
                 alarm = datetime.strptime(alarm,"%H:%M:%S")
                 alarm = alarm.replace(year=datetime.now().year,month=datetime.now().month,day=datetime.now().day)
                 alarm = alarm + timedelta(days=1)
-                t = DataRepository.insert_alarm("Alarm",alarm)
+                t = DataRepository.insert_alarm("Alarm",alarm,True,None)
                 socketio.emit("B2F_Addalarm",broadcast=True)
                 # data = DataRepository.read_alarmen_nog_komen()
                 # print("#",data)
