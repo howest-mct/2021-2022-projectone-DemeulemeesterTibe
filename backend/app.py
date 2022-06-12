@@ -1,43 +1,409 @@
 import time
 from RPi import GPIO
+from numpy import average
+from helpers.lcdClass import lcdClass
 from helpers.klasseknop import Button
+from helpers.spiclass import SpiClass
+from hx711 import HX711
+from datetime import datetime,timedelta
 import threading
-
+from subprocess import check_output
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from repositories.DataRepository import DataRepository
+import neopixel
+import board
 
 from selenium import webdriver
 
 # from selenium import webdriver
 # from selenium.webdriver.chrome.options import Options
+# lcd.reset_cursor()
+        # ips = check_output(["hostname", "-I"])
+        # ips = ips.decode("utf-8")
+        # lijst = ips.split()
+            # for i in range(0, len(lijst)):
+        #         if i <2:
+        #             if (i % 2) == 0:
+        #                 lcd.second_row()
+        #             else:
+        #                 lcd.first_row()
+        #             lcd.write_message(lijst[i])
+ifconfig = check_output(['ifconfig', "wlan0"])
+for line in ifconfig.decode().split('\n'):
+    fields = line.split()
+    if fields[0] == 'inet':
+        wifiIp = fields[1]  
+        break
+ifconfig = check_output(['ifconfig', "eth0"])
+for line in ifconfig.decode().split('\n'):
+    fields = line.split()
+    if fields[0] == 'inet':
+        lanIp = fields[1]  
+        break
+print("wifi",wifiIp,"lan",lanIp )
+# variabelen
+beginTijdSlapen = None
+beginTijdSlapenLater = None
+eindTijdSlapen = None
+dtWeight = 6
+clkWeight = 13
+wekkers = []
+Red = 255
+Green = 0
+Blue = 0
+alarmopScherm = False
+rs = 21
+e =  20
+buzz = 26
+buzzer = ""
+lcdStatus = 1
+vorips = ""
+huidigetijd = "fddfsdf"
+tijd = ""
+teller = 4
+minldr = 1023
+maxldr = 0
+waardeldr = 0
+lichtsterkte = 0
+alarm = ""
+timer = 0
+aan = False
+ring = False
+GaanSlapen = False
+gewichtmetingen = []
+averagegewicht = -100000
+WakkerWorden = "Wakker worden!!!"
+vorWakkerWorden = ""
+# objecten
+timenow = datetime.now().replace(microsecond=0)
+joyTimer = time.time()
+timerldr = time.time()
+joyBtn = Button(19)
+btn = Button(12)
+knopSlapen = Button(17)
+knopShutdown = Button(27)
+spi = SpiClass(0,0)
+lcd = lcdClass(rs,e,None,True)
+pixels = neopixel.NeoPixel(board.D18,12)
+pixels.brightness = 0.5
+hx = HX711(dtWeight,clkWeight)
 
-
-ledPin = 21
-btnPin = Button(20)
 
 # Code voor Hardware
 def setup_gpio():
+    global buzzer
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM)
-    
-    GPIO.setup(ledPin, GPIO.OUT)
-    GPIO.output(ledPin, GPIO.LOW)
-    
-    btnPin.on_press(lees_knop)
+    GPIO.setup(buzz, GPIO.OUT)
+    buzzer = GPIO.PWM(buzz,1000)
+    buzzer.ChangeFrequency(1000)
+    buzzer.start(0)
+    btn.on_press(lees_knop)
+    joyBtn.on_press(joy_knop)
+    knopSlapen.on_press(Slaap_knop)
+    knopShutdown.on_press(Shutdown_knop)
 
+def Slaap_knop(pin):
+    global beginTijdSlapen, eindTijdSlapen, GaanSlapen
+    GaanSlapen = not GaanSlapen
+    print("slaap",GaanSlapen)
+    if GaanSlapen == 1:
+        print("Slaapwel")
+        beginTijdSlapen = datetime.now().replace(microsecond=0)
+    elif GaanSlapen == 0:
+        print("Hallo")
+        eindTijdSlapen = datetime.now().replace(microsecond=0)
+        dat = DataRepository.insert_slaap(beginTijdSlapen,eindTijdSlapen)
+        print(dat)
+    socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
+
+def Shutdown_knop(pin):
+    print("Shutdown")
+    lcd.reset_lcd()
+    pixels.deinit()
+    GPIO.cleanup()
+    test = check_output(["sudo","shutdown","-h","now"])
 
 def lees_knop(pin):
-    if btnPin.pressed:
-        print("**** button pressed ****")
-        if GPIO.input(ledPin) == 1:
-            switch_light({'lamp_id': '3', 'new_status': 0})
+    global lcdStatus,tijd,vorips,alarmopScherm
+    if btn.pressed:
+        if lcdStatus == 3:
+            lcd.disable_cursor()
+        lcdStatus += 1
+        if lcdStatus >= 2:
+            lcdStatus = 0
+            vorips = ""
+            if wekkers:
+                alarmopScherm = True
+        tijd = "gggggggg"
+        lcd.reset_lcd()
+
+def joy_knop(pin):
+    global lcdStatus,tijd,alarm,alarmopScherm,wekkers
+    if joyBtn.pressed:
+        if lcdStatus == 1 or lcdStatus == 3:
+            if lcdStatus == 3:
+                lcdStatus = 1
+                alarm = tijd
+                alarm = datetime.strptime(alarm,"%H:%M:%S")
+                alarm = alarm.replace(year=datetime.now().year,month=datetime.now().month,day=datetime.now().day)
+                alarm = alarm + timedelta(days=1)
+                t = DataRepository.insert_alarm("Alarm",alarm,True,None)
+                socketio.emit("B2F_Addalarm",broadcast=True)
+                # data = DataRepository.read_alarmen_nog_komen()
+                # print("#",data)
+                # wekkers = []
+                # for w in data:
+                #     wekkers.append(w["tijd"])
+                # print(">",wekkers[0])
+                Wekkers()
+                print("alarm",alarm,"\n",alarm)
+                lcd.disable_cursor()
+                alarmopScherm = True
+            else:
+                lcd.enable_cursor()
+                lcdStatus = 3
+                lcd.set_cursor(4)
+
+def codeSchakeling():
+    global minldr,maxldr,aan,timer,timerldr,pixels,huidigetijd,timenow,alarmopScherm,GaanSlapen,beginTijdSlapen
+    # data = DataRepository.read_alarmen_nog_komen()
+    # for w in data:
+    #     wekkers.append([w["tijd"],w["alarmID"]])
+    Wekkers()
+    if wekkers:
+        alarmopScherm = True
+    while True: 
+        timer = time.time()
+        huidigetijd = time.strftime("%H:%M:%S")
+        timenow = datetime.now().replace(microsecond=0)
+        joyY = spi.readChannel(0)
+        joyX = spi.readChannel(1)
+        # ldr
+        waardeldr = spi.readChannel(2)
+        if(waardeldr < minldr):
+            minldr = waardeldr
+        if waardeldr > maxldr:
+            maxldr = waardeldr
+        if maxldr != minldr:
+            lichtsterkte = round(100 - (100*((waardeldr - minldr) / (maxldr - minldr))),2)
+            # print(f"Lichtsterkte: {lichtsterkte:.2f} %")
+        if timer - timerldr >= 60:
+            print("LDR inlezen") 
+            timerldr = time.time()
+            insert = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),lichtsterkte,None,2,1)
+            data = DataRepository.read_historiek_by_id(insert)
+            print("LDR",lichtsterkte)
+            socketio.emit('B2F_verandering_ldr', {'ldr': data}, broadcast=True)
+        # alarm 
+        # for w in wekkers:
+        if timenow == wekkers["tijd"]:
+            lcd.reset_lcd()
+            aan = True
+        if timenow == beginTijdSlapenLater:
+            print("GAAN SLAPEN JIJ KOEKWOUS")
+            beginTijdSlapen = beginTijdSlapenLater
+            GaanSlapen = 1
+            socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
+        if aan == True:
+            # buzzer.start(10)
+            print("WEKKER GAAT AF")
+        displayStatus(lcdStatus,joyY,joyX)
+        if ring == 1:
+            pixels.fill((Red,Green,Blue))
+        elif ring == 0:
+            pixels.fill((0,0,0))
+
+def displayStatus(lcdStatus,y,x):
+    global vorips , tijd , teller , joyTimer , alarmopScherm, huidigetijd,timer, vorWakkerWorden
+    if lcdStatus == 0:
+        lcd.reset_cursor()
+        ips = check_output(["hostname", "-I"])
+        ips = ips.decode("utf-8")
+        lijst = ips.split()
+        if ips != vorips:
+            for i in range(0, len(lijst)):
+                if i <2:
+                    if (i % 2) == 0:
+                        lcd.second_row()
+                    else:
+                        lcd.first_row()
+                    lcd.write_message(lijst[i])
+        vorips = ips
+    elif lcdStatus == 1:
+        if tijd != huidigetijd:
+            t = 0
+            for (a, b) in zip(huidigetijd, tijd):
+                if a !=b:
+                    lcd.set_cursor(4+t)
+                    lcd.write_message(a)
+                t += 1
+            tijd = huidigetijd
+        if wekkers:
+            if alarmopScherm is True:
+                print("nieuw alarm")
+                lcd.set_cursor(64)
+                print("@",wekkers["tijd"].time())
+                lcd.write_message(f"Alarm: {wekkers['tijd'].time()}")
+                alarmopScherm = False
+    elif lcdStatus == 3:
+        if timer - joyTimer >=0.3:
+            if x > 1000:
+                teller += 1
+                cijfer = tijd[teller-4:teller-3]
+                # als hij op een : komt 1 skippen
+                if cijfer == ":":
+                    teller += 1
+                # checken als teller groter is dan lengte tijd
+                if teller -4  > len(tijd)-1:
+                    print("terug naar begin\t",len(tijd))
+                    teller = 4
+                lcd.set_cursor(teller)
+                joyTimer = time.time()
+            elif x < 10:
+                teller -= 1
+                cijfer = tijd[teller-4:teller-3]
+                # als hij op een : komt 1 skippen
+                if cijfer == ":":
+                    teller -= 1
+                # checken als teller kleiner is dan lengte tijd
+                if teller <= 3:
+                    print("kleiner")
+                    teller = 11
+                lcd.set_cursor(teller)
+                joyTimer = time.time()
+            if y > 1000:
+                joyTimer = getal_veranderen(teller,tijd)
+            elif y < 10:
+                joyTimer = getal_veranderen(teller,tijd,True)
+    elif lcdStatus == 5:
+        if vorWakkerWorden != WakkerWorden:
+            lcd.first_row()
+            lcd.write_message(WakkerWorden)
+        vorWakkerWorden = WakkerWorden
+
+def getal_veranderen(teller,vortijd,plus=False):
+    global tijd
+    cijfer = int(tijd[teller-4])
+    if plus is False:
+        cijfer -= 1
+    else:
+        cijfer +=1
+    if cijfer <= -1:
+        cijfer = 9
+    elif cijfer >= 10:
+        cijfer = 0
+    tijd = tijd[0:teller-4] + str(cijfer) + tijd[teller-3::]
+    # lcd.set_cursor(4)
+    # lcd.write_message(tijd)
+    tijd = checkdeel(tijd)
+    # print("#", tijd)
+    t = 0
+    for (a, b) in zip(vortijd, tijd):
+        if a !=b:
+            lcd.set_cursor(4+t)
+            lcd.write_message(b)
+        t += 1
+    lcd.set_cursor(teller)
+    joyTimer = time.time()
+    return joyTimer
+
+def checkdeel(tijd):
+    delen = tijd.split(":")
+    string = ""
+    for deel in range(0,len(delen)):
+        if deel == 0:
+            # print("M",delen[deel])
+            if int(delen[deel]) >= 24:
+                delen[deel] = "23"
         else:
-            switch_light({'lamp_id': '3', 'new_status': 1})
+            # print("N",delen[deel])
+            # if int(delen[deel]) == 90:
+            #     delen[deel] = "60"
+            if int(delen[deel]) >= 60:
+                delen[deel] = "59"
+            
+        string += str(delen[deel])
+        if deel != 2:
+            string += ":"
+    # print(">", string)
+    return string
+
+def getWeight():
+    global averagegewicht,gewichtmetingen,aan,eindTijdSlapen,GaanSlapen,beginTijdSlapen, lcdStatus,vorWakkerWorden
+    # hx.set_scale_ratio(hx.get_data_mean(20)/188.0)
+    timergewicht = time.time()
+    while True:
+        # while aan == True:
+        # print(round(hx.get_weight_mean(20),2), 'g')
+        reading = hx.get_raw_data_mean(10)
+        if aan == False:
+            gewichtmetingen.append(reading)
+            if len(gewichtmetingen) == 5:
+                averagegewicht = average(gewichtmetingen)
+                print("gemiddelde",averagegewicht)
+                gewichtmetingen = []
+                # print(">",averagegewicht,"\t#",gewichtmetingen)
+            timergewicht = time.time()  
+        else:
+            lcdStatus = 5
+            diff = averagegewicht - reading
+            if diff > 500:
+                print(">",timer - timergewicht)
+                if timer - timergewicht >= 2:
+                    print("ALARM UIT")
+                    aan = False
+                    buzzer.start(0)
+                    lcdStatus = 2
+                    vorWakkerWorden = ""
+                    print("id wekker",wekkers["alarmID"])
+                    if wekkers["herhaal"] != "":
+                        dagenoverlopen = True
+                        tijdstip = wekkers["tijd"]
+                        while dagenoverlopen is True:
+                            tijdstip = tijdstip + timedelta(days=1)
+                            if tijdstip.strftime("%A") in wekkers["herhaal"]:
+                                print("NIEUWE DATUM",tijdstip)
+                                te = DataRepository.update_alarm_tijdstip_by_id(wekkers["alarmID"],tijdstip)
+                                socketio.emit("B2F_Addalarm",broadcast=True)
+                                dagenoverlopen = False
+                            
+                    if beginTijdSlapen:
+                        eindTijdSlapen = datetime.now().replace(microsecond=0)
+                        print("eindTijdSlapen")
+                        dat = DataRepository.insert_slaap(beginTijdSlapen,eindTijdSlapen)
+                        GaanSlapen = 0
+                        socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
+                        beginTijdSlapen = None
+                    Wekkers()
+            else:
+                timergewicht = time.time()  
+            print("diff",diff)
 
 
-
+# def Wekkers():
+#     global wekkers,alarmopScherm,tijd
+#     if lcdStatus == 2:
+#         lcd.reset_lcd()
+#     wekkers = []
+#     data = DataRepository.read_alarmen_nog_komen()
+#     for w in data:
+#         wekkers.append([w["tijd"],w["alarmID"]])
+#     print("W0",wekkers)
+#     if wekkers:
+#         alarmopScherm = True
+#     tijd = "gggggggg"
+def Wekkers():
+    global wekkers,alarmopScherm,tijd
+    if lcdStatus == 2:
+        lcd.reset_lcd()
+    wekkers = DataRepository.read_alarm_nog_komen()
+    print("W0",wekkers)
+    if wekkers:
+        alarmopScherm = True
+    tijd = "gggggggg"
 
 # Code voor Flask
 
@@ -62,53 +428,155 @@ def error_handler(e):
 def hallo():
     return "Server is running, er zijn momenteel geen API endpoints beschikbaar."
 
+@app.route('/api/alarm/',methods=["GET","POST"])
+def alarmen():
+    if request.method == "GET":
+        data = DataRepository.read_alarmen()
+        if data is not None:
+            return jsonify(alarmen=data),200
+    elif request.method == "POST":
+        gegevens = DataRepository.json_or_formdata(request)
+        print(gegevens)
+        data = DataRepository.insert_alarm(gegevens["naam"],gegevens["tijd"],gegevens["actief"],gegevens["herhaal"])
+        return jsonify(alarmid=data),201
+
+@app.route('/api/alarm/<alarmid>/',methods=["GET","PUT","DELETE"])
+def alarmbyid(alarmid):
+    if request.method == "GET":
+        data = DataRepository.read_alarm_by_id(alarmid)
+        if data is not None:
+            return jsonify(alarm=data),200
+        else:
+            return jsonify(status="error"),404
+    elif request.method == "DELETE":
+        dele = DataRepository.delete_alarm_by_id(alarmid)
+        return jsonify(status=dele),201
+
+@app.route('/api/historiek/',methods=["GET","POST"])
+def historiek():
+    if request.method == "POST":
+        gegevens = DataRepository.json_or_formdata(request)
+        print(gegevens)
+        data = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),gegevens["color"],None,gegevens["deviceID"],gegevens["actieID"])
+        return jsonify(historiekID=data),201
+
+@app.route('/api/slaap/',methods=["GET"])
+def slaap():
+    if request.method == "GET":
+        data = DataRepository.read_slaap()
+        if data is not None:
+            return jsonify(slaap=data),200
+# socket endpoints
+
 
 @socketio.on('connect')
 def initial_connection():
     print('A new client connect')
-    # # Send to the client!
-    # vraag de status op van de lampen uit de DB
-    status = DataRepository.read_status_lampen()
-    emit('B2F_status_lampen', {'lampen': status}, broadcast=True)
+    # random ldr waarde op website tot volgende inlees moment
+    socketio.emit("B2F_Ringstatus",{"ring": ring})
+    socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen})
+    socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness},broadcast=True)
+    socketio.emit("B2F_SetColor",{"red":Red,"green":Green,"blue":Blue})
+    
 
+@socketio.on("F2B_SetColor")
+def setColor(payload):
+    global Red,Green,Blue
+    print("---------- Set Color ----------")
+    RGB = payload["color"].split(",")
+    Red = int(RGB[0])
+    Green = int(RGB[1])
+    Blue = int(RGB[2])
+    print("RGB",Red,Green,Blue)
+    socketio.emit("B2F_SetColor",{"red":Red,"green":Green,"blue":Blue},broadcast=True)
 
-@socketio.on('F2B_switch_light')
-def switch_light(data):
-    # Ophalen van de data
-    lamp_id = data['lamp_id']
-    new_status = data['new_status']
-    print(f"Lamp {lamp_id} wordt geswitcht naar {new_status}")
+@socketio.on("F2B_RGBring")
+def setRing(payload):
+    global ring
+    ring = payload["aan"]
+    if payload["aan"] == 1:
+        id = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),None,None,4,3)
+    else:
+        id = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),None,None,4,4)
+    socketio.emit("B2F_Ringstatus",{"ring":payload["aan"]})
 
-    # Stel de status in op de DB
-    res = DataRepository.update_status_lamp(lamp_id, new_status)
+@socketio.on("F2B_Addalarm")
+def addAlarm(payload):
+    global alarmopScherm
+    Wekkers()
+    socketio.emit("B2F_Addalarm",broadcast=True)
 
-    # Vraag de (nieuwe) status op van de lamp en stuur deze naar de frontend.
-    data = DataRepository.read_status_lamp_by_id(lamp_id)
-    socketio.emit('B2F_verandering_lamp', {'lamp': data}, broadcast=True)
+@socketio.on("F2B_SetBrightness")
+def setBrightness(payload):
+    pixels.brightness = float(payload["brightness"])
+    d = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),None,None,4,5)
+    socketio.emit("B2F_SetBrightness",{"brightness": payload["brightness"]},broadcast=True)
 
-    # Indien het om de lamp van de TV kamer gaat, dan moeten we ook de hardware aansturen.
-    if lamp_id == '3':
-        print(f"TV kamer moet switchen naar {new_status} !")
-        GPIO.output(ledPin, new_status)
+@socketio.on("F2B_DELalarm")
+def delAlarm(payload):
+    global alarmopScherm,tijd
+    dele = DataRepository.delete_alarm_by_id(payload["alarmid"])
+    print(dele)
+    Wekkers()
 
+    socketio.emit("B2F_Addalarm",broadcast=True)
 
+@socketio.on("F2B_UpdateAlarm")
+def updateAlarm(payload):
+    print("*** Update alarm ***")
+    dele = DataRepository.update_alarm_by_id(payload["alarmid"],payload["naam"],payload["tijdstip"],payload["actief"],payload["herhaal"])
+    Wekkers()
+    socketio.emit("B2F_Addalarm",broadcast=True)
+
+@socketio.on("F2B_GaanSlapen")
+def setSlaap(payload):
+    # checken of de tijden gelijk zijn voor GaanSlapen intestellen
+    global beginTijdSlapen, eindTijdSlapen,GaanSlapen,beginTijdSlapenLater
+    tijd = str(datetime.now().hour) + ":" + str(datetime.now().minute)
+    print(payload,tijd)
+    if payload["Slapen"] == 1:
+        if payload["tijd"] == tijd:
+            print("test")
+            GaanSlapen = 1
+            beginTijdSlapen = datetime.now().replace(microsecond=0)
+            print(beginTijdSlapen)
+        else:
+            print("andere tijd")
+            uur = int(payload["tijd"][0:2])
+            minuten = int(payload["tijd"][3:5])
+            print("uur",uur,"min",minuten)
+            beginTijdSlapenLater = datetime.now().replace(hour=uur,minute=minuten,microsecond=0)
+            if(beginTijdSlapenLater < datetime.now()) == True:
+                beginTijdSlapenLater += timedelta(days=1)
+                print(beginTijdSlapenLater)
+            print(beginTijdSlapenLater)
+    # GaanSlapen = payload["Slapen"]
+    # print(payload["Slapen"])
+    # if GaanSlapen == 1:
+    #     beginTijdSlapen = datetime.now().replace(microsecond=0)
+    #     print(beginTijdSlapen)
+    elif payload["Slapen"] == 0:
+        GaanSlapen = 0
+        eindTijdSlapen = datetime.now().replace(microsecond=0)
+        print(eindTijdSlapen)
+        dat = DataRepository.insert_slaap(beginTijdSlapen,eindTijdSlapen)
+        print("id",dat)
+    # print(GaanSlapen)
+    socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
 
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
-def all_out():
-    while True:
-        print('*** We zetten alles uit **')
-        DataRepository.update_status_alle_lampen(0)
-        GPIO.output(ledPin, 0)
-        status = DataRepository.read_status_lampen()
-        socketio.emit('B2F_status_lampen', {'lampen': status})
-        time.sleep(15)
 
-def start_thread():
-    print("**** Starting THREAD ****")
-    thread = threading.Thread(target=all_out, args=(), daemon=True)
-    thread.start()
+def start_schakeling_thread():
+    print("**** Starting SCHAKELING THREAD ****")
+    schakelingThread = threading.Thread(target=codeSchakeling, args=(), daemon=True)
+    schakelingThread.start()
 
+def start_weight_thread():
+    print("**** Starting WEIGHT THREAD ****")
+    weightThread = threading.Thread(target=getWeight,args=(),daemon=True)
+    weightThread.start()
+    
 
 def start_chrome_kiosk():
     import os
@@ -145,19 +613,20 @@ def start_chrome_thread():
     chromeThread.start()
 
 
-
 # ANDERE FUNCTIES
 
 
 if __name__ == '__main__':
     try:
         setup_gpio()
-        start_thread()
-        start_chrome_thread()
+        start_schakeling_thread()
+        start_weight_thread()
+        # start_chrome_thread()
         print("**** Starting APP ****")
         socketio.run(app, debug=False, host='0.0.0.0')
     except KeyboardInterrupt:
         print ('KeyboardInterrupt exception is caught')
+        lcd.reset_lcd()
+        pixels.deinit()
     finally:
         GPIO.cleanup()
-

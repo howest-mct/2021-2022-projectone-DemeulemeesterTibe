@@ -26,7 +26,7 @@ class lcdClass:
     
     def init_LCD(self):
         self.send_instruction(0b00111000)
-        self.send_instruction(0b00001111)
+        self.send_instruction(0b00001100)
         self.send_instruction(0b00000001)
 
     def send_instruction(self, value):
@@ -91,3 +91,9 @@ class lcdClass:
 
     def move_screen_left(self):
         self.send_instruction(0b00011100)
+    
+    def enable_cursor(self):
+        self.send_instruction(0b00001111)
+
+    def disable_cursor(self):
+        self.send_instruction(0b00001100)
