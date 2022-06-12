@@ -145,7 +145,6 @@ const herhaalDagen = function () {
   return repeat;
 };
 const drawChart = function (l, d) {
-  console.log(d);
   let options = {
     chart: {
       id: 'myChart',
@@ -164,6 +163,14 @@ const drawChart = function (l, d) {
       style: {
         fontSize: '16px',
         colors: ['#000000'],
+      },
+      formatter: function (val, opt) {
+        console.log(typeof val);
+        let formattedtijd =
+          opt.w.config.series[opt.seriesIndex].data[opt.dataPointIndex];
+        formattedtijd = String(formattedtijd).replace('.', ':');
+        console.log(formattedtijd);
+        return formattedtijd;
       },
     },
     plotOptions: {
@@ -184,6 +191,34 @@ const drawChart = function (l, d) {
     labels: l,
     noData: {
       text: 'Loading...',
+    },
+    tooltip: {
+      custom: function (opt) {
+        let data =
+          opt.w.config.series[opt.seriesIndex].data[opt.dataPointIndex];
+        data = String(data).replace('.', ':');
+        let label = opt.w.globals.labels[opt.dataPointIndex];
+        return (
+          `<div class="apexcharts-tooltip-title" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;">${label}</div>` +
+          `<div class="apexcharts-tooltip-series-group apexcharts-active" style="order: 1; display: flex;"><span class="apexcharts-tooltip-marker" style="background-color: rgba(255, 0, 0, 0.85);"></span><div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;"><div class="apexcharts-tooltip-y-group"><span class="apexcharts-tooltip-text-y-label"></span><span class="apexcharts-tooltip-text-y-value">${data}</span></div><div class="apexcharts-tooltip-goals-group"><span class="apexcharts-tooltip-text-goals-label"></span><span class="apexcharts-tooltip-text-goals-value"></span></div><div class="apexcharts-tooltip-z-group"><span class="apexcharts-tooltip-text-z-label"></span><span class="apexcharts-tooltip-text-z-value"></span></div></div></div>`
+        );
+      },
+      theme: 'light',
+      x: {
+        show: true,
+      },
+      y: {
+        title: {
+          formatter: function () {
+            return '';
+          },
+        },
+        title: {
+          formatter: function () {
+            return '';
+          },
+        },
+      },
     },
   };
   let chart = new ApexCharts(document.querySelector('.js-content'), options);
@@ -415,10 +450,10 @@ const ListenToRgb = function () {
 //#region ***  Init / DOMContentLoaded                  ***********
 const init = function () {
   toggleNav();
-  herhaalDagen();
   if (document.querySelector('.js-alarmen')) {
     document.querySelector('.c-input__color').style.backgroundColor =
       document.querySelector('.c-input__color').value;
+    // herhaalDagen();
     togglePopUP();
     getAlarmen();
     listenToSocket();
