@@ -20,12 +20,17 @@ const showAlarmen = function (jsonObject) {
   const alarmen = document.querySelector('.c-alarmen-list');
   let html = '';
   for (alarm of jsonObject.alarmen) {
-    html += `<a class="c-alarm" href="detail.html?alarmid=${alarm.alarmID}">
+    let actief = alarm.actief == 1 ? 'c-alarm__on' : '';
+    let herhaal = alarm.herhaal;
+    if (herhaal != '') {
+      herhaal = 'Iedere ' + herhaal.replaceAll(',', ' ');
+    }
+    html += `<a class="c-alarm ${actief}" href="detail.html?alarmid=${alarm.alarmID}">
                     <div class="c-alarm__content">
                     <h2 class="c-alarm__title">${alarm.naam}</h2>
                     <div class="c-alarm__periode"><span class="c-alarm__van">${alarm.tijdstip}</span></div></div>
                     <h3 class="c-alarm__day">${alarm.date}</h3>
-                    <p class="c-alarm__description"></p>
+                    <p class="c-alarm__description">${herhaal}</p>
                 </a>`;
   }
   alarmen.innerHTML = html;

@@ -48,7 +48,7 @@ html {
  */
 
 ::selection {
-    background: #5051DB;
+    background: #4D96FF;
     color: white;
     text-shadow: none;
 }
@@ -154,18 +154,18 @@ hr {
 }
 
 a {
-    color: #5051DB;
+    /* color: #4D96FF; */
     transition: all .1s ease-in-out;
 }
 
 a:visited,
 a:active {
-    color: #3E3EA8;
+    /* color: #4D96FF; */
 }
 
 a:hover,
 a:focus {
-    color: #3E3EA8;
+    /* color: #4D96FF; */
 }
 
 /*------------------------------------*\
@@ -188,15 +188,16 @@ a:focus {
 /* color modifiers */
 
 .o-row--neutral-x-light {
-    background-color: #FFF2F2
+    background-color: #F7F2F2;
+    /* background-color: #FF8080 */
 }
 .o-row--header{
     /* background-color: linear-gradient( right, rgba(255, 81, 47, 0), rgba(221, 36, 118, 1)); */
-    background: #FF5F6D;
+    background: #ff8080;
     /* fallback for old browsers */
-    background: -webkit-linear-gradient(to right, #ec6f66, #f3a183);
+    /* background: -webkit-linear-gradient(to right, #ec6f66, #f3a183); */
     /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, #ec6f66, #f3a183);
+    /* background: linear-gradient(to right, #ec6f66, #f3a183); */
     /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     /* background-color: #FFB3B3; */
     /* border-bottom: 1px solid black; */
@@ -515,7 +516,8 @@ a:focus {
     transition: background-color 200ms ease-in-out, transform 200ms ease-in-out;
 }
 .c-toggle:checked+label::before {
-    background-color: hsl(100, 70%, 90%);
+    /* background-color: hsl(100, 70%, 90%); */
+    background-color: #C0EDA6;
 }
 .c-toggle:checked +label::after{
     left: 1.1em;
@@ -595,7 +597,7 @@ a:focus {
     Component: input text + datetime-local
     ---
 */
-input[type=text],input[type=datetime-local] {
+input[type=text],input[type=datetime-local],input[type=time] {
     font-size: 16px;
     border:none;
     -webkit-appearance: none;
@@ -608,6 +610,10 @@ input[type=text],input[type=datetime-local] {
     width: 250px;
     outline: none;
     margin-bottom: 10px;
+}
+input[type=time] {
+    background: #CCBEBE;
+    width: 150px;
 }
 /*
     Component: input color
@@ -760,11 +766,6 @@ input[type=text],input[type=datetime-local] {
     Component: alarm
     ---
 */
-.test{
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-}
 .c-alarmen-list {
     /* display: -webkit-box; */
     /* text-align: center; */
@@ -804,13 +805,19 @@ input[type=text],input[type=datetime-local] {
     margin: 1em;
     padding: 1em;
     cursor: pointer;
-    background-color: #fff4e9;
+    background-color: #FFCDCD;
     text-decoration: none;
     color: #02140b;
 }
 
 .c-alarm:hover {
-    background-color: #f4e9e9;
+    background-color: #FFB3B3;
+}
+.c-alarm__on{
+    background-color: #E0F3DB;
+}
+.c-alarm__on:hover{
+    background-color: #C3F3B6;
 }
 
 .c-alarm__img {
@@ -836,7 +843,6 @@ input[type=text],input[type=datetime-local] {
     margin: 0.125em 0 0.5em;
     font-weight: 400;
     font-size: 1em;
-    color: #585a59;
 }
 .c-alarm__description{
     /* text-align: center; */
