@@ -91,20 +91,24 @@
                     DIT</a></p> -->
                 <h1>RGB RING</h1>
                 <h2>INPUT MET HEXEDECIMALE WAARDE ONDER INPUT COLOR</h2>
-                <div class="o-layout o-layout--justify-space-around">
+                <!-- <div class="o-layout o-layout--justify-space-around"> -->
+                <div class="c-customization">
                     <input type="color" class="js-color c-input__color" value="#ff0000" id="">
                     <!-- <div class="o-layout o-layout--justify-center"> -->
-                    <div class="test">
+                    <div class="c-customization__item">
                         <input type="checkbox" id="RGB" class="c-toggle js-rgb">
                         <label for="RGB"></label>
                     </div>
-                    <input type="range" class="js-brightness c-input__range" id="" min="0" max="1" step="0.05">
+                    <div class="o-layout o-layout--column o-layout--justify-center o-layout--align-center">
+                        <input type="range" class="js-brightness c-input__range" id="" min="0" max="1" step="0.05">
+                        <p class="js-rangeValue">50 %</p>
+                    </div>
                 </div>
-                <p class="js-rangeValue">50 %</p>
             </div>
     </div>
     </section>
     <hr>
+    <h1 class="js-test">Test</h1>
     <section class="o-row o-row--lg o-row--neutral-x-light">
         <div class="o-container center">
             <h1>Alarmen</h1>
@@ -147,7 +151,7 @@
         <div class="o-container">
             <div class="c-footer">
                 <div class="c-footer__logo">
-                    <p class="c-logo">
+                    <p class="c-lead c-lead--lg">
                         SmartWekker
                         <!-- <svg class="c-logo__symbol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 40">
                                 <title>Flatiron</title>
@@ -160,30 +164,6 @@
                             </svg> -->
                     </p>
                 </div>
-                <div class="c-footer__nav">
-                    <nav class="c-nav c-nav--meta">
-                        <ul class="o-list c-nav__list">
-                            <li class="c-nav__item"><a href="#!" class="c-nav__link c-nav__link--meta">Contact</a>
-                            </li>
-                            <li class="c-nav__item"><a href="#!" class="c-nav__link c-nav__link--meta">Legal</a>
-                            </li>
-                            <li class="c-nav__item"><a href="#!" class="c-nav__link c-nav__link--meta">Privacy</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-                <div class="c-footer__nav">
-                    <nav class="c-nav c-nav--meta">
-                        <ul class="o-list c-nav__list">
-                            <li class="c-nav__item"><a href="#!" class="c-nav__link c-nav__link--meta">Facebook</a>
-                            </li>
-                            <li class="c-nav__item"><a href="#!" class="c-nav__link c-nav__link--meta">Twitter</a>
-                            </li>
-                            <li class="c-nav__item"><a href="#!" class="c-nav__link c-nav__link--meta">LinkedIn</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
             </div>
         </div>
     </footer>
@@ -192,7 +172,7 @@
         <div class="c-mobile-nav__bg"></div>
         <div class="c-mobile-nav__body">
             <div class="c-mobile-nav__header">
-                <p class="c-logo">
+                <p class="c-logo c-lead c-lead--xxxl">
                     Smartwekker
                 </p>
                 <button class="o-button-reset c-nav-trigger js-toggle-nav">
@@ -202,10 +182,11 @@
                     </svg>
                 </button>
             </div>
+            <hr class="c-mobile-nav__lijn">
             <div class="c-mobile-nav__nav c-mobile-nav__nav--main">
                 <nav class="c-nav">
                     <ul class="o-list c-nav__list">
-                        <li class="c-nav__item"><a href="#!" class="c-nav__link">Overzicht</a></li>
+                        <li class="c-nav__item"><a href="index.html" class="c-nav__link">Overzicht</a></li>
                         <li class="c-nav__item"><a href="historiek.html" class="c-nav__link">Historiek</a></li>
                     </ul>
                 </nav>

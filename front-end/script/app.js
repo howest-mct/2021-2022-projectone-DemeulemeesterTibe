@@ -25,6 +25,13 @@ const showAlarmen = function (jsonObject) {
     if (herhaal != '') {
       herhaal = 'Iedere ' + herhaal.replaceAll(',', ' ');
     }
+    herhaal = herhaal.replace('Monday', 'Maandag');
+    herhaal = herhaal.replace('Tuesday', 'Dinsdag');
+    herhaal = herhaal.replace('Wednesday', 'Woensdag');
+    herhaal = herhaal.replace('Thursday', 'Donderdag');
+    herhaal = herhaal.replace('Friday', 'Vrijdag');
+    herhaal = herhaal.replace('Saterday', 'Zaterdag');
+    herhaal = herhaal.replace('Sunday', 'Zondag');
     html += `<a class="c-alarm ${actief}" href="detail.html?alarmid=${alarm.alarmID}">
                     <div class="c-alarm__content">
                     <h2 class="c-alarm__title">${alarm.naam}</h2>

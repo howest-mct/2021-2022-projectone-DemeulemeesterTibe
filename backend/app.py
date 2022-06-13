@@ -48,7 +48,7 @@ beginTijdSlapen = None
 beginTijdSlapenLater = None
 eindTijdSlapen = None
 dtWeight = 6
-clkWeight = 13
+clkWeight = 5
 wekkers = []
 Red = 255
 Green = 0
@@ -72,6 +72,7 @@ timer = 0
 aan = False
 ring = False
 GaanSlapen = False
+showtekst = False
 gewichtmetingen = []
 averagegewicht = -100000
 WakkerWorden = "Wakker worden!!!"
@@ -81,7 +82,7 @@ timenow = datetime.now().replace(microsecond=0)
 joyTimer = time.time()
 timerldr = time.time()
 joyBtn = Button(19)
-btn = Button(12)
+btn = Button(12,500)
 knopSlapen = Button(17)
 knopShutdown = Button(27)
 spi = SpiClass(0,0)
@@ -124,7 +125,7 @@ def Shutdown_knop(pin):
     lcd.reset_lcd()
     pixels.deinit()
     GPIO.cleanup()
-    test = check_output(["sudo","shutdown","-h","now"])
+    down = check_output(["sudo","shutdown","-h","now"])
 
 def lees_knop(pin):
     global lcdStatus,tijd,vorips,alarmopScherm
@@ -150,7 +151,7 @@ def joy_knop(pin):
                 alarm = datetime.strptime(alarm,"%H:%M:%S")
                 alarm = alarm.replace(year=datetime.now().year,month=datetime.now().month,day=datetime.now().day)
                 alarm = alarm + timedelta(days=1)
-                t = DataRepository.insert_alarm("Alarm",alarm,True,None)
+                t = DataRepository.insert_alarm("Alarm",alarm,True,"")
                 socketio.emit("B2F_Addalarm",broadcast=True)
                 # data = DataRepository.read_alarmen_nog_komen()
                 # print("#",data)
@@ -168,7 +169,7 @@ def joy_knop(pin):
                 lcd.set_cursor(4)
 
 def codeSchakeling():
-    global minldr,maxldr,aan,timer,timerldr,pixels,huidigetijd,timenow,alarmopScherm,GaanSlapen,beginTijdSlapen
+    global minldr,maxldr,aan,timer,timerldr,pixels,huidigetijd,timenow,alarmopScherm,GaanSlapen,beginTijdSlapen,lcdStatus,showtekst,lichtsterkte
     # data = DataRepository.read_alarmen_nog_komen()
     # for w in data:
     #     wekkers.append([w["tijd"],w["alarmID"]])
@@ -183,6 +184,7 @@ def codeSchakeling():
         joyX = spi.readChannel(1)
         # ldr
         waardeldr = spi.readChannel(2)
+        # print(joyX,joyY,waardeldr)
         if(waardeldr < minldr):
             minldr = waardeldr
         if waardeldr > maxldr:
@@ -200,16 +202,20 @@ def codeSchakeling():
         # alarm 
         # for w in wekkers:
         if timenow == wekkers["tijd"]:
-            lcd.reset_lcd()
-            aan = True
+            if showtekst == False:
+                print("fffffff")
+                lcd.reset_lcd()
+                aan = True
+                lcdStatus = 5
+                showtekst = True
+                print("WEKKER GAAT AF")
         if timenow == beginTijdSlapenLater:
             print("GAAN SLAPEN JIJ KOEKWOUS")
             beginTijdSlapen = beginTijdSlapenLater
             GaanSlapen = 1
             socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
-        if aan == True:
+        # if aan == True:
             # buzzer.start(10)
-            print("WEKKER GAAT AF")
         displayStatus(lcdStatus,joyY,joyX)
         if ring == 1:
             pixels.fill((Red,Green,Blue))
@@ -235,6 +241,7 @@ def displayStatus(lcdStatus,y,x):
     elif lcdStatus == 1:
         if tijd != huidigetijd:
             t = 0
+            # print(tijd)
             for (a, b) in zip(huidigetijd, tijd):
                 if a !=b:
                     lcd.set_cursor(4+t)
@@ -332,7 +339,7 @@ def checkdeel(tijd):
     return string
 
 def getWeight():
-    global averagegewicht,gewichtmetingen,aan,eindTijdSlapen,GaanSlapen,beginTijdSlapen, lcdStatus,vorWakkerWorden
+    global averagegewicht,gewichtmetingen,aan,eindTijdSlapen,GaanSlapen,beginTijdSlapen, lcdStatus,vorWakkerWorden,showtekst,tijd
     # hx.set_scale_ratio(hx.get_data_mean(20)/188.0)
     timergewicht = time.time()
     while True:
@@ -348,7 +355,6 @@ def getWeight():
                 # print(">",averagegewicht,"\t#",gewichtmetingen)
             timergewicht = time.time()  
         else:
-            lcdStatus = 5
             diff = averagegewicht - reading
             if diff > 500:
                 print(">",timer - timergewicht)
@@ -356,8 +362,11 @@ def getWeight():
                     print("ALARM UIT")
                     aan = False
                     buzzer.start(0)
-                    lcdStatus = 2
+                    tijd = "gggggggg"
+                    lcd.reset_lcd()
+                    showtekst = False
                     vorWakkerWorden = ""
+                    lcdStatus = 1
                     print("id wekker",wekkers["alarmID"])
                     if wekkers["herhaal"] != "":
                         dagenoverlopen = True
@@ -530,7 +539,7 @@ def updateAlarm(payload):
 
 @socketio.on("F2B_GaanSlapen")
 def setSlaap(payload):
-    # checken of de tijden gelijk zijn voor GaanSlapen intestellen
+    # checken of de tijden gelijk zijn voor GaanSlapen inteststellen
     global beginTijdSlapen, eindTijdSlapen,GaanSlapen,beginTijdSlapenLater
     tijd = str(datetime.now().hour) + ":" + str(datetime.now().minute)
     print(payload,tijd)
