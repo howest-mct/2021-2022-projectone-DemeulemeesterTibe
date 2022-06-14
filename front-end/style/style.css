@@ -8,7 +8,9 @@
 .center{
     text-align: center;
 }
-
+.test{
+    margin-bottom: 20px;
+}
 /*
     Generic: Page
     ---
@@ -279,7 +281,7 @@ a:focus {
         padding-top: 48px;
     }
     .o-section--xxl{
-        padding-top: 134px;
+        padding-top: 88px;
     }
 }
 
@@ -484,16 +486,38 @@ a:focus {
     }
 }
 /*
-    Component: Button
+    Component: shutdown button
     ---
 */
-.c-button{
-    background-color: hsl(108, 100%, 65%);
+.c-shutdown{
+    background-color: #1b191a;
+    cursor: pointer;
+    color: white;
     text-decoration: none;
-    border: none;
+    border: 2px solid #DE6061;
     border-radius: 15px;
+    padding: 4px 4px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    transition: background-color 0.25s ease-in-out;
 }
+.c-shutdown:hover{
+    background-color: #DE6061;
+}
+.c-sleep{
+    background-color: #1b191a;
+    cursor: pointer;
+    color: white;
+    text-decoration: none;
+    border: 2px solid #6061de;
+    border-radius: 15px;
+    padding: 4px 4px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    transition: background-color 0.25s ease-in-out;
+}
+.c-sleep:hover{
+    background-color: #6061de;
+}
+
 /*
     Component: input color
     ---
@@ -1498,6 +1522,10 @@ input[type=time] {
 
 .u-mb-md {
     margin-bottom: 16px !important;
+}
+
+.u-mb-md-2 {
+    margin-bottom: 20px !important;
 }
 
 .u-mb-lg {

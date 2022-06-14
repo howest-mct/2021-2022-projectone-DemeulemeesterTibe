@@ -161,6 +161,7 @@ const drawChart = function (l, d) {
     chart: {
       id: 'myChart',
       type: 'bar',
+      foreColor: '#ffffff',
     },
     plotOptions: {
       bar: {
@@ -173,8 +174,8 @@ const drawChart = function (l, d) {
     dataLabels: {
       enabled: true,
       style: {
-        fontSize: '16px',
-        colors: ['#000000'],
+        // fontSize: '16px',
+        colors: ['#ffffff'],
       },
       formatter: function (val, opt) {
         console.log(typeof val);
@@ -197,7 +198,7 @@ const drawChart = function (l, d) {
         type: 'column',
         name: 'Uren geslapen',
         data: d,
-        color: '#ff0000',
+        color: '#6061de',
       },
     ],
     labels: l,
@@ -221,10 +222,13 @@ const drawChart = function (l, d) {
         let label = opt.w.globals.labels[opt.dataPointIndex];
         return (
           `<div class="apexcharts-tooltip-title" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;">${label}</div>` +
-          `<div class="apexcharts-tooltip-series-group apexcharts-active" style="order: 1; display: flex;"><span class="apexcharts-tooltip-marker" style="background-color: rgba(255, 0, 0, 0.85);"></span><div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;"><div class="apexcharts-tooltip-y-group"><span class="apexcharts-tooltip-text-y-label"></span><span class="apexcharts-tooltip-text-y-value">${text}</span></div><div class="apexcharts-tooltip-goals-group"><span class="apexcharts-tooltip-text-goals-label"></span><span class="apexcharts-tooltip-text-goals-value"></span></div><div class="apexcharts-tooltip-z-group"><span class="apexcharts-tooltip-text-z-label"></span><span class="apexcharts-tooltip-text-z-value"></span></div></div></div>`
+          `<div class="apexcharts-tooltip-series-group apexcharts-active" style="order: 1; display: flex;"><span class="apexcharts-tooltip-marker" style="background-color: rgb(96, 97, 222);"></span><div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;"><div class="apexcharts-tooltip-y-group"><span class="apexcharts-tooltip-text-y-label"></span><span class="apexcharts-tooltip-text-y-value">${text}</span></div><div class="apexcharts-tooltip-goals-group"><span class="apexcharts-tooltip-text-goals-label"></span><span class="apexcharts-tooltip-text-goals-value"></span></div><div class="apexcharts-tooltip-z-group"><span class="apexcharts-tooltip-text-z-label"></span><span class="apexcharts-tooltip-text-z-value"></span></div></div></div>`
         );
       },
-      theme: 'light',
+
+      // <div class="apexcharts-tooltip-title" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;">31 May 2022</div>
+      // <div class="apexcharts-tooltip-series-group apexcharts-active" style="order: 1; display: flex;"><span class="apexcharts-tooltip-marker" style="background-color: rgb(96, 97, 222);"></span><div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;"><div class="apexcharts-tooltip-y-group"><span class="apexcharts-tooltip-text-y-label"></span><span class="apexcharts-tooltip-text-y-value">10.00</span></div><div class="apexcharts-tooltip-goals-group"><span class="apexcharts-tooltip-text-goals-label"></span><span class="apexcharts-tooltip-text-goals-value"></span></div><div class="apexcharts-tooltip-z-group"><span class="apexcharts-tooltip-text-z-label"></span><span class="apexcharts-tooltip-text-z-value"></span></div></div></div>
+      theme: 'dark',
       x: {
         show: true,
       },
@@ -240,6 +244,9 @@ const drawChart = function (l, d) {
           },
         },
       },
+    },
+    fill: {
+      opacity: 1,
     },
   };
   let chart = new ApexCharts(document.querySelector('.js-content'), options);
@@ -436,6 +443,7 @@ const listenToUpdateAlarm = function () {
     actief: document.querySelector('.js-actief').checked,
     herhaal: herhaling,
   });
+  window.location.href = 'index.html';
 };
 const ListenToGoSleep = function () {
   let time;
