@@ -497,6 +497,39 @@ a:focus {
   #COMPONENTS
 \*------------------------------------*/
 /*
+    Component: Customization text RGB
+    ---
+*/
+.c-text-customization {
+    display: none;
+}
+
+.c-text-customization__item {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.c-text-customization__item:first-child {
+    margin-left: 15px;
+}
+
+.c-text-customization__item:last-child {
+    margin-right: 8px;
+}
+@media (min-width: 576px) {
+    .c-text-customization {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    .c-customization__item {
+        order: 0;
+    }
+}
+/*
     Component: Customization RGB
     ---
 */

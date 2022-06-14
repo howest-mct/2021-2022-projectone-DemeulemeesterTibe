@@ -1,3 +1,4 @@
+import sys
 import time
 from RPi import GPIO
 from numpy import average
@@ -14,6 +15,7 @@ from flask import Flask, jsonify, request
 from repositories.DataRepository import DataRepository
 import neopixel
 import board
+import os
 
 from selenium import webdriver
 
@@ -124,8 +126,10 @@ def Shutdown_knop(pin):
     print("Shutdown")
     lcd.reset_lcd()
     pixels.deinit()
-    GPIO.cleanup()
-    down = check_output(["sudo","shutdown","-h","now"])
+    # down = check_output(["sudo","shutdown","-h","now"])
+    time.sleep(2)
+    os.system("sudo poweroff -h now")
+    sys.exit()
 
 def lees_knop(pin):
     global lcdStatus,tijd,vorips,alarmopScherm
