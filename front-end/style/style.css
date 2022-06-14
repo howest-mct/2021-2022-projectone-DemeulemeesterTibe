@@ -672,6 +672,62 @@ a:focus {
     background-color: white;
 } 
 
+.c-auto{
+    display: none;
+}
+.c-auto +label{
+    position: relative;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+.c-auto +label::before{
+    content: "";
+    width: 2em;
+    height: 1em;
+    background-color: #DE6061;
+    border-radius: 1em;
+    margin-right: .25em;
+    transition: background-color 200ms ease-in-out;
+}
+.c-auto +label::after{
+    /* padding-right: 0.1rem;
+    padding-top: 0.2rem; */
+    padding-bottom: 0.15rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    content: "\2715";
+    font-size: 0.5em;
+    height: .9em;
+    left: .2em;
+    width: 1.8em;
+    height: 1.8em;
+    background-color: white;
+    color: #DE6061;
+    border-radius: 1em;
+    transition: background-color 200ms ease-in-out, transform 200ms ease-in-out;
+}
+@media (min-width: 768px) {
+    .c-auto+label::after {
+        padding-top: 0.2rem;
+    }
+}
+.c-auto:checked+label::before {
+    /* background-color: hsl(100, 70%, 90%); */
+    background-color: #61DE60;
+}
+.c-auto:checked +label::after{
+    /* padding-left: 0.1rem;
+    padding-top: 0.2rem; */
+    left: 1.1em;
+    content: "\2713";
+    color: #61DE60;
+    transform: translateX(.9em);
+    background-color: white;
+} 
+
 /*
     Component: c-toggle alarmen
     ---
@@ -736,7 +792,7 @@ a:focus {
 }
 .c-dagen:checked +label {
     font-weight: 600;
-    background-color: #FF4D4D;
+    background-color: #6061de;
     color: white;
 }
 /*
@@ -897,7 +953,7 @@ input[type=time] {
     bottom: 25px;
     width: 55px;
     height: 55px;
-    background-color: #DE6061;
+    background-color: #6061de;
     z-index: 1;
     display: flex;
     align-items: center;
@@ -1365,6 +1421,9 @@ input[type=time] {
 
 .c-lead {
     font-weight: 400;
+}
+.c-leadBold {
+    font-weight: 600;
 }
 
 .c-lead--lg {
