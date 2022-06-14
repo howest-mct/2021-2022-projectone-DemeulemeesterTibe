@@ -119,6 +119,7 @@ def Slaap_knop(pin):
         print("Hallo")
         eindTijdSlapen = datetime.now().replace(microsecond=0)
         dat = DataRepository.insert_slaap(beginTijdSlapen,eindTijdSlapen)
+        socketio.emit("B2F_NewSleepData",broadcast=True)
         print(dat)
     socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
 

@@ -8,6 +8,8 @@ let RingAan = 0;
 let Slapen = 0;
 let brightnessbool = false;
 let colorbool = false;
+let chart;
+let chartActive = false;
 //#endregion
 
 //#region ***  Callback-Visualisation - show___         ***********
@@ -73,7 +75,22 @@ const ShowSlaapGrafiek = function (jsonObject) {
     converted_data.push(s.hoursMin);
     converted_labels.push(s.datum);
   }
-  drawChart(converted_labels, converted_data);
+  if (chartActive == false) {
+    drawChart(converted_labels, converted_data);
+    chartActive = true;
+  } else {
+    console.log('UPDATE');
+    chart.updateOptions({
+      xaxis: {
+        categories: converted_labels,
+      },
+      series: [
+        {
+          data: converted_data,
+        },
+      ],
+    });
+  }
 };
 const showHistoriek = function () {
   console.log('NOG AFWERKEN');
@@ -178,11 +195,9 @@ const drawChart = function (l, d) {
         colors: ['#ffffff'],
       },
       formatter: function (val, opt) {
-        console.log(typeof val);
         let formattedtijd =
           opt.w.config.series[opt.seriesIndex].data[opt.dataPointIndex];
         formattedtijd = String(formattedtijd).replace('.', ':');
-        console.log(formattedtijd);
         return formattedtijd;
       },
     },
@@ -249,7 +264,7 @@ const drawChart = function (l, d) {
       opacity: 1,
     },
   };
-  let chart = new ApexCharts(document.querySelector('.js-content'), options);
+  chart = new ApexCharts(document.querySelector('.js-content'), options);
   chart.render();
 };
 //#endregion
@@ -300,46 +315,57 @@ const togglePopUP = function () {
   };
 };
 const listenToSocket = function () {
-  socket.on('B2F_verandering_ldr', function (jsonObject) {
-    console.log('Ldr binnen');
-    document.querySelector(
-      '.js-test'
-    ).innerHTML = `${jsonObject.ldr.waarde} ${jsonObject.ldr.meeteenheid}`;
-  });
-  socket.on('B2F_SetColor', function (jsonObject) {
-    if (colorbool == false) {
-      console.log('B2F_SETCOLOR', jsonObject);
-      const hexcode = rgbToHex(
-        jsonObject['red'],
-        jsonObject['green'],
-        jsonObject['blue']
-      );
-      console.log('HEXCODE', hexcode);
-      document.querySelector('.js-color').value = hexcode;
-      document.querySelector('.c-input__color').style.backgroundColor = hexcode;
-    }
-  });
-  socket.on('B2F_SetBrightness', function (jsonObject) {
-    if (brightnessbool == false) {
-      document.querySelector('.js-brightness').value = jsonObject['brightness'];
-      document.querySelector('.js-rangeValue').innerHTML =
-        Math.round(document.querySelector('.js-brightness').value * 100) + ' %';
-    }
-  });
-  socket.on('B2F_Addalarm', function () {
-    getAlarmen();
-  });
-  socket.on('B2F_Ringstatus', function (jsonObject) {
-    RingAan = jsonObject.ring;
-    if (RingAan == 1) {
-      document.querySelector('.js-rgb').checked = true;
-    } else {
-      document.querySelector('.js-rgb').checked = false;
-    }
-  });
-  socket.on('B2F_SlaapStatus', function (jsonObject) {
-    Slapen = jsonObject.slapen;
-  });
+  if (document.querySelector('.js-alarmen')) {
+    socket.on('B2F_verandering_ldr', function (jsonObject) {
+      console.log('Ldr binnen');
+      document.querySelector(
+        '.js-test'
+      ).innerHTML = `${jsonObject.ldr.waarde} ${jsonObject.ldr.meeteenheid}`;
+    });
+    socket.on('B2F_SetColor', function (jsonObject) {
+      if (colorbool == false) {
+        console.log('B2F_SETCOLOR', jsonObject);
+        const hexcode = rgbToHex(
+          jsonObject['red'],
+          jsonObject['green'],
+          jsonObject['blue']
+        );
+        console.log('HEXCODE', hexcode);
+        document.querySelector('.js-color').value = hexcode;
+        document.querySelector('.c-input__color').style.backgroundColor =
+          hexcode;
+      }
+    });
+    socket.on('B2F_SetBrightness', function (jsonObject) {
+      if (brightnessbool == false) {
+        document.querySelector('.js-brightness').value =
+          jsonObject['brightness'];
+        document.querySelector('.js-rangeValue').innerHTML =
+          Math.round(document.querySelector('.js-brightness').value * 100) +
+          ' %';
+      }
+    });
+    socket.on('B2F_Addalarm', function () {
+      getAlarmen();
+    });
+    socket.on('B2F_Ringstatus', function (jsonObject) {
+      RingAan = jsonObject.ring;
+      if (RingAan == 1) {
+        document.querySelector('.js-rgb').checked = true;
+      } else {
+        document.querySelector('.js-rgb').checked = false;
+      }
+    });
+    socket.on('B2F_SlaapStatus', function (jsonObject) {
+      Slapen = jsonObject.slapen;
+    });
+  } else if (document.querySelector('.js-slaap')) {
+    console.log('dfqsfd');
+    socket.on('B2F_NewSleepData', function () {
+      console.log('binnen');
+      getSlaapData();
+    });
+  }
 };
 const listenToUI = function () {
   if (document.querySelector('.js-alarmen')) {
@@ -508,6 +534,7 @@ const init = function () {
       window.location.href = 'index.html';
     }
   } else if (document.querySelector('.js-slaap')) {
+    listenToSocket();
     listenToUI();
   }
 };
