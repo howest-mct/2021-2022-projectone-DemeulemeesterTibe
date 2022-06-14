@@ -491,6 +491,7 @@ a:focus {
 */
 .c-shutdown{
     background-color: #1b191a;
+    font-size: 1.25em;
     cursor: pointer;
     color: white;
     text-decoration: none;
@@ -505,6 +506,7 @@ a:focus {
 }
 .c-sleep{
     background-color: #1b191a;
+    font-size: 1.25em;
     cursor: pointer;
     color: white;
     text-decoration: none;
@@ -917,6 +919,7 @@ input[type=time] {
 }
 .c-alarm__description{
     /* text-align: center; */
+    margin-bottom: 0px;
     font-size: 0.75em;
 }
 /*
@@ -1088,7 +1091,10 @@ input[type=time] {
 }
 
 .c-logo__symbol {
+    width: 131px;
+    height: 45px;
     height: 100%;
+    fill: white;
 }
 
 @media (min-width: 768px) {
