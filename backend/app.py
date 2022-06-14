@@ -356,7 +356,7 @@ def getWeight():
             timergewicht = time.time()  
         else:
             diff = averagegewicht - reading
-            if diff > 500:
+            if diff < -5000:
                 print(">",timer - timergewicht)
                 if timer - timergewicht >= 2:
                     print("ALARM UIT")

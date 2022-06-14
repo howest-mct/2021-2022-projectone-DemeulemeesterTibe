@@ -353,6 +353,9 @@ const listenToUI = function () {
       .addEventListener('click', ListenToGoSleep);
     listenToChangeColor();
     listenToChangeBrightness();
+    document
+      .querySelector('.js-rangeIcon')
+      .addEventListener('click', ListenToSetAutoBrightness);
   } else if (document.querySelector('.js-updatealarm')) {
     // detail.html
     document
@@ -473,6 +476,14 @@ const ListenToRgb = function () {
   }
   socket.emit('F2B_RGBring', { aan: RingAan });
   console.log(RingAan);
+};
+const ListenToSetAutoBrightness = function () {
+  document
+    .querySelector('.js-rangeIcon')
+    .classList.toggle('material-symbols-fill');
+  document
+    .querySelector('.js-rangeIcon')
+    .classList.toggle('material-symbols-nofill');
 };
 //#endregion
 
