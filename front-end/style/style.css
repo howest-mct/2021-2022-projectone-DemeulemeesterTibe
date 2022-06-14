@@ -269,12 +269,17 @@ a:focus {
 .o-section+.o-section {
     padding-top: 24px;
 }
-
+.o-section--xxl {
+    padding-top: 80px;
+}
 @media (min-width: 768px) {
 
     .o-section--lg+.o-section--lg,
     .o-section--xl+.o-section--xl {
         padding-top: 48px;
+    }
+    .o-section--xxl{
+        padding-top: 134px;
     }
 }
 
@@ -663,6 +668,13 @@ input[type=time] {
     Component: input color
     ---
 */
+.u-fixed-content {
+    overflow: hidden !important;
+    position: fixed !important;
+    top: 0 !important;
+    width: 100% !important;
+    z-index: 20;
+}
 .c-input__range--icon{
     /* fill: 1; */
     fill: white;
@@ -945,7 +957,7 @@ input[type=time] {
 }
 
 .c-mobile-nav {
-    z-index: 10;
+    z-index: 20;
     position: fixed;
     top: 0;
     right: 0;
@@ -1006,6 +1018,16 @@ input[type=time] {
 .c-mobile-nav__nav{
     padding: 0 24px;
 }
+@media (min-width: 768px) {
+    .c-mobile-nav__header{
+        padding-left: 48px;
+        padding-right: 48px;
+    }
+    .c-mobile-nav__nav{
+        padding-left: 48px;
+        padding-right: 48px;
+    }
+}
 .has-mobile-nav .c-mobile-nav__body {}
 
 .display-none {
@@ -1013,7 +1035,7 @@ input[type=time] {
 }
 @media (min-width: 768px) {
     .c-mobile-nav__body {
-        padding: 48px;
+        /* padding: 48px; */
     }
 }
 
@@ -1032,6 +1054,10 @@ input[type=time] {
 */
 
 .c-logo {
+    font-family: 'Roboto Mono', 'Source Sans Pro',
+            Helvetica,
+            arial,
+            sans-serif;
     height: 32px;
     display: flex;
     align-items: center;
@@ -1064,6 +1090,11 @@ input[type=time] {
 
 .c-header__nav {
     display: none;
+}
+.c-header__button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 @media (min-width: 992px) {
