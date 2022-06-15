@@ -397,9 +397,14 @@ const listenToSocket = function () {
       console.log(jsonObject);
       if (jsonObject['autobrightness'] == true) {
         document.querySelector('.js-autobrightnessauto').innerHTML = 'Auto';
+        document.querySelector('.js-brightness').disabled = true;
       } else {
+        document.querySelector('.js-brightness').disabled = false;
         document.querySelector('.js-autobrightnessauto').innerHTML = 'Manueel';
       }
+      document
+        .querySelector('.c-input__range')
+        .classList.toggle('c-input__range--disabled');
       document.querySelector('.js-autobrightness').checked =
         jsonObject['autobrightness'];
     });

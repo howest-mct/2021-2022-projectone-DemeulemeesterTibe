@@ -864,6 +864,12 @@ input[type=time] {
     border-radius: 5px;
     border: 1px solid #000000;
 }
+.c-input__range--disabled{
+    opacity: 0.25;
+}
+.c-input__range--disabled::-webkit-slider-runnable-track {
+    background: grey;
+}
 
 .c-input__range::-webkit-slider-thumb {
     box-shadow: 1px 1px 1px #000000;
