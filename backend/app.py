@@ -71,10 +71,12 @@ waardeldr = 0
 lichtsterkte = 0
 alarm = ""
 timer = 0
+vorBright = 0
 aan = False
 ring = False
 GaanSlapen = False
 showtekst = False
+autoBrightness = False
 gewichtmetingen = []
 averagegewicht = -100000
 WakkerWorden = "Wakker worden!!!"
@@ -174,7 +176,7 @@ def joy_knop(pin):
                 lcd.set_cursor(4)
 
 def codeSchakeling():
-    global minldr,maxldr,aan,timer,timerldr,pixels,huidigetijd,timenow,alarmopScherm,GaanSlapen,beginTijdSlapen,lcdStatus,showtekst,lichtsterkte
+    global minldr,maxldr,aan,timer,timerldr,pixels,huidigetijd,timenow,alarmopScherm,GaanSlapen,beginTijdSlapen,lcdStatus,showtekst,lichtsterkte,vorBright
     # data = DataRepository.read_alarmen_nog_komen()
     # for w in data:
     #     wekkers.append([w["tijd"],w["alarmID"]])
@@ -185,8 +187,8 @@ def codeSchakeling():
         timer = time.time()
         huidigetijd = time.strftime("%H:%M:%S")
         timenow = datetime.now().replace(microsecond=0)
-        joyY = spi.readChannel(0)
-        joyX = spi.readChannel(1)
+        joyY = spi.readChannel(1)
+        joyX = spi.readChannel(0)
         # ldr
         waardeldr = spi.readChannel(2)
         # print(joyX,joyY,waardeldr)
@@ -197,7 +199,7 @@ def codeSchakeling():
         if maxldr != minldr:
             lichtsterkte = round(100 - (100*((waardeldr - minldr) / (maxldr - minldr))),2)
             # print(f"Lichtsterkte: {lichtsterkte:.2f} %")
-        if timer - timerldr >= 60:
+        if timer - timerldr >= 10:
             print("LDR inlezen") 
             timerldr = time.time()
             insert = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),lichtsterkte,None,2,1)
@@ -222,10 +224,25 @@ def codeSchakeling():
         # if aan == True:
             # buzzer.start(10)
         displayStatus(lcdStatus,joyY,joyX)
-        if ring == 1:
-            pixels.fill((Red,Green,Blue))
-        elif ring == 0:
-            pixels.fill((0,0,0))
+        if autoBrightness == False:
+            if ring == 1:
+                pixels.fill((Red,Green,Blue))
+            elif ring == 0:
+                pixels.fill((0,0,0))
+        else:
+            if lichtsterkte <= 51:
+                pixels.fill((Red,Green,Blue))
+                bright = 1 -lichtsterkte / 50
+                print("in if")
+                print("bright",bright,"vorbright",vorBright)
+                if abs(bright - vorBright) >0.05 :
+                    print("in if2")
+                    pixels.brightness = float(bright)
+                    vorBright = bright
+                    socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness},broadcast=True)
+            else:
+                pixels.fill((0,0,0))
+                socketio.emit("B2F_Ringstatus",{"ring": ring})
 
 def displayStatus(lcdStatus,y,x):
     global vorips , tijd , teller , joyTimer , alarmopScherm, huidigetijd,timer, vorWakkerWorden
@@ -489,8 +506,9 @@ def initial_connection():
     # random ldr waarde op website tot volgende inlees moment
     socketio.emit("B2F_Ringstatus",{"ring": ring})
     socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen})
-    socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness},broadcast=True)
+    socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness})
     socketio.emit("B2F_SetColor",{"red":Red,"green":Green,"blue":Blue})
+    socketio.emit("B2F_SlaapStatus",{"autobrightness": autoBrightness})
     
 
 @socketio.on("F2B_SetColor")
@@ -577,6 +595,13 @@ def setSlaap(payload):
         print("id",dat)
     # print(GaanSlapen)
     socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
+
+@socketio.on("F2B_setautobrightness")
+def setAutoBrightness(payload):
+    global autoBrightness
+    autoBrightness = payload["autobrightness"]
+    print("auto",autoBrightness)    
+    socketio.emit("B2F_SlaapStatus",{"autobrightness": autoBrightness},broadcast=True)
 
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.

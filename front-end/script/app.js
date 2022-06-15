@@ -179,6 +179,7 @@ const drawChart = function (l, d) {
       id: 'myChart',
       type: 'bar',
       foreColor: '#ffffff',
+      background: '#1f1d1f',
     },
     plotOptions: {
       bar: {
@@ -192,6 +193,7 @@ const drawChart = function (l, d) {
       enabled: true,
       style: {
         // fontSize: '16px',
+        fontFamily: 'Changa',
         colors: ['#ffffff'],
       },
       formatter: function (val, opt) {
@@ -199,6 +201,27 @@ const drawChart = function (l, d) {
           opt.w.config.series[opt.seriesIndex].data[opt.dataPointIndex];
         formattedtijd = String(formattedtijd).replace('.', ':');
         return formattedtijd;
+      },
+    },
+    theme: {
+      mode: 'dark',
+      monochrome: {
+        enabled: false,
+        color: '#1f1d1f',
+        shadeTo: 'light',
+        shadeIntensity: 0.65,
+      },
+    },
+    title: {
+      text: 'Aantal uren geslapen',
+      align: 'center',
+      margin: 10,
+      floating: false,
+      style: {
+        fontSize: '16px',
+        fontWeight: 'bold',
+        fontFamily: 'Changa',
+        color: '#ffffff',
       },
     },
     plotOptions: {
@@ -219,6 +242,22 @@ const drawChart = function (l, d) {
     labels: l,
     noData: {
       text: 'Loading...',
+    },
+    xaxis: {
+      labels: {
+        style: {
+          // fontSize: '12px',
+          fontFamily: 'Changa',
+        },
+      },
+    },
+    yaxis: {
+      labels: {
+        style: {
+          // fontSize: '12px',
+          fontFamily: 'Changa',
+        },
+      },
     },
     tooltip: {
       custom: function (opt) {
@@ -248,11 +287,6 @@ const drawChart = function (l, d) {
         show: true,
       },
       y: {
-        title: {
-          formatter: function () {
-            return '';
-          },
-        },
         title: {
           formatter: function () {
             return '';
@@ -359,6 +393,16 @@ const listenToSocket = function () {
     socket.on('B2F_SlaapStatus', function (jsonObject) {
       Slapen = jsonObject.slapen;
     });
+    socket.on('B2F_SlaapStatus', function (jsonObject) {
+      console.log(jsonObject);
+      if (jsonObject['autobrightness'] == true) {
+        document.querySelector('.js-autobrightnessauto').innerHTML = 'Auto';
+      } else {
+        document.querySelector('.js-autobrightnessauto').innerHTML = 'Manueel';
+      }
+      document.querySelector('.js-autobrightness').checked =
+        jsonObject['autobrightness'];
+    });
   } else if (document.querySelector('.js-slaap')) {
     console.log('dfqsfd');
     socket.on('B2F_NewSleepData', function () {
@@ -380,7 +424,7 @@ const listenToUI = function () {
     listenToChangeColor();
     listenToChangeBrightness();
     document
-      .querySelector('.js-rangeIcon')
+      .querySelector('.js-autobrightness')
       .addEventListener('click', ListenToSetAutoBrightness);
   } else if (document.querySelector('.js-updatealarm')) {
     // detail.html
@@ -504,12 +548,13 @@ const ListenToRgb = function () {
   console.log(RingAan);
 };
 const ListenToSetAutoBrightness = function () {
-  document
-    .querySelector('.js-rangeIcon')
-    .classList.toggle('material-symbols-fill');
-  document
-    .querySelector('.js-rangeIcon')
-    .classList.toggle('material-symbols-nofill');
+  let val = document.querySelector('.js-autobrightness').checked;
+  if (val == true) {
+    document.querySelector('.js-autobrightnessauto').innerHTML = 'Auto';
+  } else {
+    document.querySelector('.js-autobrightnessauto').innerHTML = 'Manueel';
+  }
+  socket.emit('F2B_setautobrightness', { autobrightness: val });
 };
 //#endregion
 
