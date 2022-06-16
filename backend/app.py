@@ -16,7 +16,6 @@ from repositories.DataRepository import DataRepository
 import neopixel
 import board
 import os
-from pygame import mixer
 
 from selenium import webdriver
 

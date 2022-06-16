@@ -22,7 +22,7 @@ html {
     font-weight: 400;
     font-family: 'Changa','Source Sans Pro',Helvetica, arial, sans-serif;
     background-color: #1f1d1f;
-    color: white;
+    color: #F2F2F7;
     box-sizing: border-box;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -828,7 +828,7 @@ input[type=time] {
 }
 .c-input__range--icon{
     /* fill: 1; */
-    fill: white;
+    fill: #F2F2F7;
     cursor: pointer;
 }
 .c-input__range {
@@ -858,7 +858,7 @@ input[type=time] {
     height: 10px;
     cursor: pointer;
     box-shadow: 1px 1px 1px #000000;
-    background: white;
+    background: #F2F2F7;
     border-radius: 5px;
     border: 1px solid #000000;
 }
@@ -866,7 +866,7 @@ input[type=time] {
     opacity: 0.25;
 }
 .c-input__range--disabled::-webkit-slider-runnable-track {
-    background: grey;
+    background: #707080;
 }
 
 .c-input__range::-webkit-slider-thumb {
@@ -875,7 +875,7 @@ input[type=time] {
     height: 25px;
     width: 25px;
     border-radius: 50px;
-    background: white;
+    background: #F2F2F7;
     cursor: pointer;
     -webkit-appearance: none;
     margin-top: -8px;
@@ -952,6 +952,7 @@ input[type=time] {
     ---
 */
 .c-floatingButton{
+    padding: 0;
     position: fixed;
     right: 10px;
     bottom: 25px;
@@ -1367,7 +1368,7 @@ input[type=time] {
 }
 
 .c-nav-trigger__svg {
-    fill: white;
+    fill: #F2F2F7;
     height: 100%;
 }
 
