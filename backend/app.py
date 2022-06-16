@@ -1,5 +1,6 @@
 import sys
 import time
+from tracemalloc import start
 from RPi import GPIO
 from numpy import average
 from helpers.lcdClass import lcdClass
@@ -77,6 +78,8 @@ showtekst = False
 GaanSlapen = False
 alarmopScherm = False
 autoBrightness = False
+rgbStilletjesAan = False
+startbright = False
 gewichtmetingen = []
 averagegewicht = -100000
 WakkerWorden = "Wakker worden!!!"
@@ -85,6 +88,7 @@ vorWakkerWorden = ""
 timenow = datetime.now().replace(microsecond=0)
 joyTimer = time.time()
 timerldr = time.time()
+timerRGB = time.time()
 joyBtn = Button(19)
 btn = Button(12,500)
 knopSlapen = Button(17)
@@ -175,7 +179,7 @@ def joy_knop(pin):
                 lcd.set_cursor(4)
 
 def codeSchakeling():
-    global ring,minldr,maxldr,aan,timer,timerldr,pixels,huidigetijd,timenow,alarmopScherm,GaanSlapen,beginTijdSlapen,lcdStatus,showtekst,lichtsterkte,vorBright
+    global startbright,timerRGB,rgbStilletjesAan,ring,minldr,maxldr,aan,timer,timerldr,pixels,huidigetijd,timenow,alarmopScherm,GaanSlapen,beginTijdSlapen,lcdStatus,showtekst,lichtsterkte,vorBright
     # data = DataRepository.read_alarmen_nog_komen()
     # for w in data:
     #     wekkers.append([w["tijd"],w["alarmID"]])
@@ -210,9 +214,16 @@ def codeSchakeling():
         # if timenow == (wekkers["tijd"] - timedelta(6)):
 
 
-        # print(">",wekkers["tijd"],"#",wekkers["tijd"] - timedelta(seconds=6))
+        if timenow == (wekkers["tijd"] - timedelta(seconds=10)):
+            if startbright == False:
+                print("gelijk")
+                rgbStilletjesAan = True
+                pixels.brightness = 0
+                timerRGB = time.time()
+                startbright = True
         if timenow == wekkers["tijd"]:
             if showtekst == False:
+                startbright = True
                 print("fffffff")
                 lcd.reset_lcd()
                 aan = True
@@ -227,28 +238,48 @@ def codeSchakeling():
         if aan == True:
             buzzer.start(10)
         displayStatus(lcdStatus,joyY,joyX)
-        if autoBrightness == False:
-            if ring == 1:
-                pixels.fill((Red,Green,Blue))
-            elif ring == 0:
-                pixels.fill((0,0,0))
-        else:
-            if lichtsterkte <= 51:
-                pixels.fill((Red,Green,Blue))
-                bright = 1 -lichtsterkte / 50
+        if rgbStilletjesAan != False:
+            if (timer - timerRGB) >=0.5:
                 if ring == False:
                     ring = True
                     socketio.emit("B2F_Ringstatus",{"ring": ring})
-                if abs(bright - vorBright) >0.05 :
-                    pixels.brightness = float(bright)
-                    vorBright = bright
-                    socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness},broadcast=True)
+                    id = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),None,None,4,3)
+                pixels.fill((Red,Green,Blue))
+                timerRGB = time.time()
+                pixels.brightness += 0.05
+                print(pixels.brightness)
+                if pixels.brightness == 1:
+                    rgbStilletjesAan = False
+                    d = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),round(pixels.brightness,2),None,4,5)
+                socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness},broadcast=True)
+
+        else:
+            if autoBrightness == False:
+                if ring == 1:
+                    pixels.fill((Red,Green,Blue))
+                elif ring == 0:
+                    pixels.fill((0,0,0))
             else:
-                pixels.brightness = 0
-                if ring == True:
-                    ring = False
-                    socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness},broadcast=True)
-                    socketio.emit("B2F_Ringstatus",{"ring": ring})
+                if lichtsterkte <= 51:
+                    pixels.fill((Red,Green,Blue))
+                    bright = 1 -lichtsterkte / 50
+                    if ring == False:
+                        ring = True
+                        socketio.emit("B2F_Ringstatus",{"ring": ring})
+                        id = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),None,None,4,3)
+                    if abs(bright - vorBright) >0.05 :
+                        pixels.brightness = float(bright)
+                        vorBright = bright
+                        socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness},broadcast=True)
+                        d = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),round(pixels.brightness,2),None,4,5)
+                else:
+                    pixels.brightness = 0
+                    if ring == True:
+                        ring = False
+                        socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness},broadcast=True)
+                        socketio.emit("B2F_Ringstatus",{"ring": ring})
+                        id = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),None,None,4,4)
+                        d = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),round(pixels.brightness,2),None,4,5)
 
 def displayStatus(lcdStatus,y,x):
     global vorips , tijd , teller , joyTimer , alarmopScherm, huidigetijd,timer, vorWakkerWorden
