@@ -8,6 +8,8 @@ let RingAan = 0;
 let Slapen = 0;
 let brightnessbool = false;
 let colorbool = false;
+let chart;
+let chartActive = false;
 //#endregion
 
 //#region ***  Callback-Visualisation - show___         ***********
@@ -25,6 +27,13 @@ const showAlarmen = function (jsonObject) {
     if (herhaal != '') {
       herhaal = 'Iedere ' + herhaal.replaceAll(',', ' ');
     }
+    herhaal = herhaal.replace('Monday', 'Maandag');
+    herhaal = herhaal.replace('Tuesday', 'Dinsdag');
+    herhaal = herhaal.replace('Wednesday', 'Woensdag');
+    herhaal = herhaal.replace('Thursday', 'Donderdag');
+    herhaal = herhaal.replace('Friday', 'Vrijdag');
+    herhaal = herhaal.replace('Saterday', 'Zaterdag');
+    herhaal = herhaal.replace('Sunday', 'Zondag');
     html += `<a class="c-alarm ${actief}" href="detail.html?alarmid=${alarm.alarmID}">
                     <div class="c-alarm__content">
                     <h2 class="c-alarm__title">${alarm.naam}</h2>
@@ -66,7 +75,22 @@ const ShowSlaapGrafiek = function (jsonObject) {
     converted_data.push(s.hoursMin);
     converted_labels.push(s.datum);
   }
-  drawChart(converted_labels, converted_data);
+  if (chartActive == false) {
+    drawChart(converted_labels, converted_data);
+    chartActive = true;
+  } else {
+    console.log('UPDATE');
+    chart.updateOptions({
+      xaxis: {
+        categories: converted_labels,
+      },
+      series: [
+        {
+          data: converted_data,
+        },
+      ],
+    });
+  }
 };
 const showHistoriek = function () {
   console.log('NOG AFWERKEN');
@@ -154,6 +178,8 @@ const drawChart = function (l, d) {
     chart: {
       id: 'myChart',
       type: 'bar',
+      foreColor: '#ffffff',
+      background: '#1f1d1f',
     },
     plotOptions: {
       bar: {
@@ -166,16 +192,36 @@ const drawChart = function (l, d) {
     dataLabels: {
       enabled: true,
       style: {
-        fontSize: '16px',
-        colors: ['#000000'],
+        // fontSize: '16px',
+        fontFamily: 'Changa',
+        colors: ['#ffffff'],
       },
       formatter: function (val, opt) {
-        console.log(typeof val);
         let formattedtijd =
           opt.w.config.series[opt.seriesIndex].data[opt.dataPointIndex];
         formattedtijd = String(formattedtijd).replace('.', ':');
-        console.log(formattedtijd);
         return formattedtijd;
+      },
+    },
+    theme: {
+      mode: 'dark',
+      monochrome: {
+        enabled: false,
+        color: '#1f1d1f',
+        shadeTo: 'light',
+        shadeIntensity: 0.65,
+      },
+    },
+    title: {
+      text: 'Aantal uren geslapen',
+      align: 'center',
+      margin: 10,
+      floating: false,
+      style: {
+        fontSize: '16px',
+        fontWeight: 'bold',
+        fontFamily: 'Changa',
+        color: '#ffffff',
       },
     },
     plotOptions: {
@@ -190,12 +236,28 @@ const drawChart = function (l, d) {
         type: 'column',
         name: 'Uren geslapen',
         data: d,
-        color: '#ff0000',
+        color: '#6061de',
       },
     ],
     labels: l,
     noData: {
       text: 'Loading...',
+    },
+    xaxis: {
+      labels: {
+        style: {
+          // fontSize: '12px',
+          fontFamily: 'Changa',
+        },
+      },
+    },
+    yaxis: {
+      labels: {
+        style: {
+          // fontSize: '12px',
+          fontFamily: 'Changa',
+        },
+      },
     },
     tooltip: {
       custom: function (opt) {
@@ -214,10 +276,13 @@ const drawChart = function (l, d) {
         let label = opt.w.globals.labels[opt.dataPointIndex];
         return (
           `<div class="apexcharts-tooltip-title" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;">${label}</div>` +
-          `<div class="apexcharts-tooltip-series-group apexcharts-active" style="order: 1; display: flex;"><span class="apexcharts-tooltip-marker" style="background-color: rgba(255, 0, 0, 0.85);"></span><div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;"><div class="apexcharts-tooltip-y-group"><span class="apexcharts-tooltip-text-y-label"></span><span class="apexcharts-tooltip-text-y-value">${text}</span></div><div class="apexcharts-tooltip-goals-group"><span class="apexcharts-tooltip-text-goals-label"></span><span class="apexcharts-tooltip-text-goals-value"></span></div><div class="apexcharts-tooltip-z-group"><span class="apexcharts-tooltip-text-z-label"></span><span class="apexcharts-tooltip-text-z-value"></span></div></div></div>`
+          `<div class="apexcharts-tooltip-series-group apexcharts-active" style="order: 1; display: flex;"><span class="apexcharts-tooltip-marker" style="background-color: rgb(96, 97, 222);"></span><div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;"><div class="apexcharts-tooltip-y-group"><span class="apexcharts-tooltip-text-y-label"></span><span class="apexcharts-tooltip-text-y-value">${text}</span></div><div class="apexcharts-tooltip-goals-group"><span class="apexcharts-tooltip-text-goals-label"></span><span class="apexcharts-tooltip-text-goals-value"></span></div><div class="apexcharts-tooltip-z-group"><span class="apexcharts-tooltip-text-z-label"></span><span class="apexcharts-tooltip-text-z-value"></span></div></div></div>`
         );
       },
-      theme: 'light',
+
+      // <div class="apexcharts-tooltip-title" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;">31 May 2022</div>
+      // <div class="apexcharts-tooltip-series-group apexcharts-active" style="order: 1; display: flex;"><span class="apexcharts-tooltip-marker" style="background-color: rgb(96, 97, 222);"></span><div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;"><div class="apexcharts-tooltip-y-group"><span class="apexcharts-tooltip-text-y-label"></span><span class="apexcharts-tooltip-text-y-value">10.00</span></div><div class="apexcharts-tooltip-goals-group"><span class="apexcharts-tooltip-text-goals-label"></span><span class="apexcharts-tooltip-text-goals-value"></span></div><div class="apexcharts-tooltip-z-group"><span class="apexcharts-tooltip-text-z-label"></span><span class="apexcharts-tooltip-text-z-value"></span></div></div></div>
+      theme: 'dark',
       x: {
         show: true,
       },
@@ -227,15 +292,13 @@ const drawChart = function (l, d) {
             return '';
           },
         },
-        title: {
-          formatter: function () {
-            return '';
-          },
-        },
       },
     },
+    fill: {
+      opacity: 1,
+    },
   };
-  let chart = new ApexCharts(document.querySelector('.js-content'), options);
+  chart = new ApexCharts(document.querySelector('.js-content'), options);
   chart.render();
 };
 //#endregion
@@ -286,46 +349,72 @@ const togglePopUP = function () {
   };
 };
 const listenToSocket = function () {
-  socket.on('B2F_verandering_ldr', function (jsonObject) {
-    console.log('Ldr binnen');
-    document.querySelector(
-      '.js-test'
-    ).innerHTML = `${jsonObject.ldr.waarde} ${jsonObject.ldr.meeteenheid}`;
-  });
-  socket.on('B2F_SetColor', function (jsonObject) {
-    if (colorbool == false) {
-      console.log('B2F_SETCOLOR', jsonObject);
-      const hexcode = rgbToHex(
-        jsonObject['red'],
-        jsonObject['green'],
-        jsonObject['blue']
-      );
-      console.log('HEXCODE', hexcode);
-      document.querySelector('.js-color').value = hexcode;
-      document.querySelector('.c-input__color').style.backgroundColor = hexcode;
-    }
-  });
-  socket.on('B2F_SetBrightness', function (jsonObject) {
-    if (brightnessbool == false) {
-      document.querySelector('.js-brightness').value = jsonObject['brightness'];
-      document.querySelector('.js-rangeValue').innerHTML =
-        Math.round(document.querySelector('.js-brightness').value * 100) + ' %';
-    }
-  });
-  socket.on('B2F_Addalarm', function () {
-    getAlarmen();
-  });
-  socket.on('B2F_Ringstatus', function (jsonObject) {
-    RingAan = jsonObject.ring;
-    if (RingAan == 1) {
-      document.querySelector('.js-rgb').checked = true;
-    } else {
-      document.querySelector('.js-rgb').checked = false;
-    }
-  });
-  socket.on('B2F_SlaapStatus', function (jsonObject) {
-    Slapen = jsonObject.slapen;
-  });
+  if (document.querySelector('.js-alarmen')) {
+    socket.on('B2F_verandering_ldr', function (jsonObject) {
+      console.log('Ldr binnen');
+      document.querySelector(
+        '.js-test'
+      ).innerHTML = `${jsonObject.ldr.waarde} ${jsonObject.ldr.meeteenheid}`;
+    });
+    socket.on('B2F_SetColor', function (jsonObject) {
+      if (colorbool == false) {
+        console.log('B2F_SETCOLOR', jsonObject);
+        const hexcode = rgbToHex(
+          jsonObject['red'],
+          jsonObject['green'],
+          jsonObject['blue']
+        );
+        console.log('HEXCODE', hexcode);
+        document.querySelector('.js-color').value = hexcode;
+        document.querySelector('.c-input__color').style.backgroundColor =
+          hexcode;
+      }
+    });
+    socket.on('B2F_SetBrightness', function (jsonObject) {
+      if (brightnessbool == false) {
+        document.querySelector('.js-brightness').value =
+          jsonObject['brightness'];
+        document.querySelector('.js-rangeValue').innerHTML =
+          Math.round(document.querySelector('.js-brightness').value * 100) +
+          ' %';
+      }
+    });
+    socket.on('B2F_Addalarm', function () {
+      getAlarmen();
+    });
+    socket.on('B2F_Ringstatus', function (jsonObject) {
+      RingAan = jsonObject.ring;
+      if (RingAan == 1) {
+        document.querySelector('.js-rgb').checked = true;
+      } else {
+        document.querySelector('.js-rgb').checked = false;
+      }
+    });
+    socket.on('B2F_SlaapStatus', function (jsonObject) {
+      Slapen = jsonObject.slapen;
+    });
+    socket.on('B2F_SlaapStatus', function (jsonObject) {
+      console.log(jsonObject);
+      if (jsonObject['autobrightness'] == true) {
+        document.querySelector('.js-autobrightnessauto').innerHTML = 'Auto';
+        document.querySelector('.js-brightness').disabled = true;
+      } else {
+        document.querySelector('.js-brightness').disabled = false;
+        document.querySelector('.js-autobrightnessauto').innerHTML = 'Manueel';
+      }
+      document
+        .querySelector('.c-input__range')
+        .classList.toggle('c-input__range--disabled');
+      document.querySelector('.js-autobrightness').checked =
+        jsonObject['autobrightness'];
+    });
+  } else if (document.querySelector('.js-slaap')) {
+    console.log('dfqsfd');
+    socket.on('B2F_NewSleepData', function () {
+      console.log('binnen');
+      getSlaapData();
+    });
+  }
 };
 const listenToUI = function () {
   if (document.querySelector('.js-alarmen')) {
@@ -339,6 +428,9 @@ const listenToUI = function () {
       .addEventListener('click', ListenToGoSleep);
     listenToChangeColor();
     listenToChangeBrightness();
+    document
+      .querySelector('.js-autobrightness')
+      .addEventListener('click', ListenToSetAutoBrightness);
   } else if (document.querySelector('.js-updatealarm')) {
     // detail.html
     document
@@ -429,6 +521,7 @@ const listenToUpdateAlarm = function () {
     actief: document.querySelector('.js-actief').checked,
     herhaal: herhaling,
   });
+  window.location.href = 'index.html';
 };
 const ListenToGoSleep = function () {
   let time;
@@ -459,6 +552,15 @@ const ListenToRgb = function () {
   socket.emit('F2B_RGBring', { aan: RingAan });
   console.log(RingAan);
 };
+const ListenToSetAutoBrightness = function () {
+  let val = document.querySelector('.js-autobrightness').checked;
+  if (val == true) {
+    document.querySelector('.js-autobrightnessauto').innerHTML = 'Auto';
+  } else {
+    document.querySelector('.js-autobrightnessauto').innerHTML = 'Manueel';
+  }
+  socket.emit('F2B_setautobrightness', { autobrightness: val });
+};
 //#endregion
 
 //#region ***  Init / DOMContentLoaded                  ***********
@@ -482,6 +584,7 @@ const init = function () {
       window.location.href = 'index.html';
     }
   } else if (document.querySelector('.js-slaap')) {
+    listenToSocket();
     listenToUI();
   }
 };
