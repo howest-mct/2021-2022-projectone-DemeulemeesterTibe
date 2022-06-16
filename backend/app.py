@@ -209,7 +209,9 @@ def codeSchakeling():
         # alarm 
         # for w in wekkers:
         # if timenow == (wekkers["tijd"] - timedelta(6)):
-        print(">",wekkers["tijd"],"#",wekkers["tijd"] - timedelta(seconds=6))
+
+
+        # print(">",wekkers["tijd"],"#",wekkers["tijd"] - timedelta(seconds=6))
         if timenow == wekkers["tijd"]:
             if showtekst == False:
                 print("fffffff")
@@ -546,7 +548,7 @@ def addAlarm(payload):
 @socketio.on("F2B_SetBrightness")
 def setBrightness(payload):
     pixels.brightness = float(payload["brightness"])
-    d = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),None,None,4,5)
+    d = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),pixels.brightness,None,4,5)
     socketio.emit("B2F_SetBrightness",{"brightness": payload["brightness"]},broadcast=True)
 
 @socketio.on("F2B_DELalarm")

@@ -7,47 +7,8 @@
 .center{
     text-align: center;
 }
-@font-face {
-    font-family: 'Material Symbols nofill';
-    font-style: normal;
-    font-weight: 100 700;
-    src: url(https://fonts.gstatic.com/s/materialsymbolsoutlined/v10/kJEhBvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oFsI.woff2) format('woff2');
-}
-@font-face {
-    font-family: 'Material Symbols fill';
-    font-style: normal;
-    font-weight: 400;
-    src: url(https://fonts.gstatic.com/s/materialsymbolsoutlined/v10/kJF1BvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzByHX9rA6RzazHD_dY43zj-jCxv3fzvRNU22ZXGJpEpjC_1v-p_4MrImHCIJIZrDCvHOej.woff2) format('woff2');
-}
-.material-symbols-fill {
-    font-family: 'Material Symbols fill';
-    font-weight: normal;
-    font-style: normal;
-    font-size: 24px;
-    line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    -webkit-font-feature-settings: 'liga';
-    -webkit-font-smoothing: antialiased;
-}
-.material-symbols-nofill {
-    font-family: 'Material Symbols nofill';
-    font-weight: normal;
-    font-style: normal;
-    font-size: 24px;
-    line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    -webkit-font-feature-settings: 'liga';
-    -webkit-font-smoothing: antialiased;
+.material-symbols-outlined{
+    font-size: 16px;
 }
 /*
     Generic: Page
@@ -66,7 +27,15 @@ html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-
+/* html::-webkit-scrollbar{
+    width: 10px;
+}
+html::-webkit-scrollbar-thumb{
+    background-color: red;
+}
+html::-webkit-scrollbar-track{
+    background-color: green;
+} */
 *,
 *:before,
 *:after {
@@ -254,6 +223,9 @@ a:focus {
 
 /* size modifiers */
 
+.o-row--lg {
+    padding: 48px 24px 24px;
+}
 .o-row--lg {
     padding: 48px 24px 24px;
 }
@@ -496,6 +468,32 @@ a:focus {
 /*------------------------------------*\
   #COMPONENTS
 \*------------------------------------*/
+/*
+    Component: Scrollable div
+    ---
+*/
+.c-scroll {
+    overflow: scroll;
+    max-height: 31em;
+    /* max-height: 480px; */
+    overflow-x: hidden;
+}
+
+.c-scroll::-webkit-scrollbar {
+    width: 12px;
+}
+
+.c-scroll::-webkit-scrollbar-track {
+    /* -webkit-box-shadow: inset 0 0 6px #F2F2F7;
+    border-radius: 10px; */
+}
+
+.c-scroll::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    /* background-color: #DADAE6 ; */
+    -webkit-box-shadow: inset 0 0 6px #DADAE6;
+    box-shadow: inset 0 0 6px #DADAE6;
+}
 /*
     Component: Customization text RGB
     ---
