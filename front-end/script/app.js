@@ -32,7 +32,7 @@ const showAlarmen = function (jsonObject) {
     herhaal = herhaal.replace('Wednesday', 'Woensdag');
     herhaal = herhaal.replace('Thursday', 'Donderdag');
     herhaal = herhaal.replace('Friday', 'Vrijdag');
-    herhaal = herhaal.replace('Saterday', 'Zaterdag');
+    herhaal = herhaal.replace('Saturday', 'Zaterdag');
     herhaal = herhaal.replace('Sunday', 'Zondag');
     html += `<a class="c-alarm ${actief}" href="detail.html?alarmid=${alarm.alarmID}">
                     <div class="c-alarm__content">
@@ -68,6 +68,7 @@ const showAlarm = function (jsonObject) {
   document.querySelector('.js-actief').checked = jsonObject.alarm.actief;
 };
 const ShowSlaapGrafiek = function (jsonObject) {
+  console.log('json', jsonObject);
   let converted_labels = [];
   let converted_data = [];
   for (let s of jsonObject.slaap) {
@@ -91,9 +92,6 @@ const ShowSlaapGrafiek = function (jsonObject) {
       ],
     });
   }
-};
-const showHistoriek = function () {
-  console.log('NOG AFWERKEN');
 };
 //#endregion
 
@@ -337,6 +335,10 @@ const getSlaapDataMaand = function () {
   const url = `http://${lanIP}/api/slaap/maand/`;
   handleData(url, ShowSlaapGrafiek, showError);
 };
+const getWekkerDiffData = function () {
+  const url = `http://${lanIP}/api/slaap/wekkerdiff/`;
+  handleData(url, ShowSlaapGrafiek, showError);
+};
 //#endregion
 
 //#region ***  Event Listeners - listenTo___            ***********
@@ -370,12 +372,6 @@ const togglePopUP = function () {
 };
 const listenToSocket = function () {
   if (document.querySelector('.js-alarmen')) {
-    socket.on('B2F_verandering_ldr', function (jsonObject) {
-      console.log('Ldr binnen');
-      document.querySelector(
-        '.js-test'
-      ).innerHTML = `${jsonObject.ldr.waarde} ${jsonObject.ldr.meeteenheid}`;
-    });
     socket.on('B2F_SetColor', function (jsonObject) {
       if (colorbool == false) {
         console.log('B2F_SETCOLOR', jsonObject);
@@ -417,7 +413,7 @@ const listenToSocket = function () {
     socket.on('B2F_autoBrightness', function (jsonObject) {
       console.log(jsonObject);
       if (jsonObject['autobrightness'] == true) {
-        document.querySelector('.js-autobrightnessauto').innerHTML = 'Auto';
+        // document.querySelector('.js-autobrightnessauto').innerHTML = 'Auto';
         document.querySelector('.js-brightness').disabled = true;
         document.querySelector('.js-rgb').disabled = true;
         document
@@ -426,7 +422,7 @@ const listenToSocket = function () {
       } else {
         document.querySelector('.js-brightness').disabled = false;
         document.querySelector('.js-rgb').disabled = false;
-        document.querySelector('.js-autobrightnessauto').innerHTML = 'Manueel';
+        // document.querySelector('.js-autobrightnessauto').innerHTML = 'Manueel';
         document
           .querySelector('.c-input__range')
           .classList.remove('c-input__range--disabled');
@@ -438,7 +434,7 @@ const listenToSocket = function () {
     console.log('dfqsfd');
     socket.on('B2F_NewSleepData', function () {
       console.log('binnen');
-      getSlaapData();
+      ListenToChangeFilter();
     });
   }
 };
@@ -465,11 +461,11 @@ const listenToUI = function () {
     document
       .querySelector('.js-updatealarm')
       .addEventListener('click', listenToUpdateAlarm);
-  } else if (document.querySelector('.js-slaap')) {
+  } else if (document.querySelector('.js-content')) {
     document.querySelector('.js-slaap').addEventListener('click', getSlaapData);
     document
-      .querySelector('.js-historiek')
-      .addEventListener('click', showHistoriek);
+      .querySelector('.js-selectHistoriekFilter')
+      .addEventListener('change', ListenToChangeFilter);
   }
 };
 const listenToCreateAlarm = function () {
@@ -593,6 +589,23 @@ const ListenToSetAutoBrightness = function () {
   // }
   socket.emit('F2B_setautobrightness', { autobrightness: val });
 };
+const ListenToChangeFilter = function () {
+  let value = document.querySelector('.js-selectHistoriekFilter').value;
+  console.log(value);
+  if (value == 1) {
+    console.log('week');
+    getSlaapDataWeek();
+  } else if (value == 2) {
+    console.log('maand');
+    getSlaapDataMaand();
+  } else if (value == 3) {
+    console.log('alles');
+    getSlaapData();
+  } else if (value == 4) {
+    console.log('hoelang');
+    getWekkerDiffData();
+  }
+};
 //#endregion
 
 //#region ***  Init / DOMContentLoaded                  ***********
@@ -615,7 +628,7 @@ const init = function () {
     } else {
       window.location.href = 'index.html';
     }
-  } else if (document.querySelector('.js-slaap')) {
+  } else if (document.querySelector('.js-content')) {
     listenToSocket();
     listenToUI();
     getSlaapDataWeek();

@@ -469,15 +469,51 @@ a:focus {
   #COMPONENTS
 \*------------------------------------*/
 /*
+    Component: tooltip for extra information
+    ---
+*/
+/* .c-tooltip{
+    position: relative;
+}
+.c-tooltip:hover::after,.c-tooltip:hover::before{
+    --scale: 0;
+    font-size: 0.75em;
+    position: absolute;
+    top: -.25rem;
+    left: 50%;
+    content: attr(data-tooltip);
+    transform: translateX(-50%) translateY(-100%) scale(var(--scale));
+    transition: 150ms transform;
+}
+.c-tooltip::before{
+    content: attr(data-tooltip);
+    color: black;
+    padding: .5rem;
+    border-radius: .3rem;
+    text-align: center;
+    width: max-content;
+    max-width: 100%;
+    background: white;
+}
+.c-tooltip:hover::before{
+    --scale: 1;
+} */
+/*
     Component: Scrollable div
     ---
 */
 .c-scroll {
     overflow: scroll;
-    max-height: 31em;
+    max-height: 22em;
     /* max-height: 480px; */
     overflow-x: hidden;
 }
+@media (min-height: 700px) {
+    .c-scroll{
+        max-height: 28.8em;
+     }
+}
+
 
 .c-scroll::-webkit-scrollbar {
     width: 12px;
@@ -564,6 +600,11 @@ a:focus {
     Component: shutdown button
     ---
 */
+.c-shutdown_text{
+    color: #DE6061;
+    text-decoration: underline;
+
+}
 .c-shutdown{
     background-color: #1b191a;
     font-size: 1.25em;
@@ -698,8 +739,8 @@ a:focus {
     transition: background-color 200ms ease-in-out;
 }
 .c-auto +label::after{
-    /* padding-right: 0.1rem;
-    padding-top: 0.2rem; */
+    /* padding-right: 0.1rem; */
+    padding-top: 0.2rem;
     padding-bottom: 0.15rem;
     display: flex;
     justify-content: center;
@@ -809,13 +850,13 @@ a:focus {
 input[type=text],input[type=datetime-local],input[type=time] {
     font-size: 16px;
     border:none;
-    -webkit-appearance: none;
+    /* -webkit-appearance: none; */
     -ms-appearance: none;
     -moz-appearance: none;
-    appearance: none;
+    /* appearance: none; */
     background: #f2f2f2;
     padding: 12px;
-    border-radius: 3px;
+    border-radius: 10px;
     width: 250px;
     outline: none;
     margin-bottom: 10px;

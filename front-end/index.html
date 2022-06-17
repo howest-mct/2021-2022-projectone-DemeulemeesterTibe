@@ -19,6 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Changa:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="style/normalize.css">
     <link rel="stylesheet" href="style/style.css">
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"
@@ -118,11 +120,12 @@
             <!-- <section class="o-section o-section--lg o-section--xxl"> -->
             <div class="o-container center">
                 <h1>Alarmen</h1>
-                <p>SLAAP niet direct toevoegen pas als je langer dan 10 min ebt geslapen + grafiek updaten wnr je gaat
-                    slapen</p>
+                <p>SLAAP niet direct toevoegen pas als je langer dan 10 min ebt geslapen (staat op 1 min nu)</p>
                 <p>Afsluiten Knop nog maken</p>
-                <p>RING GAAT STILLETJES AAN WNR WEKKER AFGAAT + brightness moet 0 worden wnr er op de slaap knop wordt
+                <p>Hoelang het duurt om de wekker uittezetten</p>
+                <p>brightness moet 0 worden wnr er op de slaap knop wordt
                     geklikt</p>
+                <p>Icon toevoegen</p>
                 <p>EXTRA: SPEAKER TOEVOEGEN</p>
                 <p>EXTRA: LCD DAG KUNNEN KIEZEN</p>
                 <button class="js-GoSleep c-sleep">Gaan slapen</button>
@@ -164,7 +167,7 @@
         <hr>
         <!-- <h1 class="js-test">Test</h1> -->
 
-        <section class="o-row o-row--lg">
+        <section class="o-row">
             <div class="o-container center">
                 <h1 class="u-mb-clear">RGB RING</h1>
                 <!-- <div class="o-layout o-layout--justify-space-between o-layout--align-center"> -->
@@ -206,7 +209,13 @@
                             <!-- <p class="u-mb-clear c-leadBold">Manueel</p> -->
                             <input type="checkbox" id="AUTO" class="c-auto js-autobrightness">
                             <label for="AUTO"></label>
-                            <label class="js-autobrightnessauto" for="AUTO">Manueel</label>
+                            <label class="js-autobrightnessauto" for="AUTO">Auto</label>
+                            <div class="o-layout o-layout--justify-center o-layout--align-center">
+                                <span class="material-symbols-outlined c-tooltip"
+                                    data-tooltip="Helderheid wordt automatisch aangepast aan de hand van de lichtsterke">
+                                    info
+                                </span>
+                            </div>
                         </div>
                         <input type="range" class="js-brightness c-input__range u-mb-clear" id="" min="0" max="1"
                             step="0.05">
@@ -352,6 +361,9 @@
                     <ul class="o-list c-nav__list">
                         <li class="c-nav__item"><a href="index.html" class="c-nav__link">Overzicht</a></li>
                         <li class="c-nav__item"><a href="historiek.html" class="c-nav__link">Historiek</a></li>
+                        <li class="c-nav__item">
+                            <p class="c-leadBold c-shutdown_text">Afsluiten</p>
+                        </li>
                     </ul>
                 </nav>
             </div>
