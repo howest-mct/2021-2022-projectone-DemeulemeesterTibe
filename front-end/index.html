@@ -101,7 +101,7 @@
             </div>
             <div class="c-header__nav">
                 <div class="u-mb-md-2">
-                    <button class="c-shutdown">Afsluiten</button>
+                    <button class="c-shutdown c-shutdown--fontfamily">Afsluiten</button>
                 </div>
             </div>
             <div class="c-header__mobile-nav-trigger">
@@ -114,22 +114,22 @@
         </div>
     </header>
     <div class="c-page">
-        <!-- <div class="o-container"> -->
         <section class="o-row o-row--lg o-section--xxl">
             <!-- <section class="o-section o-section--lg o-section--xxl"> -->
             <div class="o-container center">
                 <h1>Alarmen</h1>
-                <h2>SLAAP niet direct toevoegen pas als je langer dan 10 min ebt geslapen + grafiek updaten wnr je gaat
-                    slapen</h2>
-                <h2>Afsluiten Knop nog maken</h2>
-                <h2>RING GAAT STILLETJES AAN WNR WEKKER AFGAAT</h2>
-                <h2>EXTRA: SPEAKER TOEVOEGEN</h2>
-                <h2>EXTRA: LCD DAG KUNNEN KIEZEN</h2>
-                <button class="js-GoSleep c-sleep">Slapen</button>
+                <p>SLAAP niet direct toevoegen pas als je langer dan 10 min ebt geslapen + grafiek updaten wnr je gaat
+                    slapen</p>
+                <p>Afsluiten Knop nog maken</p>
+                <p>RING GAAT STILLETJES AAN WNR WEKKER AFGAAT + brightness moet 0 worden wnr er op de slaap knop wordt
+                    geklikt</p>
+                <p>EXTRA: SPEAKER TOEVOEGEN</p>
+                <p>EXTRA: LCD DAG KUNNEN KIEZEN</p>
+                <button class="js-GoSleep c-sleep">Gaan slapen</button>
                 <input type="time" class="js-GoSleepInput">
                 <div class="c-scroll">
                     <div class="c-alarmen-list js-alarmen">
-                        <a class="c-alarm c-alarm__on" href="detail.html?alarmid=x">
+                        <!-- <a class="c-alarm c-alarm__on" href="detail.html?alarmid=x">
                             <div class="c-alarm__content">
                                 <h2 class="c-alarm__title">Titel</h2>
                                 <div class="c-alarm__periode"><span class="c-alarm__van">9u</span> tot <span
@@ -156,7 +156,7 @@
                                         class="c-alarm__tot">10u</span></div>
                                 <p class="c-alarm__description">Bla bla bla</p>
                             </div>
-                        </a>
+                        </a> -->
                     </div>
                 </div>
             </div>
@@ -166,7 +166,7 @@
 
         <section class="o-row o-row--lg">
             <div class="o-container center">
-                <h1>RGB RING</h1>
+                <h1 class="u-mb-clear">RGB RING</h1>
                 <!-- <div class="o-layout o-layout--justify-space-between o-layout--align-center"> -->
                 <div class="c-text-customization">
                     <div class="c-text-customization__item">
@@ -180,12 +180,15 @@
                     </div>
                 </div>
                 <div class="c-customization">
+                    <h3 class="c-lead c-lead--xl c-text-customization__mobile">Kleur</h3>
                     <input type="color" class="js-color c-input__color" value="#ff0000" id="">
                     <!-- <div class="o-layout o-layout--justify-center"> -->
                     <div class="c-customization__item">
+                        <h3 class="c-text-customization__mobile">Aan/Uit</h3>
                         <input type="checkbox" id="RGB" class="c-toggle js-rgb">
                         <label for="RGB"></label>
                     </div>
+                    <h3 class="c-text-customization__mobile">Helderheid</h3>
                     <div class="o-layout o-layout--column o-layout--justify-center o-layout--align-center ">
                         <!-- <svg xmlns="http://www.w3.org/2000/svg" class="c-input__range--icon js-rangeIcon" height="24"
                             width="24">
@@ -289,9 +292,53 @@
         <div class="c-mobile-nav__bg"></div>
         <div class="c-mobile-nav__body">
             <div class="c-mobile-nav__header">
-                <p class="c-logo c-lead c-lead--xxxl">
-                    WakeUpSmart
-                </p>
+                <svg class="c-logo__symbol" xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink" width="93" height="32" viewBox="0 0 93 32">
+                    <defs>
+                        <clipPath id="b">
+                            <rect width="93" height="32" />
+                        </clipPath>
+                    </defs>
+                    <g id="a" clip-path="url(#b)">
+                        <g transform="translate(1.539 -1)">
+                            <g transform="translate(0 2.691)">
+                                <g transform="translate(0 0)">
+                                    <path
+                                        d="M27.423,4.191a5.121,5.121,0,0,0-7.243,0,.576.576,0,0,0,0,.815L22.944,7.77l-.409.409a11.761,11.761,0,0,0-16.145,0L5.979,7.77,8.743,5.006a.576.576,0,0,0,0-.815A5.122,5.122,0,1,0,1.5,11.434a.576.576,0,0,0,.815,0l2.85-2.85.424.424A11.772,11.772,0,0,0,8.636,27L5.306,30.326a.576.576,0,0,0,.815.815l3.6-3.6a11.771,11.771,0,0,0,9.483,0l3.6,3.6a.576.576,0,0,0,.815-.815L20.286,27A11.772,11.772,0,0,0,23.334,9.009l.424-.424,2.85,2.85a.576.576,0,0,0,.815,0,5.121,5.121,0,0,0,0-7.243ZM1.937,10.183A3.97,3.97,0,0,1,7.492,4.628Zm23.157,6.573A10.632,10.632,0,1,1,14.461,6.123,10.644,10.644,0,0,1,25.093,16.755Zm1.893-6.573L21.431,4.628a3.97,3.97,0,0,1,5.555,5.555Z"
+                                        transform="translate(0 -2.691)" />
+                                </g>
+                            </g>
+                            <g transform="translate(4.981 7.275)">
+                                <g transform="translate(0 0)">
+                                    <path
+                                        d="M97.659,83.837a9.48,9.48,0,1,0,9.48,9.48A9.491,9.491,0,0,0,97.659,83.837Zm0,17.808a8.328,8.328,0,1,1,8.328-8.328A8.337,8.337,0,0,1,97.659,101.645Z"
+                                        transform="translate(-88.179 -83.837)" />
+                                </g>
+                            </g>
+                            <g transform="translate(11.083 9.828)">
+                                <path
+                                    d="M199.579,129.029a.576.576,0,0,0-.576.576v6.112l-2.633,2.633a.576.576,0,0,0,.815.815l2.74-2.74c.01-.01.02-.021.029-.032a.574.574,0,0,0,.2-.438v-6.351A.576.576,0,0,0,199.579,129.029Z"
+                                    transform="translate(-196.201 -129.029)" />
+                            </g>
+                            <g transform="translate(18.618 18.171)">
+                                <path
+                                    d="M332.2,276.752a.576.576,0,0,0-.718.386,6.343,6.343,0,0,1-1.731,2.791.576.576,0,0,0,.789.84,7.5,7.5,0,0,0,2.045-3.3A.576.576,0,0,0,332.2,276.752Z"
+                                    transform="translate(-329.572 -276.727)" />
+                            </g>
+                            <g transform="translate(16.376 22.351)">
+                                <path
+                                    d="M291.6,351.035a.576.576,0,0,0-.774-.254c-.185.094-.377.179-.57.254a.576.576,0,1,0,.415,1.075c.229-.089.456-.189.675-.3A.576.576,0,0,0,291.6,351.035Z"
+                                    transform="translate(-289.887 -350.719)" />
+                            </g>
+                        </g><text transform="translate(36 28)" font-size="16"
+                            font-family="RobotoMono-Regular, Roboto Mono">
+                            <tspan x="0" y="0">WakeUp</tspan>
+                        </text><text transform="translate(36 15)" font-size="16"
+                            font-family="RobotoMono-Regular, Roboto Mono">
+                            <tspan x="0" y="0">Smart</tspan>
+                        </text>
+                    </g>
+                </svg>
                 <button class="o-button-reset c-nav-trigger js-toggle-nav">
                     <svg class="c-nav-trigger__svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -317,8 +364,8 @@
 
             <input class="js-alarmnaam c-input__text" type="text" placeholder="Alarm" id="naam">
             <h3 class="c-lead--lg"><label for="Datetime">Tijdstip</label></h3>
-            <input class="js-alarm" type="datetime-local" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}"
-                name="Datetime" id="Datetime">
+            <input class="js-alarm" required type="datetime-local"
+                pattern="[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}" name="Datetime" id="Datetime">
             <br>
             <p class="c-lead--lg u-mb-sm">Actief </p>
 

@@ -78,6 +78,18 @@ class DataRepository:
         # sql = "SELECT *, TIMESTAMPDIFF(hour,starttijd,eindtijd) as hour, MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60) as minutes,year(eindtijd)) as datum  FROM smartwekker.slaap;"
         sql = "SELECT *,timestampdiff(minute,starttijd,eindtijd) as sleptmin,concat(day(eindtijd),' ',monthname(eindtijd),' ',year(eindtijd)) as datum,concat(LPad(TIMESTAMPDIFF(hour,starttijd,eindtijd), 2, 0), '.', LPad(MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60), 2, 0))as 'hoursMin' FROM smartwekker.slaap ORDER BY STARTTIJD;"
         return Database.get_rows(sql)
+    
+    @staticmethod
+    def read_slaap_1week():
+        # sql = "SELECT *, TIMESTAMPDIFF(hour,starttijd,eindtijd) as hour, MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60) as minutes,year(eindtijd)) as datum  FROM smartwekker.slaap;"
+        sql = "SELECT *,timestampdiff(minute,starttijd,eindtijd) as sleptmin,concat(day(eindtijd),' ',monthname(eindtijd),' ',year(eindtijd)) as datum,concat(LPad(TIMESTAMPDIFF(hour,starttijd,eindtijd), 2, 0), '.', LPad(MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60), 2, 0))as 'hoursMin' FROM smartwekker.slaap WHERE eindtijd between date_sub(now(),interval 1 week) and now() ORDER BY STARTTIJD;"
+        return Database.get_rows(sql)
+    
+    @staticmethod
+    def read_slaap_1maand():
+        # sql = "SELECT *, TIMESTAMPDIFF(hour,starttijd,eindtijd) as hour, MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60) as minutes,year(eindtijd)) as datum  FROM smartwekker.slaap;"
+        sql = "SELECT *,timestampdiff(minute,starttijd,eindtijd) as sleptmin,concat(day(eindtijd),' ',monthname(eindtijd),' ',year(eindtijd)) as datum,concat(LPad(TIMESTAMPDIFF(hour,starttijd,eindtijd), 2, 0), '.', LPad(MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60), 2, 0))as 'hoursMin' FROM smartwekker.slaap WHERE eindtijd between date_sub(now(),interval 1 month) and now() ORDER BY STARTTIJD;"
+        return Database.get_rows(sql)
 
     @staticmethod
     def insert_slaap(start,eind):

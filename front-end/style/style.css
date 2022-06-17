@@ -498,6 +498,9 @@ a:focus {
     Component: Customization text RGB
     ---
 */
+.c-text-customization__mobile{
+    margin: 24px 0 24px;
+}
 .c-text-customization {
     display: none;
 }
@@ -516,6 +519,9 @@ a:focus {
     margin-right: 8px;
 }
 @media (min-width: 576px) {
+    .c-text-customization__mobile{
+        display: none;
+    }
     .c-text-customization {
         display: flex;
         flex-direction: row;
@@ -569,6 +575,9 @@ a:focus {
     padding: 4px 4px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     transition: background-color 0.25s ease-in-out;
+}
+.c-shutdown--fontfamily{
+    font-family: 'Roboto Mono', 'Source Sans Pro', Helvetica, arial, sans-serif;
 }
 .c-shutdown:hover{
     background-color: #DE6061;
@@ -816,16 +825,16 @@ input[type=time] {
     width: 150px;
 }
 /*
+    Component: vul in input
+    ---
+*/
+.c-input--empty {
+    border: 2px solid red;
+}
+/*
     Component: input color
     ---
 */
-.u-fixed-content {
-    overflow: hidden !important;
-    position: fixed !important;
-    top: 0 !important;
-    width: 100% !important;
-    z-index: 20;
-}
 .c-input__range--icon{
     /* fill: 1; */
     fill: #F2F2F7;
@@ -1621,7 +1630,18 @@ input[type=time] {
 /*------------------------------------*\
   #UTILITIES
 \*------------------------------------*/
-
+/*
+    Utilities: fixed content
+    ---
+    Utility classes to put on elements you want the place to be fixed
+*/
+.u-fixed-content {
+    overflow: hidden !important;
+    position: fixed !important;
+    top: 0 !important;
+    width: 100% !important;
+    z-index: 20;
+}
 /*
     Utilities: color
     ---

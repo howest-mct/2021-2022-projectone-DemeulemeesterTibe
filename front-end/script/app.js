@@ -175,6 +175,18 @@ const herhaalDagen = function () {
 };
 const drawChart = function (l, d) {
   let options = {
+    responsive: [
+      {
+        breakpoint: 576,
+        options: {
+          plotOptions: {
+            bar: {
+              horizontal: true,
+            },
+          },
+        },
+      },
+    ],
     chart: {
       id: 'myChart',
       type: 'bar',
@@ -317,6 +329,14 @@ const getSlaapData = function () {
   const url = `http://${lanIP}/api/slaap/`;
   handleData(url, ShowSlaapGrafiek, showError);
 };
+const getSlaapDataWeek = function () {
+  const url = `http://${lanIP}/api/slaap/week/`;
+  handleData(url, ShowSlaapGrafiek, showError);
+};
+const getSlaapDataMaand = function () {
+  const url = `http://${lanIP}/api/slaap/maand/`;
+  handleData(url, ShowSlaapGrafiek, showError);
+};
 //#endregion
 
 //#region ***  Event Listeners - listenTo___            ***********
@@ -392,19 +412,25 @@ const listenToSocket = function () {
     });
     socket.on('B2F_SlaapStatus', function (jsonObject) {
       Slapen = jsonObject.slapen;
+      console.log('Slapen binnen', Slapen);
     });
-    socket.on('B2F_SlaapStatus', function (jsonObject) {
+    socket.on('B2F_autoBrightness', function (jsonObject) {
       console.log(jsonObject);
       if (jsonObject['autobrightness'] == true) {
         document.querySelector('.js-autobrightnessauto').innerHTML = 'Auto';
         document.querySelector('.js-brightness').disabled = true;
+        document.querySelector('.js-rgb').disabled = true;
+        document
+          .querySelector('.c-input__range')
+          .classList.add('c-input__range--disabled');
       } else {
         document.querySelector('.js-brightness').disabled = false;
+        document.querySelector('.js-rgb').disabled = false;
         document.querySelector('.js-autobrightnessauto').innerHTML = 'Manueel';
+        document
+          .querySelector('.c-input__range')
+          .classList.remove('c-input__range--disabled');
       }
-      document
-        .querySelector('.c-input__range')
-        .classList.toggle('c-input__range--disabled');
       document.querySelector('.js-autobrightness').checked =
         jsonObject['autobrightness'];
     });
@@ -448,25 +474,29 @@ const listenToUI = function () {
 };
 const listenToCreateAlarm = function () {
   let t = document.querySelector('.js-alarm').value;
-  t = t.replace('T', ' ');
-  const url = `http://${lanIP}/api/alarm/`;
-  let naam = '';
-  if (document.querySelector('.js-alarmnaam').value == '') {
-    naam = 'Alarm';
-  } else {
-    naam = document.querySelector('.js-alarmnaam').value;
+  if (t) {
+    t = t.replace('T', ' ');
+    const url = `http://${lanIP}/api/alarm/`;
+    let naam = '';
+    if (document.querySelector('.js-alarmnaam').value == '') {
+      naam = 'Alarm';
+    } else {
+      naam = document.querySelector('.js-alarmnaam').value;
+    }
+    const herhaling = herhaalDagen();
+    const payload = JSON.stringify({
+      naam: naam,
+      tijd: t,
+      actief: document.querySelector('.js-actief').checked,
+      herhaal: herhaling,
+    });
+    document.querySelector('.c-floatingButton').style.display = 'flex';
+    document.querySelector('.c-createalarm').style.display = 'None';
+    console.log(payload);
+    handleData(url, showResultAddAlarm, showError, 'POST', payload);
   }
-  const herhaling = herhaalDagen();
-  const payload = JSON.stringify({
-    naam: naam,
-    tijd: t,
-    actief: document.querySelector('.js-actief').checked,
-    herhaal: herhaling,
-  });
-  document.querySelector('.c-floatingButton').style.display = 'flex';
-  document.querySelector('.c-createalarm').style.display = 'None';
-  console.log(payload);
-  handleData(url, showResultAddAlarm, showError, 'POST', payload);
+  console.error('NOOB');
+  document.querySelector('.js-alarm').classList.add('c-input--empty');
 };
 const listenToChangeColor = function () {
   document.querySelector('.c-input__color').oninput = function () {
@@ -527,6 +557,7 @@ const ListenToGoSleep = function () {
   let time;
   if (Slapen == 0) {
     Slapen = 1;
+    console.log('GaanSlapen');
     if (document.querySelector('.js-GoSleepInput').value) {
       console.log(document.querySelector('.js-GoSleepInput').value);
       time = document.querySelector('.js-GoSleepInput').value;
@@ -541,6 +572,7 @@ const ListenToGoSleep = function () {
     Slapen = 0;
     console.log('Goeiemorgen /Middag /Avond');
   }
+  console.log('Slapen', Slapen, 'tijd', time);
   socket.emit('F2B_GaanSlapen', { Slapen: Slapen, tijd: time });
 };
 const ListenToRgb = function () {
@@ -554,11 +586,11 @@ const ListenToRgb = function () {
 };
 const ListenToSetAutoBrightness = function () {
   let val = document.querySelector('.js-autobrightness').checked;
-  if (val == true) {
-    document.querySelector('.js-autobrightnessauto').innerHTML = 'Auto';
-  } else {
-    document.querySelector('.js-autobrightnessauto').innerHTML = 'Manueel';
-  }
+  // if (val == true) {
+  //   document.querySelector('.js-autobrightnessauto').innerHTML = 'Auto';
+  // } else {
+  //   document.querySelector('.js-autobrightnessauto').innerHTML = 'Manueel';
+  // }
   socket.emit('F2B_setautobrightness', { autobrightness: val });
 };
 //#endregion
@@ -586,6 +618,7 @@ const init = function () {
   } else if (document.querySelector('.js-slaap')) {
     listenToSocket();
     listenToUI();
+    getSlaapDataWeek();
   }
 };
 

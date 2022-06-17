@@ -179,7 +179,7 @@ def joy_knop(pin):
                 lcd.set_cursor(4)
 
 def codeSchakeling():
-    global startbright,timerRGB,rgbStilletjesAan,ring,minldr,maxldr,aan,timer,timerldr,pixels,huidigetijd,timenow,alarmopScherm,GaanSlapen,beginTijdSlapen,lcdStatus,showtekst,lichtsterkte,vorBright
+    global autoBrightness,startbright,timerRGB,rgbStilletjesAan,ring,minldr,maxldr,aan,timer,timerldr,pixels,huidigetijd,timenow,alarmopScherm,GaanSlapen,beginTijdSlapen,lcdStatus,showtekst,lichtsterkte,vorBright
     # data = DataRepository.read_alarmen_nog_komen()
     # for w in data:
     #     wekkers.append([w["tijd"],w["alarmID"]])
@@ -212,24 +212,23 @@ def codeSchakeling():
         # alarm 
         # for w in wekkers:
         # if timenow == (wekkers["tijd"] - timedelta(6)):
-
-
-        if timenow == (wekkers["tijd"] - timedelta(seconds=10)):
-            if startbright == False:
-                print("gelijk")
-                rgbStilletjesAan = True
-                pixels.brightness = 0
-                timerRGB = time.time()
-                startbright = True
-        if timenow == wekkers["tijd"]:
-            if showtekst == False:
-                startbright = True
-                print("fffffff")
-                lcd.reset_lcd()
-                aan = True
-                lcdStatus = 5
-                showtekst = True
-                print("WEKKER GAAT AF")
+        if wekkers:
+            if timenow == (wekkers["tijd"] - timedelta(seconds=11)):
+                if startbright == False:
+                    print("gelijk")
+                    rgbStilletjesAan = True
+                    pixels.brightness = 0
+                    timerRGB = time.time()
+                    startbright = True
+            if timenow == wekkers["tijd"]:
+                if showtekst == False:
+                    startbright = True
+                    print("fffffff")
+                    lcd.reset_lcd()
+                    aan = True
+                    lcdStatus = 5
+                    showtekst = True
+                    print("WEKKER GAAT AF")
         if timenow == beginTijdSlapenLater:
             print("GAAN SLAPEN JIJ KOEKWOUS")
             beginTijdSlapen = beginTijdSlapenLater
@@ -239,6 +238,9 @@ def codeSchakeling():
             buzzer.start(10)
         displayStatus(lcdStatus,joyY,joyX)
         if rgbStilletjesAan != False:
+            if autoBrightness == True:
+                autoBrightness = False
+                socketio.emit("B2F_autoBrightness",{"autobrightness": autoBrightness})
             if (timer - timerRGB) >=0.5:
                 if ring == False:
                     ring = True
@@ -252,7 +254,6 @@ def codeSchakeling():
                     rgbStilletjesAan = False
                     d = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),round(pixels.brightness,2),None,4,5)
                 socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness},broadcast=True)
-
         else:
             if autoBrightness == False:
                 if ring == 1:
@@ -261,19 +262,23 @@ def codeSchakeling():
                     pixels.fill((0,0,0))
             else:
                 if lichtsterkte <= 51:
-                    pixels.fill((Red,Green,Blue))
-                    bright = 1 -lichtsterkte / 50
-                    if ring == False:
-                        ring = True
-                        socketio.emit("B2F_Ringstatus",{"ring": ring})
-                        id = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),None,None,4,3)
-                    if abs(bright - vorBright) >0.05 :
-                        pixels.brightness = float(bright)
-                        vorBright = bright
-                        socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness},broadcast=True)
-                        d = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),round(pixels.brightness,2),None,4,5)
+                    if (timer - timerRGB) >=0.25:
+                        pixels.fill((Red,Green,Blue))
+                        bright = 1 -lichtsterkte / 50
+                        if ring == False:
+                            ring = True
+                            socketio.emit("B2F_Ringstatus",{"ring": ring})
+                            id = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),None,None,4,3)
+                        if abs(bright - vorBright) >0.05 :
+                            pixels.brightness = float(bright)
+                            vorBright = bright
+                            socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness},broadcast=True)
+                            d = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),round(pixels.brightness,2),None,4,5)
+                        timerRGB = time.time()
                 else:
-                    pixels.brightness = 0
+                    if pixels.brightness != 0:
+                        pixels.brightness = 0
+                        socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness},broadcast=True)
                     if ring == True:
                         ring = False
                         socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness},broadcast=True)
@@ -442,6 +447,7 @@ def getWeight():
                         eindTijdSlapen = datetime.now().replace(microsecond=0)
                         print("eindTijdSlapen")
                         dat = DataRepository.insert_slaap(beginTijdSlapen,eindTijdSlapen)
+                        socketio.emit("B2F_NewSleepData",broadcast=True)
                         GaanSlapen = 0
                         socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
                         beginTijdSlapen = None
@@ -450,19 +456,6 @@ def getWeight():
                 timergewicht = time.time()  
             print("diff",diff)
 
-
-# def Wekkers():
-#     global wekkers,alarmopScherm,tijd
-#     if lcdStatus == 2:
-#         lcd.reset_lcd()
-#     wekkers = []
-#     data = DataRepository.read_alarmen_nog_komen()
-#     for w in data:
-#         wekkers.append([w["tijd"],w["alarmID"]])
-#     print("W0",wekkers)
-#     if wekkers:
-#         alarmopScherm = True
-#     tijd = "gggggggg"
 def Wekkers():
     global wekkers,alarmopScherm,tijd
     if lcdStatus == 2:
@@ -534,18 +527,31 @@ def slaap():
         data = DataRepository.read_slaap()
         if data is not None:
             return jsonify(slaap=data),200
+
+@app.route('/api/slaap/week/',methods=["GET"])
+def slaapweek():
+    if request.method == "GET":
+        data = DataRepository.read_slaap_1week()
+        if data is not None:
+            return jsonify(slaap=data),200
+
+@app.route('/api/slaap/maand/',methods=["GET"])
+def slaapmaand():
+    if request.method == "GET":
+        data = DataRepository.read_slaap_1maand()
+        if data is not None:
+            return jsonify(slaap=data),200
 # socket endpoints
 
 
 @socketio.on('connect')
 def initial_connection():
     print('A new client connect')
-    # random ldr waarde op website tot volgende inlees moment
     socketio.emit("B2F_Ringstatus",{"ring": ring})
     socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen})
     socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness})
     socketio.emit("B2F_SetColor",{"red":Red,"green":Green,"blue":Blue})
-    socketio.emit("B2F_SlaapStatus",{"autobrightness": autoBrightness})
+    socketio.emit("B2F_autoBrightness",{"autobrightness": autoBrightness})
     
 
 @socketio.on("F2B_SetColor")
@@ -602,7 +608,7 @@ def setSlaap(payload):
     # checken of de tijden gelijk zijn voor GaanSlapen inteststellen
     global beginTijdSlapen, eindTijdSlapen,GaanSlapen,beginTijdSlapenLater
     tijd = str(datetime.now().hour) + ":" + str(datetime.now().minute)
-    print(payload,tijd)
+    print("#",payload,tijd)
     if payload["Slapen"] == 1:
         if payload["tijd"] == tijd:
             print("test")
@@ -629,6 +635,7 @@ def setSlaap(payload):
         eindTijdSlapen = datetime.now().replace(microsecond=0)
         print(eindTijdSlapen)
         dat = DataRepository.insert_slaap(beginTijdSlapen,eindTijdSlapen)
+        socketio.emit("B2F_NewSleepData",broadcast=True)
         print("id",dat)
     # print(GaanSlapen)
     socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
@@ -644,7 +651,7 @@ def setAutoBrightness(payload):
         pixels.brightness = 0.5
         socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness},broadcast=True)
         d = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),None,None,4,7)
-    socketio.emit("B2F_SlaapStatus",{"autobrightness": autoBrightness},broadcast=True)
+    socketio.emit("B2F_autoBrightness",{"autobrightness": autoBrightness},broadcast=True)
 
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.
