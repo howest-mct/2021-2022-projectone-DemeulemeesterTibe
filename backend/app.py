@@ -130,10 +130,10 @@ def Shutdown_knop(pin):
     print("Shutdown")
     lcd.reset_lcd()
     pixels.deinit()
-    # down = check_output(["sudo","shutdown","-h","now"])
     time.sleep(2)
-    os.system("sudo poweroff -h now")
-    sys.exit()
+    check_output(["sudo","shutdown","-h","now"])
+    # os.system("sudo poweroff -h now")
+    # sys.exit()
 
 def lees_knop(pin):
     global lcdStatus,tijd,vorips,alarmopScherm
@@ -207,7 +207,9 @@ def codeSchakeling():
         # for w in wekkers:
         # if timenow == (wekkers["tijd"] - timedelta(6)):
         if wekkers:
+            # print(timenow,wekkers["tijd"]-timedelta(seconds=11))
             if timenow == (wekkers["tijd"] - timedelta(seconds=11)):
+                print("jaaaa")
                 if startbright == False:
                     print("gelijk")
                     rgbStilletjesAan = True
@@ -671,6 +673,11 @@ def setAutoBrightness(payload):
         socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness},broadcast=True)
         d = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),None,None,4,7)
     socketio.emit("B2F_autoBrightness",{"autobrightness": autoBrightness},broadcast=True)
+
+@socketio.on("F2B_Shutdown")
+def shutdown():
+    print("shutdown")
+    Shutdown_knop("f")
 
 # START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
 # werk enkel met de packages gevent en gevent-websocket.

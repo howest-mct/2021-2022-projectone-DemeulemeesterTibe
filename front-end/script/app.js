@@ -91,6 +91,32 @@ const ShowSlaapGrafiek = function (jsonObject) {
         },
       ],
     });
+    let val = document.querySelector('.js-selectHistoriekFilter').value;
+    if (val == 1) {
+      chart.updateOptions({
+        title: {
+          text: 'Week overzicht van hoelang je slaapt',
+        },
+      });
+    } else if (val == 2) {
+      chart.updateOptions({
+        title: {
+          text: 'Maand overzicht van hoelang je slaapt',
+        },
+      });
+    } else if (val == 3) {
+      chart.updateOptions({
+        title: {
+          text: 'Overzicht van hoelang je slaapt',
+        },
+      });
+    } else if (val == 4) {
+      chart.updateOptions({
+        title: {
+          text: 'Overzicht van hoelang het duurt om de wekker uit te zetten',
+        },
+      });
+    }
   }
 };
 //#endregion
@@ -190,6 +216,9 @@ const drawChart = function (l, d) {
       type: 'bar',
       foreColor: '#ffffff',
       background: '#1f1d1f',
+      toolbar: {
+        show: false,
+      },
     },
     plotOptions: {
       bar: {
@@ -606,11 +635,21 @@ const ListenToChangeFilter = function () {
     getWekkerDiffData();
   }
 };
+const ListenToShutdown = function () {
+  const buttons = document.querySelectorAll('.js-shutdown');
+  for (const button of buttons) {
+    button.addEventListener('click', function () {
+      console.log('shutdown');
+      socket.emit('F2B_Shutdown');
+    });
+  }
+};
 //#endregion
 
 //#region ***  Init / DOMContentLoaded                  ***********
 const init = function () {
   toggleNav();
+  ListenToShutdown();
   if (document.querySelector('.js-alarmen')) {
     document.querySelector('.c-input__color').style.backgroundColor =
       document.querySelector('.c-input__color').value;
