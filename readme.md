@@ -26,6 +26,26 @@ Then you have to fill in the correct values
 
 Download the sql file in the folder [database-export](https://github.com/howest-mct/2021-2022-projectone-DemeulemeesterTibe/tree/master/database-export) and run the file in the remote MySQL workbench session
 
+## RaspberryPi Settings
+
+If you want to use this code you're going to need to enable some busses. You can do that with these steps:
+In the first place you are going to need to go to the raspberry config page. Do that with this command:
+
+```
+sudo raspi-config
+```
+
+Then go to the Third option named `Interface Options` and click `Enter`
+After that go to `SPI` and click `Enter` After which it asks you if you want to enable it and say `Yes`
+Now that you have enabled the **SPI Bus** you now have to do the same for `I2C`
+Go back to `Interface Options` and then click on `I2C` and then say `Yes` if you want to enable it
+
+After that you have to reboot your raspberry pi you can do that with the following command:
+
+```
+sudo reboot
+```
+
 ## Backend
 
 Before you can run app.py you first have to download some libraries and some packages
@@ -75,7 +95,7 @@ You can do that by following these steps:
    ```
    sudo systemctl enable mijnproject.service
    ```
-6. (Optional) If you want to disable this service you can do that with this command:
+6. If you want to disable this service you can do that with this command:
    ```
    sudo systemctl disable mijnproject.service
    ```
@@ -151,4 +171,4 @@ Zoals je kan zien is er geen "vaste" structuur voor zo'n document. Je bepaalt ze
 
 ## Instructables
 
-Plaats zeker een link naar de Instructables zodat het project kan nagebouwd worden!
+Here you can find the link to my [Instructables (link aanpassen)](https://github.com/othneildrew/Best-README-Template)
