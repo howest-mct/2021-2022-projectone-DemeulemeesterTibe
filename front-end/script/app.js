@@ -70,19 +70,17 @@ const showAlarm = function (jsonObject) {
   document.querySelector('.js-actief').checked = jsonObject.alarm.actief;
 };
 const ShowSlaapGrafiek = function (jsonObject) {
-  console.log('json', jsonObject);
+  console.log('sdfqlgijuhfqsdlukghsdfquhildfqsuyiqsdfyuiodfqs', jsonObject);
   let converted_labels = [];
   let converted_data = [];
   for (let s of jsonObject.slaap) {
-    let hours = Math.round(s.sleptmin % 60, 2);
-    converted_data.push(s.hoursMin);
+    converted_data.push(s.avgUur + '.' + s.avgmin);
     converted_labels.push(s.datum);
   }
   if (chartActive == false) {
     drawChart(converted_labels, converted_data);
     chartActive = true;
   } else {
-    console.log('UPDATE');
     chart.updateOptions({
       xaxis: {
         categories: converted_labels,
@@ -94,6 +92,31 @@ const ShowSlaapGrafiek = function (jsonObject) {
       ],
     });
     let val = document.querySelector('.js-selectHistoriekFilter').value;
+    if (val == 1 || val == 2 || val == 3) {
+      chart.updateOptions({
+        tooltip: {
+          custom: function (opt) {
+            let data =
+              opt.w.config.series[opt.seriesIndex].data[opt.dataPointIndex];
+            data = String(data).replace('.', ':');
+            let array = data.split(':');
+            let text = '';
+            if (array[0] != '00') {
+              text += `${array[0]} Uren `;
+            }
+            if (array[1] != '00') {
+              text += `${array[1]} Minuten`;
+            }
+            text += ' Geslapen';
+            let label = opt.w.globals.labels[opt.dataPointIndex];
+            return (
+              `<div class="apexcharts-tooltip-title" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;">${label}</div>` +
+              `<div class="apexcharts-tooltip-series-group apexcharts-active" style="order: 1; display: flex;"><span class="apexcharts-tooltip-marker" style="background-color: rgb(96, 97, 222);"></span><div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;"><div class="apexcharts-tooltip-y-group"><span class="apexcharts-tooltip-text-y-label"></span><span class="apexcharts-tooltip-text-y-value">${text}</span></div><div class="apexcharts-tooltip-goals-group"><span class="apexcharts-tooltip-text-goals-label"></span><span class="apexcharts-tooltip-text-goals-value"></span></div><div class="apexcharts-tooltip-z-group"><span class="apexcharts-tooltip-text-z-label"></span><span class="apexcharts-tooltip-text-z-value"></span></div></div></div>`
+            );
+          },
+        },
+      });
+    }
     if (val == 1) {
       chart.updateOptions({
         title: {
@@ -115,7 +138,27 @@ const ShowSlaapGrafiek = function (jsonObject) {
     } else if (val == 4) {
       chart.updateOptions({
         title: {
-          text: 'Overzicht van hoelang het duurt om de wekker uit te zetten',
+          text: 'Hoelang duurt het om de wekker uit te zetten',
+        },
+        tooltip: {
+          custom: function (opt) {
+            let data =
+              opt.w.config.series[opt.seriesIndex].data[opt.dataPointIndex];
+            data = String(data).replace('.', ':');
+            let array = data.split(':');
+            let text = '';
+            if (array[0] != '00') {
+              text += `${array[0]} Minuten `;
+            }
+            if (array[1] != '00') {
+              text += `${array[1]} Seconden`;
+            }
+            let label = opt.w.globals.labels[opt.dataPointIndex];
+            return (
+              `<div class="apexcharts-tooltip-title" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;">${label}</div>` +
+              `<div class="apexcharts-tooltip-series-group apexcharts-active" style="order: 1; display: flex;"><span class="apexcharts-tooltip-marker" style="background-color: rgb(96, 97, 222);"></span><div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;"><div class="apexcharts-tooltip-y-group"><span class="apexcharts-tooltip-text-y-label"></span><span class="apexcharts-tooltip-text-y-value">${text}</span></div><div class="apexcharts-tooltip-goals-group"><span class="apexcharts-tooltip-text-goals-label"></span><span class="apexcharts-tooltip-text-goals-value"></span></div><div class="apexcharts-tooltip-z-group"><span class="apexcharts-tooltip-text-z-label"></span><span class="apexcharts-tooltip-text-z-value"></span></div></div></div>`
+            );
+          },
         },
       });
     }
@@ -357,6 +400,57 @@ const getAlarm = function (id) {
 const getSlaapData = function () {
   const url = `http://${lanIP}/api/slaap/`;
   handleData(url, ShowSlaapGrafiek, showError);
+};
+const test = function (jsonObject) {
+  console.log('json', jsonObject);
+  let converted_labels = [];
+  let converted_data = [];
+  for (let s of jsonObject.slaap) {
+    converted_data.push(s.hoursMin);
+    converted_labels.push(s.datum);
+  }
+  if (chartActive == false) {
+    drawChart(converted_labels, converted_data);
+    chartActive = true;
+  } else {
+    console.log('UPDATE');
+    chart.updateOptions({
+      xaxis: {
+        categories: converted_labels,
+      },
+      series: [
+        {
+          data: converted_data,
+        },
+      ],
+    });
+    let val = document.querySelector('.js-selectHistoriekFilter').value;
+    if (val == 1) {
+      chart.updateOptions({
+        title: {
+          text: 'Week overzicht van hoelang je slaapt',
+        },
+      });
+    } else if (val == 2) {
+      chart.updateOptions({
+        title: {
+          text: 'Maand overzicht van hoelang je slaapt',
+        },
+      });
+    } else if (val == 3) {
+      chart.updateOptions({
+        title: {
+          text: 'Overzicht van hoelang je slaapt',
+        },
+      });
+    } else if (val == 4) {
+      chart.updateOptions({
+        title: {
+          text: 'Overzicht van hoelang het duurt om de wekker uit te zetten',
+        },
+      });
+    }
+  }
 };
 const getSlaapDataWeek = function () {
   const url = `http://${lanIP}/api/slaap/week/`;

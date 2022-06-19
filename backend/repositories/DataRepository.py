@@ -75,21 +75,25 @@ class DataRepository:
     
     @staticmethod
     def read_slaap():
-        sql = "SELECT *,concat(day(eindtijd),'-',month(eindtijd),'-',year(eindtijd)) as datum,concat(LPad(TIMESTAMPDIFF(hour,starttijd,eindtijd), 2, 0), '.', LPad(MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60), 2, 0))as 'hoursMin' FROM smartwekker.slaap ORDER BY STARTTIJD;"
+        # sql = "SELECT *,concat(day(eindtijd),'-',month(eindtijd),'-',year(eindtijd)) as datum,concat(LPad(TIMESTAMPDIFF(hour,starttijd,eindtijd), 2, 0), '.', LPad(MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60), 2, 0))as 'hoursMin' FROM smartwekker.slaap ORDER BY STARTTIJD;"
+        sql = "SELECT floor(avg(timestampdiff(hour,starttijd,eindtijd))) as 'avgUur',floor(LPad(mod(avg(timestampdiff(minute,starttijd,eindtijd)),60),2,0)) as 'avgmin' ,concat(month(eindtijd),'-',year(eindtijd)) as datum FROM smartwekker.slaap GROUP BY month(eindtijd);"
         return Database.get_rows(sql)
     
     @staticmethod
     def read_slaap_1week():
-        sql = "SELECT *,concat(day(eindtijd),'-',month(eindtijd),'-',year(eindtijd)) as datum,concat(LPad(TIMESTAMPDIFF(hour,starttijd,eindtijd), 2, 0), '.', LPad(MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60), 2, 0))as 'hoursMin' FROM smartwekker.slaap WHERE eindtijd between date_sub(now(),interval 1 week) and now() ORDER BY STARTTIJD;"
+        # sql = "SELECT *,concat(day(eindtijd),'-',month(eindtijd),'-',year(eindtijd)) as datum,concat(LPad(TIMESTAMPDIFF(hour,starttijd,eindtijd), 2, 0), '.', LPad(MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60), 2, 0))as 'hoursMin' FROM smartwekker.slaap WHERE eindtijd between date_sub(now(),interval 1 week) and now() ORDER BY STARTTIJD;"
+        sql = "SELECT *,concat(day(eindtijd),'-',month(eindtijd),'-',year(eindtijd)) as datum,FLOOR(timestampdiff(hour,starttijd,eindtijd)) as 'avgUur',floor(LPad(MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60), 2, 0)) as 'avgmin' FROM smartwekker.slaap WHERE eindtijd between date_sub(now(),interval 1 week) and now() ORDER BY STARTTIJD;"
         return Database.get_rows(sql)
     
     @staticmethod
     def read_slaap_1maand():
-        sql = "SELECT *,concat(day(eindtijd),'-',month(eindtijd),'-',year(eindtijd)) as datum,concat(LPad(TIMESTAMPDIFF(hour,starttijd,eindtijd), 2, 0), '.', LPad(MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60), 2, 0))as 'hoursMin' FROM smartwekker.slaap WHERE eindtijd between date_sub(now(),interval 1 month) and now() ORDER BY STARTTIJD;"
+        # sql = "SELECT *,concat(day(eindtijd),'-',month(eindtijd),'-',year(eindtijd)) as datum,concat(LPad(TIMESTAMPDIFF(hour,starttijd,eindtijd), 2, 0), '.', LPad(MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60), 2, 0))as 'hoursMin' FROM smartwekker.slaap WHERE eindtijd between date_sub(now(),interval 1 month) and now() ORDER BY STARTTIJD;"
+        sql = "SELECT floor(avg(timestampdiff(hour,starttijd,eindtijd))) as 'avgUur',floor(avg(LPad(MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60), 2, 0))) as 'avgmin',concat(month(eindtijd),'-',year(eindtijd)) as datum FROM smartwekker.slaap WHERE month(eindtijd) = month(now()) GROUP BY week(eindtijd);"
         return Database.get_rows(sql)
     @staticmethod
     def read_slaap_wekker_diff():
-        sql = "SELECT concat(day(eindtijd),'-',month(eindtijd),'-',year(eindtijd)) as datum,concat(LPad(TIMESTAMPDIFF(minute,eindtijd,effectievetijd), 2, 0), '.', LPad(MOD(TIMESTAMPDIFF(second,eindtijd,effectievetijd),60), 2, 0))as 'hoursMin' FROM smartwekker.slaap WHERE effectievetijd is not null ORDER BY STARTTIJD;"
+        # sql = "SELECT concat(day(eindtijd),'-',month(eindtijd),'-',year(eindtijd)) as datum,concat(LPad(TIMESTAMPDIFF(minute,eindtijd,effectievetijd), 2, 0), '.', LPad(MOD(TIMESTAMPDIFF(second,eindtijd,effectievetijd),60), 2, 0))as 'hoursMin' FROM smartwekker.slaap WHERE effectievetijd is not null ORDER BY STARTTIJD;"
+        sql = "SELECT concat(day(eindtijd),'-',month(eindtijd),'-',year(eindtijd)) as datum,FLOOR(timestampdiff(minute,eindtijd,effectievetijd)) as 'avgUur',LPad(MOD(TIMESTAMPDIFF(second,eindtijd,effectievetijd),60), 2, 0) as 'avgmin' FROM smartwekker.slaap WHERE effectievetijd is not null ORDER BY STARTTIJD;"
         return Database.get_rows(sql)
 
     @staticmethod
