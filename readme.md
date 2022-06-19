@@ -24,10 +24,8 @@ You can change that by following these commands:
 sudo nano /etc/apache2/sites-available/000-default.conf
 ```
 
-Then change `DocumentRoot /var/www/html`.
-
+Then change `DocumentRoot /var/www/html`
 To.
-
 `DocumentRoot /home/student/2021-2022-projectone-DemeulemeesterTibe/front-end`
 
 After that save it by clicking `Ctrl + X` and then clicken `Y` and `Enter`
