@@ -440,7 +440,10 @@ def getWeight():
                                 te = DataRepository.update_alarm_tijdstip_by_id(wekkers["alarmID"],tijdstip)
                                 socketio.emit("B2F_Addalarm",broadcast=True)
                                 dagenoverlopen = False
-                            
+                    else:
+                        f = DataRepository.update_alarmActief0_by_id(wekkers["alarmID"])
+                        print("jaauihdfsulighazuiefzghuizefgui")
+                    socketio.emit("B2F_Addalarm",broadcast=True)
                     if beginTijdSlapen:
                         effectievetijd = datetime.now().replace(microsecond=0)
                         print("eindTijdSlapen")
