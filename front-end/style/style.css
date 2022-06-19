@@ -282,7 +282,7 @@ a:focus {
     padding-top: 24px;
 }
 .o-section--xxl {
-    padding-top: 80px;
+    padding-top: 106px;
 }
 @media (min-width: 768px) {
 
@@ -291,7 +291,7 @@ a:focus {
         padding-top: 48px;
     }
     .o-section--xxl{
-        padding-top: 88px;
+        padding-top: 112px;
     }
 }
 
@@ -469,35 +469,23 @@ a:focus {
   #COMPONENTS
 \*------------------------------------*/
 /*
-    Component: tooltip for extra information
+    Component: keuzelijst
     ---
 */
-/* .c-tooltip{
-    position: relative;
+.c-keuzelijst{
+    font-size: 16px;
+    border: none;
+    /* -webkit-appearance: none; */
+    -ms-appearance: none;
+    -moz-appearance: none;
+    /* appearance: none; */
+    background: #f2f2f2;
+    padding: 12px;
+    border-radius: 10px;
+    width: 10em;
+    outline: none;
+    margin-bottom: 10px;
 }
-.c-tooltip:hover::after,.c-tooltip:hover::before{
-    --scale: 0;
-    font-size: 0.75em;
-    position: absolute;
-    top: -.25rem;
-    left: 50%;
-    content: attr(data-tooltip);
-    transform: translateX(-50%) translateY(-100%) scale(var(--scale));
-    transition: 150ms transform;
-}
-.c-tooltip::before{
-    content: attr(data-tooltip);
-    color: black;
-    padding: .5rem;
-    border-radius: .3rem;
-    text-align: center;
-    width: max-content;
-    max-width: 100%;
-    background: white;
-}
-.c-tooltip:hover::before{
-    --scale: 1;
-} */
 /*
     Component: Scrollable div
     ---
@@ -539,6 +527,7 @@ a:focus {
 }
 .c-text-customization {
     display: none;
+    margin: 24px 0 0;
 }
 
 .c-text-customization__item {
@@ -844,12 +833,12 @@ a:focus {
     color: white;
 }
 /*
-    Component: input text + datetime-local
+    Component: default input css
     ---
 */
-input[type=text],input[type=datetime-local],input[type=time] {
+.c-input{
     font-size: 16px;
-    border:none;
+    border: none;
     /* -webkit-appearance: none; */
     -ms-appearance: none;
     -moz-appearance: none;
@@ -866,11 +855,13 @@ input[type=time] {
     width: 150px;
 }
 /*
-    Component: vul in input
-    ---
+Component: vul in input
+---
 */
 .c-input--empty {
-    border: 2px solid red;
+    color-scheme: dark;
+    color: #f2f2f2;
+    background: rgb(222, 96, 97);
 }
 /*
     Component: input color
@@ -1054,7 +1045,7 @@ input[type=time] {
     box-sizing: border-box;
     width: 15em;
     margin: 1em;
-    padding: 1em;
+    padding: 0.5em;
     cursor: pointer;
     border: 2px solid #FFCDCD;
     text-decoration: none;
@@ -1095,6 +1086,7 @@ input[type=time] {
 
 .c-alarm__day {
     /* text-align: center; */
+    margin: 0;
     margin: 0.125em 0 0.5em;
     font-weight: 400;
     font-size: 1em;

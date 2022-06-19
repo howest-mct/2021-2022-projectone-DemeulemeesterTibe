@@ -120,16 +120,14 @@
             <!-- <section class="o-section o-section--lg o-section--xxl"> -->
             <div class="o-container center">
                 <h1>Alarmen</h1>
-                <!-- <p>SLAAP niet direct toevoegen pas als je langer dan 10 min ebt geslapen (staat op 1 min nu)</p>
+                <p>SLAAP niet direct toevoegen pas als je langer dan 10 min ebt geslapen (staat op 1 min nu)</p>
                 <p>Afsluiten Knop nog maken</p>
-                <p>Hoelang het duurt om de wekker uittezetten</p>
                 <p>brightness moet 0 worden wnr er op de slaap knop wordt
                     geklikt</p>
                 <p>Icon toevoegen</p>
-                <p>EXTRA: SPEAKER TOEVOEGEN</p>
-                <p>EXTRA: LCD DAG KUNNEN KIEZEN</p> -->
+                <p>EXTRA: LCD DAG KUNNEN KIEZEN</p>
                 <button class="js-GoSleep c-sleep">Gaan slapen</button>
-                <input type="time" class="js-GoSleepInput">
+                <input type="time" class="js-GoSleepInput c-input">
                 <div class="c-scroll">
                     <div class="c-alarmen-list js-alarmen">
                         <!-- <a class="c-alarm c-alarm__on" href="detail.html?alarmid=x">
@@ -374,9 +372,9 @@
             <div class="close js-removeCreateAlarm">+</div>
             <p class="c-lead--lg"><label for="naam">Naam</label></p>
 
-            <input class="js-alarmnaam c-input__text" type="text" placeholder="Alarm" id="naam">
+            <input class="js-alarmnaam c-input" type="text" placeholder="Alarm" id="naam">
             <h3 class="c-lead--lg"><label for="Datetime">Tijdstip</label></h3>
-            <input class="js-alarm" required type="datetime-local"
+            <input class="js-alarm c-input" required type="datetime-local"
                 pattern="[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}" name="Datetime" id="Datetime">
             <br>
             <p class="c-lead--lg u-mb-sm">Actief </p>

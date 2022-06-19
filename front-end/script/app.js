@@ -26,6 +26,8 @@ const showAlarmen = function (jsonObject) {
     let herhaal = alarm.herhaal;
     if (herhaal != '') {
       herhaal = 'Iedere ' + herhaal.replaceAll(',', ' ');
+    } else {
+      herhaal = 'Wordt niet herhaalt';
     }
     herhaal = herhaal.replace('Monday', 'Maandag');
     herhaal = herhaal.replace('Tuesday', 'Dinsdag');
@@ -280,7 +282,7 @@ const drawChart = function (l, d) {
     ],
     labels: l,
     noData: {
-      text: 'Loading...',
+      text: 'Er is geen data aanwezig',
     },
     xaxis: {
       labels: {
@@ -437,6 +439,11 @@ const listenToSocket = function () {
     });
     socket.on('B2F_SlaapStatus', function (jsonObject) {
       Slapen = jsonObject.slapen;
+      if (Slapen == 1) {
+        document.querySelector('.js-GoSleep').innerHTML = 'Wakker Worden';
+      } else {
+        document.querySelector('.js-GoSleep').innerHTML = 'Gaan Slapen';
+      }
       console.log('Slapen binnen', Slapen);
     });
     socket.on('B2F_autoBrightness', function (jsonObject) {
@@ -515,13 +522,14 @@ const listenToCreateAlarm = function () {
       actief: document.querySelector('.js-actief').checked,
       herhaal: herhaling,
     });
+    document.querySelector('.js-alarm').classList.remove('c-input--empty');
     document.querySelector('.c-floatingButton').style.display = 'flex';
     document.querySelector('.c-createalarm').style.display = 'None';
-    console.log(payload);
     handleData(url, showResultAddAlarm, showError, 'POST', payload);
+  } else {
+    console.error('NOOB');
+    document.querySelector('.js-alarm').classList.add('c-input--empty');
   }
-  console.error('NOOB');
-  document.querySelector('.js-alarm').classList.add('c-input--empty');
 };
 const listenToChangeColor = function () {
   document.querySelector('.c-input__color').oninput = function () {

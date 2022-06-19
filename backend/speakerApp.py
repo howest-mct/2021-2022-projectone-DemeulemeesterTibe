@@ -31,10 +31,3 @@ def stop():
 
 
 app.run(debug=False, host='0.0.0.0', port=8888)
-
-
-# while True:
-#     print("L")
-#     pass
-# p.pause() 
-# vlc.libvlc_audio_set_volume(p, volume)  # volume 0..100
