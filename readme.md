@@ -13,23 +13,72 @@ In this project there are some sensors and actuators.
 
 ## Database
 
-Download the sql file in the folder [database-export](https://github.com/howest-mct/2021-2022-projectone-DemeulemeesterTibe/tree/master/database-export) and run the file in MySQL workbench
+To import the database onto your raspberry pi you firstly have to make a `ssh connection` using `TCP/IP` over `SSH` using `MYSQL Workbench`
+Then you have to fill in the correct values
+
+- SSH Hostname: (IP address)
+- SSH Username: (User of the Pi)
+- SSH Password: (Password of Pi)
+- MYSQL Hostname: 127.0.0.1
+- MySQL Server Port: 3306
+- Username: (User of the Pi)
+- Password: (Password of Pi)
+
+Download the sql file in the folder [database-export](https://github.com/howest-mct/2021-2022-projectone-DemeulemeesterTibe/tree/master/database-export) and run the file in the remote MySQL workbench session
 
 ## Backend
 
-Before you can run app.py you first have to download some libraries
+Before you can run app.py you first have to download some libraries and some packages
 This can be done using these commands
-Firstly we will install the NeoPixel libary using this command.
 
 ```
 pip install rpi_ws281x adafruit-circuitpython-neopixel
-pip3 install 'git+https://github.com/bytedisciple/HX711.git#egg=HX711&subdirectory=HX711_Python3'
+pip install 'git+https://github.com/bytedisciple/HX711.git#egg=HX711&subdirectory=HX711_Python3'
 pip install flask-cors
 pip install flask-socketio
 pip install mysql-connector-python
 pip install gevent
 pip install gevent-websocket
 ```
+
+Now that you have all the libraries and all the packages we will make sure that the code will automatically run on startup
+You can do that by following these steps:
+
+1. First we will create a file by running this command:
+
+   ```
+   nano mijnproject.service
+   ```
+
+2. Now that we have created a file and are in the editor you can copy this into the file:
+   ```
+    [Unit]
+    Description=ProjectOne Project
+    After=network.target
+    [Service]
+    ExecStart=/usr/bin/python3 -u /home/student/2021-2022-projectone-DemeulemeesterTibe/backend/app.py
+    WorkingDirectory=/home/student/2021-2022-projectone-DemeulemeesterTibe/backend
+    StandardOutput=inherit
+    StandardError=inherit
+    Restart=always
+    User=root
+    [Install]
+    WantedBy=multi-user.target
+   ```
+3. Now that you have copied the text into the file you can save the changes by pressing these shortcuts:
+   `Ctrl + X` then `Y` and `Enter`
+4. After that you have to copy the file to another path with this command:
+   ```
+    sudo cp mijnproject.service /etc/systemd/system/mijnproject.service
+   ```
+5. finally we will make sure that the service runs on bootup byy running this command:
+   ```
+   sudo systemctl enable mijnproject.service
+   ```
+6. (Optional) If you want to disable this service you can do that with this command:
+   ```
+   sudo systemctl disable mijnproject.service
+   ```
 
 ## Frontend
 
