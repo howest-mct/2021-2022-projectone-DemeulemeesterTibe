@@ -417,6 +417,7 @@ def getWeight():
             timergewicht = time.time()  
         else:
             diff = averagegewicht - reading
+            print("#",diff)
             if diff < -5000:
                 print(">",timer - timergewicht)
                 if timer - timergewicht >= 2:

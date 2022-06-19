@@ -553,10 +553,6 @@ a:focus {
         justify-content: space-around;
         align-items: center;
     }
-
-    .c-customization__item {
-        order: 0;
-    }
 }
 /*
     Component: Customization RGB
@@ -863,6 +859,9 @@ Component: vul in input
     color: #f2f2f2;
     background: rgb(222, 96, 97);
 }
+.c-input--empty::-webkit-calendar-picker-indicator {
+    color: white;
+} 
 /*
     Component: input color
     ---
@@ -1097,9 +1096,8 @@ Component: vul in input
     font-size: 0.75em;
 }
 /*
-    Component: mobile nav
+    Component: Pop up create alarm
     ---
-    Dedicated mobile nav component
 */
 .c-createalarm{
     z-index: 30;
@@ -1144,6 +1142,62 @@ Component: vul in input
 }
 @media (min-width: 992px) {
     .c-createalarm__content{
+        width: 450px;
+    }
+}
+/*
+    Component: mobile nav
+    ---
+    Dedicated mobile nav component
+*/
+.c-afsluiten {
+    z-index: 30;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.c-afsluiten__content {
+    width: 350px;
+    min-height: 325px;
+    background-color: #1f1d1f;
+    border-radius: 20px;
+    text-align: center;
+    padding: 20px;
+    position: relative;
+}
+
+.c-afsluiten__content--close {
+    top: 0;
+    right: 14px;
+    font-size: 42px;
+}
+
+.close {
+    position: absolute;
+    top: 0;
+    right: 14px;
+    font-size: 42px;
+    text-decoration: none;
+    cursor: pointer;
+    transform: rotate(45deg);
+}
+
+@media (min-width: 768px) {
+    .c-afsluiten__content {
+        width: 400px;
+    }
+}
+
+@media (min-width: 992px) {
+    .c-afsluiten__content {
         width: 450px;
     }
 }

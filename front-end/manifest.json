@@ -1,0 +1,13 @@
+{
+  "name": "SmartWakeUp",
+  "short_name": "SmartWakeUp",
+  "icons": [
+    {
+      "src": "SmartWakeUp-Google.png",
+      "sizes": "512x512"
+    }
+  ],
+  "theme_color": "#F2F2F7",
+  "background_color": "#F2F2F7",
+  "display": "standalone"
+}

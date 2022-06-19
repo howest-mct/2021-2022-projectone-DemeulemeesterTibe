@@ -393,11 +393,13 @@ const togglePopUP = function () {
     .addEventListener('click', function () {
       document.querySelector('.c-floatingButton').style.display = 'flex';
       document.querySelector('.c-createalarm').style.display = 'None';
+      document.querySelector('.js-alarm').classList.remove('c-input--empty');
     });
   document.onclick = function (event) {
     if (event.target == document.querySelector('.c-createalarm')) {
       document.querySelector('.c-createalarm').style.display = 'none';
       document.querySelector('.c-floatingButton').style.display = 'flex';
+      document.querySelector('.js-alarm').classList.remove('c-input--empty');
     }
   };
 };
