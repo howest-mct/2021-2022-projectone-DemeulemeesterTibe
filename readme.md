@@ -15,6 +15,22 @@ In this project there are some sensors and actuators.
 
 Download the sql file in the folder [database-export](https://github.com/howest-mct/2021-2022-projectone-DemeulemeesterTibe/tree/master/database-export) and run the file in MySQL workbench
 
+## Backend
+
+Before you can run app.py you first have to download some libraries
+This can be done using these commands
+Firstly we will install the NeoPixel libary using this command.
+
+```
+pip install rpi_ws281x adafruit-circuitpython-neopixel
+pip3 install 'git+https://github.com/bytedisciple/HX711.git#egg=HX711&subdirectory=HX711_Python3'
+pip install flask-cors
+pip install flask-socketio
+pip install mysql-connector-python
+pip install gevent
+pip install gevent-websocket
+```
+
 ## Frontend
 
 When you have copied the content of the Github Content you have to change the the html file of the apache server.
