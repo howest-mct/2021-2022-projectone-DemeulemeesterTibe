@@ -11,6 +11,17 @@ In this project there are some sensors and actuators.
 - RGB Ring
 - LCD Display
 
+## Connecting Visual Studio Code to Raspberry PI
+
+If you want to connect Visual Studio Code to your Raspberry Pi you first have to download [Remote - SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) extenstion in Vscode When you have installed this extension you can click on the `Remote Explorer` icon on the left side of your screen in Vscode. then click on the `+` and type this command
+
+```
+ssh <pi-user>@<ip-address of pi> -A
+```
+
+Now you have created a ssh connection to your raspberry pi you first have to install the [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) extension
+After you have installed the python extension you can click on the green button `code` on this github page and **copy** the github url. Then go to Vscode and click on Source control and paste the github url then you have cloned the github repository
+
 ## Database
 
 To import the database onto your raspberry pi you firstly have to make a `ssh connection` using `TCP/IP` over `SSH` using `MYSQL Workbench`
