@@ -871,12 +871,12 @@ Component: vul in input
 ---
 */
 .c-input--empty {
-    color-scheme: dark;
+    /* color-scheme: dark; */
     color: #f2f2f2;
     background: rgb(222, 96, 97);
 }
 .c-input--empty::-webkit-calendar-picker-indicator {
-    color: white;
+    filter: invert(1);
 } 
 /*
     Component: input color

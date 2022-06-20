@@ -96,7 +96,7 @@
                     <ul class="o-list c-nav__list">
                         <li class="c-nav__item "><a href="index.html" class="c-nav__link">Overzicht</a>
                         </li>
-                        <li class="c-nav__item is-selected"><a href="historiek.html" class="c-nav__link">Historiek</a>
+                        <li class="c-nav__item is-selected"><a href="grafieken.html" class="c-nav__link">Grafieken</a>
                         </li>
                         <!-- <li class="c-nav__item"><a href="#!" class="c-nav__link">Publications</a></li> -->
                     </ul>
@@ -120,7 +120,6 @@
         <section class="o-row o-row--lg o-section--xxl">
             <div class="o-container center">
                 <h1>Grafieken</h1>
-                <button class="js-slaap c-sleep">Slaap</button>
                 <!-- <button class="js-historiek">Historiek</button> -->
                 <select class="js-selectHistoriekFilter c-keuzelijst">
                     <option value="1" selected>Week</option>
@@ -262,7 +261,7 @@
                 <nav class="c-nav">
                     <ul class="o-list c-nav__list">
                         <li class="c-nav__item"><a href="index.html" class="c-nav__link">Overzicht</a></li>
-                        <li class="c-nav__item"><a href="historiek.html" class="c-nav__link">Historiek</a></li>
+                        <li class="c-nav__item"><a href="grafieken.html" class="c-nav__link">Grafieken</a></li>
                         <li class="c-nav__item">
                             <p class="c-leadBold c-shutdown_text js-shutdown">Afsluiten</p>
                         </li>
@@ -275,8 +274,10 @@
         <div class="c-afsluiten__content">
             <div class="close js-removeAflsuitenalarm">+</div>
             <p class="js-shutdowntext c-lead--lg">Weet je zeker?</p>
-            <button class="js-shutdownCancel c-shutdown"> Nee</button>
-            <button class="js-shutdownConfirm c-confirm"> Ja</button>
+            <div class="o-layout o-layout--justify-space-evenly">
+                <button class="js-shutdownCancel c-shutdown"> Nee</button>
+                <button class="js-shutdownConfirm c-confirm"> Ja</button>
+            </div>
         </div>
     </div>
 </body>

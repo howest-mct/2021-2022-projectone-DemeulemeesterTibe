@@ -45,7 +45,6 @@ class lcdClass:
 
     def write_message(self, text):
         for char in text:
-            self.teller += 1
             self.send_character(ord(char))
             # if(self.teller == 16):
             #     if(self.rij == 1):

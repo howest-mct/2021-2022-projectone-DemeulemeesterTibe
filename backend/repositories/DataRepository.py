@@ -88,7 +88,7 @@ class DataRepository:
     @staticmethod
     def read_slaap_1maand():
         # sql = "SELECT *,concat(day(eindtijd),'-',month(eindtijd),'-',year(eindtijd)) as datum,concat(LPad(TIMESTAMPDIFF(hour,starttijd,eindtijd), 2, 0), '.', LPad(MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60), 2, 0))as 'hoursMin' FROM smartwekker.slaap WHERE eindtijd between date_sub(now(),interval 1 month) and now() ORDER BY STARTTIJD;"
-        sql = "SELECT floor(avg(timestampdiff(hour,starttijd,eindtijd))) as 'avgUur',floor(avg(LPad(MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60), 2, 0))) as 'avgmin',concat(month(eindtijd),'-',year(eindtijd)) as datum FROM smartwekker.slaap WHERE month(eindtijd) = month(now()) GROUP BY week(eindtijd);"
+        sql = "SELECT floor(avg(timestampdiff(hour,starttijd,eindtijd))) as 'avgUur',floor(avg(LPad(MOD(TIMESTAMPDIFF(minute,starttijd,eindtijd),60), 2, 0))) as 'avgmin',concat(day(eindtijd),'-',month(eindtijd),'-',year(eindtijd)) as datum FROM smartwekker.slaap WHERE month(eindtijd) = month(now()) GROUP BY week(eindtijd);"
         return Database.get_rows(sql)
     @staticmethod
     def read_slaap_wekker_diff():
