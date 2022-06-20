@@ -494,6 +494,9 @@ const togglePopUP = function () {
       document.querySelector('.c-createalarm').style.display = 'none';
       document.querySelector('.c-floatingButton').style.display = 'flex';
       document.querySelector('.js-alarm').classList.remove('c-input--empty');
+    } else if (event.target == document.querySelector('.c-afsluiten')) {
+      document.querySelector('.c-afsluiten').style.display = 'none';
+      document.querySelector('.c-floatingButton').style.display = 'flex';
     }
   };
 };
@@ -744,9 +747,28 @@ const ListenToShutdown = function () {
   for (const button of buttons) {
     button.addEventListener('click', function () {
       console.log('shutdown');
-      socket.emit('F2B_Shutdown');
+      document.querySelector('.c-afsluiten').style.display = 'flex';
+      document.querySelector('.c-floatingButton').style.display = 'none';
     });
   }
+  document
+    .querySelector('.js-removeAflsuitenalarm')
+    .addEventListener('click', function () {
+      document.querySelector('.c-afsluiten').style.display = 'none';
+      document.querySelector('.c-floatingButton').style.display = 'flex';
+    });
+  document
+    .querySelector('.js-shutdownCancel')
+    .addEventListener('click', function () {
+      document.querySelector('.c-afsluiten').style.display = 'none';
+      document.querySelector('.c-floatingButton').style.display = 'flex';
+    });
+  document
+    .querySelector('.js-shutdownConfirm')
+    .addEventListener('click', function () {
+      document.querySelector('.js-shutdowntext').innerHTML = 'Afsluiten';
+      socket.emit('F2B_Shutdown');
+    });
 };
 //#endregion
 

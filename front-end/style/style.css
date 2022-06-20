@@ -623,6 +623,22 @@ a:focus {
 .c-sleep:hover{
     background-color: #6061de;
 }
+.c-confirm{
+    width: 50px;
+    background-color: #1b191a;
+    font-size: 1.25em;
+    cursor: pointer;
+    color: white;
+    text-decoration: none;
+    border: 2px solid #61DE60;
+    border-radius: 15px;
+    padding: 4px 4px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    transition: background-color 0.25s ease-in-out;
+}
+.c-confirm:hover{
+    background-color: #61DE60;
+}
 
 /*
     Component: input color
@@ -1159,19 +1175,22 @@ Component: vul in input
     top: 0;
     right: 0;
     left: 0;
+    /* display: flex; */
     display: none;
     align-items: center;
     justify-content: center;
+transform: translateX(0);
 }
 
 .c-afsluiten__content {
-    width: 350px;
-    min-height: 325px;
+    width: 300px;
+    min-height: 150px;
     background-color: #1f1d1f;
     border-radius: 20px;
     text-align: center;
     padding: 20px;
     position: relative;
+    
 }
 
 .c-afsluiten__content--close {
@@ -1192,13 +1211,13 @@ Component: vul in input
 
 @media (min-width: 768px) {
     .c-afsluiten__content {
-        width: 400px;
+        width: 325px;
     }
 }
 
 @media (min-width: 992px) {
     .c-afsluiten__content {
-        width: 450px;
+        width: 350px;
     }
 }
 /*
@@ -1207,8 +1226,8 @@ Component: vul in input
     Dedicated mobile nav component
 */
 .c-page {
-    transform: translateX(0);
-    transition: transform .25s ease;
+    /* transform: translateX(0);
+    transition: transform .25s ease; */
 
 }
 
@@ -1225,9 +1244,8 @@ Component: vul in input
 }
 
 .has-mobile-nav .c-page {
-    transform: translateX(25%);
+    /* transform: translateX(25%); */
 }
-
 .has-mobile-nav .c-mobile-nav {
     pointer-events: auto;
     transform: translateX(0);
