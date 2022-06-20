@@ -26,6 +26,8 @@ Then you have to fill in the correct values
 
 Download the sql file in the folder [database-export](https://github.com/howest-mct/2021-2022-projectone-DemeulemeesterTibe/tree/master/database-export) and run the file in the remote MySQL workbench session
 
+The next thing you have to do is change **config_template.py** change the `User` to your pi user then change `password` to your pi password
+
 ## RaspberryPi Settings
 
 If you want to use this code you're going to need to enable some busses. You can do that with these steps:
