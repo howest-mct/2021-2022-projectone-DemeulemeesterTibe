@@ -138,7 +138,7 @@ const ShowSlaapGrafiek = function (jsonObject) {
     } else if (val == 4) {
       chart.updateOptions({
         title: {
-          text: 'Hoelang duurt het om de wekker uit te zetten',
+          text: 'Duur van wekker uit te zetten',
         },
         tooltip: {
           custom: function (opt) {

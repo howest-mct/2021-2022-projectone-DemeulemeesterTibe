@@ -130,10 +130,12 @@ def Shutdown_knop(pin):
     print("Shutdown")
     lcd.reset_lcd()
     pixels.deinit()
+    lcd.write_message("Afsluiten")
     time.sleep(2)
-    check_output(["sudo","shutdown","-h","now"])
     # os.system("sudo poweroff -h now")
     # sys.exit()
+    lcd.reset_lcd()
+    check_output(["sudo","shutdown","-h","now"])
 
 def lees_knop(pin):
     global lcdStatus,tijd,vorips,alarmopScherm
