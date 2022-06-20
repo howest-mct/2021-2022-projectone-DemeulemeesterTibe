@@ -708,6 +708,7 @@ def setSlaap(payload):
         eindTijdSlapen = datetime.now().replace(microsecond=0)
         rgbStilletjesAan = True
         print(eindTijdSlapen)
+        tekstOpLcd("Goeiemorgen")
         timeChecker(beginTijdSlapen,eindTijdSlapen)
     # print(GaanSlapen)
     socketio.emit("B2F_SlaapStatus",{"slapen": GaanSlapen},broadcast=True)
