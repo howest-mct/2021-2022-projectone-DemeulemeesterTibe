@@ -488,6 +488,9 @@ const togglePopUP = function () {
       document.querySelector('.c-floatingButton').style.display = 'flex';
       document.querySelector('.c-createalarm').style.display = 'None';
       document.querySelector('.js-alarm').classList.remove('c-input--empty');
+      document
+        .querySelector('.js-alarmnaam')
+        .classList.remove('c-input--empty');
     });
 };
 const listenToSocket = function () {
@@ -588,7 +591,6 @@ const listenToUI = function () {
       .querySelector('.js-updatealarm')
       .addEventListener('click', listenToUpdateAlarm);
   } else if (document.querySelector('.js-content')) {
-    document.querySelector('.js-slaap').addEventListener('click', getSlaapData);
     document
       .querySelector('.js-selectHistoriekFilter')
       .addEventListener('change', ListenToChangeFilter);
@@ -596,29 +598,39 @@ const listenToUI = function () {
 };
 const listenToCreateAlarm = function () {
   let t = document.querySelector('.js-alarm').value;
-  if (t) {
-    t = t.replace('T', ' ');
-    const url = `http://${lanIP}/api/alarm/`;
-    let naam = '';
-    if (document.querySelector('.js-alarmnaam').value == '') {
-      naam = 'Alarm';
-    } else {
-      naam = document.querySelector('.js-alarmnaam').value;
-    }
-    const herhaling = herhaalDagen();
-    const payload = JSON.stringify({
-      naam: naam,
-      tijd: t,
-      actief: document.querySelector('.js-actief').checked,
-      herhaal: herhaling,
-    });
-    document.querySelector('.js-alarm').classList.remove('c-input--empty');
-    document.querySelector('.c-floatingButton').style.display = 'flex';
-    document.querySelector('.c-createalarm').style.display = 'None';
-    handleData(url, showResultAddAlarm, showError, 'POST', payload);
+  let naam = '';
+  if (document.querySelector('.js-alarmnaam').value == '') {
+    naam = 'Alarm';
   } else {
-    console.error('NOOB');
-    document.querySelector('.js-alarm').classList.add('c-input--empty');
+    naam = document.querySelector('.js-alarmnaam').value;
+  }
+  if (naam.length > 36) {
+    console.error('NAAAM te lang');
+    document.querySelector('.js-alarmnaam').classList.add('c-input--empty');
+    if (!t) {
+      document.querySelector('.js-alarm').classList.add('c-input--empty');
+    } else {
+      document.querySelector('.js-alarm').classList.remove('c-input--empty');
+    }
+  } else {
+    document.querySelector('.js-alarmnaam').classList.remove('c-input--empty');
+    if (t) {
+      t = t.replace('T', ' ');
+      const url = `http://${lanIP}/api/alarm/`;
+      const herhaling = herhaalDagen();
+      const payload = JSON.stringify({
+        naam: naam,
+        tijd: t,
+        actief: document.querySelector('.js-actief').checked,
+        herhaal: herhaling,
+      });
+      document.querySelector('.js-alarm').classList.remove('c-input--empty');
+      document.querySelector('.c-floatingButton').style.display = 'flex';
+      document.querySelector('.c-createalarm').style.display = 'None';
+      handleData(url, showResultAddAlarm, showError, 'POST', payload);
+    } else {
+      document.querySelector('.js-alarm').classList.add('c-input--empty');
+    }
   }
 };
 const listenToChangeColor = function () {
@@ -665,16 +677,33 @@ const listenToUpdateAlarm = function () {
   let id = document.querySelector('.js-alarmid').value;
   let naam = document.querySelector('.js-naam').value;
   let tijdstip = document.querySelector('.js-tijdstip').value;
-  tijdstip = tijdstip.replace(' ', 'T');
-  const herhaling = herhaalDagen();
-  socket.emit('F2B_UpdateAlarm', {
-    alarmid: id,
-    naam: naam,
-    tijdstip: tijdstip,
-    actief: document.querySelector('.js-actief').checked,
-    herhaal: herhaling,
-  });
-  window.location.href = 'index.html';
+  if (naam == '') {
+    naam = 'Alarm';
+  }
+  if (naam.length > 36) {
+    document.querySelector('.js-naam').classList.add('c-input--empty');
+    if (!tijdstip) {
+      document.querySelector('.js-tijdstip').classList.add('c-input--empty');
+    } else {
+      document.querySelector('.js-tijdstip').classList.remove('c-input--empty');
+    }
+  } else {
+    document.querySelector('.js-naam').classList.remove('c-input--empty');
+    if (tijdstip) {
+      tijdstip = tijdstip.replace(' ', 'T');
+      const herhaling = herhaalDagen();
+      socket.emit('F2B_UpdateAlarm', {
+        alarmid: id,
+        naam: naam,
+        tijdstip: tijdstip,
+        actief: document.querySelector('.js-actief').checked,
+        herhaal: herhaling,
+      });
+      window.location.href = 'index.html';
+    } else {
+      document.querySelector('.js-tijdstip').classList.add('c-input--empty');
+    }
+  }
 };
 const ListenToGoSleep = function () {
   let time;
@@ -767,6 +796,9 @@ const removePopUP = function () {
       document.querySelector('.c-createalarm').style.display = 'none';
       document.querySelector('.c-floatingButton').style.display = 'flex';
       document.querySelector('.js-alarm').classList.remove('c-input--empty');
+      document
+        .querySelector('.js-alarmnaam')
+        .classList.remove('c-input--empty');
     } else if (event.target == document.querySelector('.c-afsluiten')) {
       document.querySelector('.c-afsluiten').style.display = 'none';
       document.querySelector('.c-floatingButton').style.display = 'flex';

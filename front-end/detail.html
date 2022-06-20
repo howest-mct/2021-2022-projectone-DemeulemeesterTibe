@@ -95,7 +95,7 @@
                     <ul class="o-list c-nav__list">
                         <li class="c-nav__item is-selected"><a href="index.html" class="c-nav__link">Overzicht</a>
                         </li>
-                        <li class="c-nav__item"><a href="historiek.html" class="c-nav__link">Historiek</a>
+                        <li class="c-nav__item"><a href="grafieken.html" class="c-nav__link">Grafieken</a>
                         </li>
                         <!-- <li class="c-nav__item"><a href="#!" class="c-nav__link">Publications</a></li> -->
                     </ul>
@@ -122,7 +122,7 @@
                     <h3>Alarmid</h3>
                     <input type="text" class="js-alarmid c-input" readonly>
                     <h3>Naam</h3>
-                    <input type="text" maxlength="45" class="js-naam c-input">
+                    <input type="text" maxlength="36" class="js-naam c-input">
                     <h3>Tijdstip</h3>
                     <input type="datetime-local" name="" class="js-tijdstip c-input">
                     <br>
@@ -283,7 +283,7 @@
                 <nav class="c-nav">
                     <ul class="o-list c-nav__list">
                         <li class="c-nav__item"><a href="index.html" class="c-nav__link">Overzicht</a></li>
-                        <li class="c-nav__item"><a href="historiek.html" class="c-nav__link">Historiek</a></li>
+                        <li class="c-nav__item"><a href="grafieken.html" class="c-nav__link">Grafieken</a></li>
                         <li class="c-nav__item">
                             <p class="c-leadBold c-shutdown_text js-shutdown">Afsluiten</p>
                         </li>
@@ -296,8 +296,10 @@
         <div class="c-afsluiten__content">
             <div class="close js-removeAflsuitenalarm">+</div>
             <p class="js-shutdowntext c-lead--lg">Weet je zeker?</p>
-            <button class="js-shutdownCancel c-shutdown"> Nee</button>
-            <button class="js-shutdownConfirm c-confirm"> Ja</button>
+            <div class="o-layout o-layout--justify-space-evenly">
+                <button class="js-shutdownCancel c-shutdown"> Nee</button>
+                <button class="js-shutdownConfirm c-confirm"> Ja</button>
+            </div>
         </div>
     </div>
 </body>
