@@ -132,7 +132,7 @@ const ShowSlaapGrafiek = function (jsonObject) {
     } else if (val == 3) {
       chart.updateOptions({
         title: {
-          text: 'Overzicht van hoelang je slaapt',
+          text: 'Jaar overzicht van hoelang je slaapt',
         },
       });
     } else if (val == 4) {
@@ -532,6 +532,7 @@ const listenToSocket = function () {
         document.querySelector('.js-GoSleep').innerHTML = 'Wakker Worden';
       } else {
         document.querySelector('.js-GoSleep').innerHTML = 'Gaan Slapen';
+        document.querySelector('.js-GoSleepInput').value = '';
       }
       console.log('Slapen binnen', Slapen);
     });
