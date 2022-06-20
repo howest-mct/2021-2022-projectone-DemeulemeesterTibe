@@ -489,16 +489,6 @@ const togglePopUP = function () {
       document.querySelector('.c-createalarm').style.display = 'None';
       document.querySelector('.js-alarm').classList.remove('c-input--empty');
     });
-  document.onclick = function (event) {
-    if (event.target == document.querySelector('.c-createalarm')) {
-      document.querySelector('.c-createalarm').style.display = 'none';
-      document.querySelector('.c-floatingButton').style.display = 'flex';
-      document.querySelector('.js-alarm').classList.remove('c-input--empty');
-    } else if (event.target == document.querySelector('.c-afsluiten')) {
-      document.querySelector('.c-afsluiten').style.display = 'none';
-      document.querySelector('.c-floatingButton').style.display = 'flex';
-    }
-  };
 };
 const listenToSocket = function () {
   if (document.querySelector('.js-alarmen')) {
@@ -770,12 +760,25 @@ const ListenToShutdown = function () {
       socket.emit('F2B_Shutdown');
     });
 };
+const removePopUP = function () {
+  document.onclick = function (event) {
+    if (event.target == document.querySelector('.c-createalarm')) {
+      document.querySelector('.c-createalarm').style.display = 'none';
+      document.querySelector('.c-floatingButton').style.display = 'flex';
+      document.querySelector('.js-alarm').classList.remove('c-input--empty');
+    } else if (event.target == document.querySelector('.c-afsluiten')) {
+      document.querySelector('.c-afsluiten').style.display = 'none';
+      document.querySelector('.c-floatingButton').style.display = 'flex';
+    }
+  };
+};
 //#endregion
 
 //#region ***  Init / DOMContentLoaded                  ***********
 const init = function () {
   toggleNav();
   ListenToShutdown();
+  removePopUP();
   if (document.querySelector('.js-alarmen')) {
     document.querySelector('.c-input__color').style.backgroundColor =
       document.querySelector('.c-input__color').value;
