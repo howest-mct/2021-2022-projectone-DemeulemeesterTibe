@@ -97,7 +97,9 @@ lcd = lcdClass(rs,e,None,True)
 pixels = neopixel.NeoPixel(board.D18,12)
 pixels.brightness = 0.5
 hx = HX711(dtWeight,clkWeight)
-
+lcd.write_message("Opstarten")
+time.sleep(10)
+lcd.reset_lcd()
 # Code voor Hardware
 def setup_gpio():
     global buzzer

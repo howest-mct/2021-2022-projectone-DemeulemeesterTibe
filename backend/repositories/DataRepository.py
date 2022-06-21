@@ -24,7 +24,7 @@ class DataRepository:
     
     @staticmethod
     def read_alarmen():
-        sql = "SELECT *,dayname(tijd) as dag,concat(time(tijd)) as tijdstip,concat(date(tijd)) as date FROM alarm"
+        sql = "SELECT *,dayname(tijd) as dag,concat(time(tijd)) as tijdstip,concat(date(tijd)) as date FROM alarm ORDER BY tijd "
         return Database.get_rows(sql)
     
     @staticmethod

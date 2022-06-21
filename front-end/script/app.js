@@ -10,6 +10,7 @@ let brightnessbool = false;
 let colorbool = false;
 let chart;
 let chartActive = false;
+let grafiek = 0;
 //#endregion
 
 //#region ***  Callback-Visualisation - show___         ***********
@@ -70,7 +71,7 @@ const showAlarm = function (jsonObject) {
   document.querySelector('.js-actief').checked = jsonObject.alarm.actief;
 };
 const ShowSlaapGrafiek = function (jsonObject) {
-  console.log('sdfqlgijuhfqsdlukghsdfquhildfqsuyiqsdfyuiodfqs', jsonObject);
+  console.log(jsonObject);
   let converted_labels = [];
   let converted_data = [];
   for (let s of jsonObject.slaap) {
@@ -563,7 +564,15 @@ const listenToSocket = function () {
     console.log('dfqsfd');
     socket.on('B2F_NewSleepData', function () {
       console.log('binnen');
-      ListenToChangeFilter();
+      if (grafiek == 1) {
+        getSlaapDataWeek();
+      } else if (grafiek == 2) {
+        getSlaapDataMaand();
+      } else if (grafiek == 3) {
+        getSlaapData();
+      } else if (grafiek == 4) {
+        getWekkerDiffData();
+      }
     });
   }
 };
@@ -750,16 +759,20 @@ const ListenToChangeFilter = function () {
   console.log(value);
   if (value == 1) {
     console.log('week');
+    grafiek = 1;
     getSlaapDataWeek();
   } else if (value == 2) {
     console.log('maand');
+    grafiek = 2;
     getSlaapDataMaand();
   } else if (value == 3) {
     console.log('alles');
     getSlaapData();
+    grafiek = 3;
   } else if (value == 4) {
     console.log('hoelang');
     getWekkerDiffData();
+    grafiek = 4;
   }
 };
 const ListenToShutdown = function () {
