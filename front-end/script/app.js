@@ -10,7 +10,7 @@ let brightnessbool = false;
 let colorbool = false;
 let chart;
 let chartActive = false;
-let grafiek = 0;
+let grafiek = 1;
 //#endregion
 
 //#region ***  Callback-Visualisation - show___         ***********
@@ -563,14 +563,18 @@ const listenToSocket = function () {
   } else if (document.querySelector('.js-slaap')) {
     console.log('dfqsfd');
     socket.on('B2F_NewSleepData', function () {
-      console.log('binnen');
+      console.log('grafiek', grafiek);
       if (grafiek == 1) {
         getSlaapDataWeek();
+        console.log('Week');
       } else if (grafiek == 2) {
+        console.log('maand');
         getSlaapDataMaand();
       } else if (grafiek == 3) {
+        console.log('alles');
         getSlaapData();
       } else if (grafiek == 4) {
+        console.log('diff');
         getWekkerDiffData();
       }
     });

@@ -251,7 +251,7 @@ def codeSchakeling():
                 pixels.fill((Red,Green,Blue))
                 timerRGB = time.time()
                 pixels.brightness += 0.025
-                print(pixels.brightness)
+                # print(pixels.brightness)
                 if pixels.brightness == 1:
                     rgbStilletjesAan = False
                     d = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),round(pixels.brightness,2),None,4,5)
@@ -268,7 +268,7 @@ def codeSchakeling():
                         socketio.emit("B2F_Ringstatus",{"ring": ring})
                         id = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),None,None,4,4)
                     else:
-                        print("#",pixels.brightness)
+                        # print("#",pixels.brightness)
                         pixels.brightness = pixels.brightness - 0.05
                         socketio.emit("B2F_SetBrightness",{"brightness": pixels.brightness},broadcast=True)
                         d = DataRepository.insert_historiek(time.strftime('%Y-%m-%d %H:%M:%S'),round(pixels.brightness,2),None,4,5)
@@ -512,6 +512,7 @@ def timeChecker(begin,einde,effectief=None):
         print("New sleepdata id:",dat)
     else:
         print("---- Geen Slaap data ----")
+        socketio.emit("B2F_NewSleepData",broadcast=True)
     print("Difference",verschil.total_seconds())
 
 def tekstOpLcd(tekst):
